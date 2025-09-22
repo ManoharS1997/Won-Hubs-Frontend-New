@@ -218,7 +218,6 @@ export default function PreviewModal({
           </div>
         </form>
 
-        {/* Tabs Overview */}
         <div className="mt-10">
           <h3 className="text-xl font-semibold text-indigo-700 mb-5">Tabs</h3>
           <div className="flex flex-wrap gap-6 mb-8">
