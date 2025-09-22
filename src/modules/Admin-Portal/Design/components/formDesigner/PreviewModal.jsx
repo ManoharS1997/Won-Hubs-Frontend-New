@@ -176,9 +176,8 @@ export default function PreviewModal({
       });
 
       if (!res.ok) throw new Error("Failed to save form");
-      const data = await res.json();
+      await res.json();
       alert("Form saved successfully!");
-      console.log("Saved:", data);
     } catch (err) {
       alert("Error saving form");
     } finally {
