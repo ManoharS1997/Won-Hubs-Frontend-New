@@ -1,0 +1,41 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+
+.context-menu {
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 10px 19px 20px rgba(0, 0, 0, 10%);
+  position: absolute;
+  z-index: 10;
+  
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px 10px;
+  row-gap: 10px;
+  border-radius: 10px;
+}
+
+.context-menu button {
+  border: none;
+  display: flex;
+  align-items: center;
+  padding: 0.6em 1em;
+  text-align: left;
+  width: 120px;
+  height: fit-content;
+  background-color: #000;
+  color: #fff;
+  
+  border-radius: 50px;
+  column-gap: 15px;
+}
+
+.context-menu button:hover {
+  background: #313ab4;
+}
