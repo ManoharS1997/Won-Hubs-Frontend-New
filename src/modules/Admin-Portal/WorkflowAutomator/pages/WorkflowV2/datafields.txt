@@ -1,0 +1,109 @@
+const tableConditions = [
+    'is', 'is not', 'is anything', 'is one of', 'starts with', 'ends with', 'contains', 'does not contain', 'is empty', 'is not empty', 'is epmty string',
+    'is same as', 'is different from', 'between', 'greater than or is', 'less than or is', 'are', 'greater than', 'less than', 'is', 'is not', 'is a', 
+    'is anything', 'is', 'is not', 'is empty', ]
+    is not empty
+    starts with
+    ends with 
+    conatins 
+    does not contain
+    is anything
+    is same as 
+    is different from 
+    is empty string 
+    is same as 
+    is different from 
+    greater than field
+    less than field
+    greater than or is field 
+    less than or is field 
+    on 
+    not on 
+    before
+    at or before 
+    after 
+    at or after 
+    between 
+    trend
+    relative
+    is empty 
+    is not empty 
+    is anything 
+    is same 
+    is different 
+    is more than 
+    is less than 
+    is not empty 
+    starts with 
+    ends with
+    contains 
+    does not contain 
+    is anything 
+    is same as 
+    is different from 
+    is empty string 
+    is 
+    is not 
+    is one of 
+    is not one of 
+    contains 
+    starts with 
+    ends with 
+    does not contain
+    is anything 
+    is same as 
+    is different from 
+    have 
+    does not have 
+    excluding 
+    is 
+    is not
+    is anything 
+    is one of 
+    starts with 
+    ends with 
+    contains 
+    does not contain 
+    is empty 
+    is not empty 
+    is empty string 
+    is same as 
+    is different from 
+    between 
+    greater than or is 
+    less than or is 
+    on not on 
+    before 
+    at or before 
+    after 
+    at or after 
+    between
+    trend 
+    relative 
+    is empty 
+    is not empty 
+    is anything 
+    is same 
+    is different 
+    is more than 
+    is less than 
+    is 
+    is not 
+    is anything 
+    is empty 
+    is not empty 
+    less than 
+    greater than 
+    less than or is 
+    greater than or is 
+    between 
+    is same as 
+    is different from 
+    greater than field 
+    less than field 
+    greater than or is field 
+    less than or is field
+]
+
+
+
