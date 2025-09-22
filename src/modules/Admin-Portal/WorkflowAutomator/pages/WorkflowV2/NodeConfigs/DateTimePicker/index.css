@@ -1,0 +1,72 @@
+.custom-body {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.custom-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  width: 100%;
+}
+
+.custom-footer label {
+  margin-right: auto;
+}
+
+.custom-footer .close-button {
+  background-color: #ff6961;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.custom-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.custom-header .nav-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  margin: 0 10px;
+}
+
+.custom-header .year-select,
+.custom-header .month-select {
+  padding: 5px;
+  margin: 0 10px;
+  font-size: 14px;
+}
+
+.main-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.open-picker-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.react-datepicker {
+  height: fit-content;
+}
+
+.react-datepicker-wrapper {
+  height: fit-content;
+}
+
+.react-datepicker__month-container {
+  float: none;
+}
