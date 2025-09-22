@@ -1,4 +1,3 @@
-// i18n/T.jsx
 import { useEffect, useState } from 'react';
 
 export default function T({ children, to = 'fr' }) {
