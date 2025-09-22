@@ -101,6 +101,12 @@ export default function FormDesignerPage() {
           <SourceForm
             formFields={[
               {
+                type: "radio",
+                label: "Radio",
+                options: ["Option A", "Option B"],
+                name: "Radio-4",
+              },
+              {
                 type: "text",
                 label: "Text",
                 name: "Text-0",
@@ -119,12 +125,6 @@ export default function FormDesignerPage() {
                 type: "date",
                 label: "Date",
                 name: "Date-3",
-              },
-              {
-                type: "radio",
-                label: "Radio",
-                options: ["Option A", "Option B"],
-                name: "Radio-4",
               },
               {
                 type: "checkbox",
