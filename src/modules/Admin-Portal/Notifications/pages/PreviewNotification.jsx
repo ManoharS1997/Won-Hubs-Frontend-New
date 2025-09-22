@@ -19,8 +19,6 @@ import imageExtensions from 'image-extensions'
 import { css } from '@emotion/css'
 
 import { withHistory } from 'slate-history'
-
-//ICON IMPORTS
 import { IoChevronBackSharp } from "react-icons/io5";
 import { Button, Icon, } from '../CreateNotification/components'
 
