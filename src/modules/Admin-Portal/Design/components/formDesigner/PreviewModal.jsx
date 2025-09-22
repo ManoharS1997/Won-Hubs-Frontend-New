@@ -197,7 +197,6 @@ export default function PreviewModal({
           ×
         </button>
 
-        {/* Title */}
         <h2 className="text-2xl font-bold text-indigo-700 mb-6 border-b pb-3">
           Preview: {module}
         </h2>
