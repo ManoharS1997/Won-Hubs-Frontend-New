@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { Link, useParams ,useLocation} from 'react-router-dom'
+import { Link, useParams, useLocation } from 'react-router-dom'
 
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
@@ -19,7 +19,7 @@ import { css } from '@emotion/css'
 import { Button, Icon, Toolbar } from '../CreateNotification/components'
 import { useNavigate } from 'react-router-dom'
 
-import WonContext from '../../../../context/WonContext'
+// import WonContext from '../../../../context/WonContext'
 import PreviewNotification from './PreviewNotification'
 
 import { IoMdAdd } from "react-icons/io";
@@ -42,6 +42,7 @@ import {
   FieldContainer, FieldsContainer, FieldsList, MainContainer,
   SidebarContainer, TextAreaTag, ToolBarContainer
 } from '../CreateNotification/StyledComponents';
+
 
 const fieldsList = [
   { fieldName: 'Address', isAdded: false, value: 'India  -6-284-1, Uma Shankar Nagar, Revenue Ward -17 , YSR Tadigadapa, 520007.' },
@@ -130,12 +131,13 @@ const initialValue = [
   },
 ]
 
-const CreateNotification = () => {
+const CreateNotification = ({ recordId }) => {
+  console.log(recordId, "hereee RecordId")
   const navigate = useNavigate();
-  const notificationItem=JSON.parse(localStorage.getItem("notificationData"));
-
-  console.log(notificationItem,"State here ..,")
+  const item = JSON.parse(localStorage.getItem("notificationData"));
+  // console.log(notificationItem,"State here ..,")
   // const [notificationContent, setNotificationContent] = useState([])
+  const[notificationItem,setNotificationItem]=useState(item||[])
   const [notificationContent, setNotificationContent] = useState(() => initialValue)
   const [notificationData, setNotificationData] = useState([])
   const [fieldsListData, setFieldsListdata] = useState(fieldsList)
@@ -148,25 +150,72 @@ const CreateNotification = () => {
     () => withImages(withHistory(withReact(createEditor()))),
     []
   )
+
   const { id } = useParams()
+  console.log(id, "From useParams")
+  const [suggestion, setSuggestion] = useState("")
+
+  const fetchAISuggestion = async (text) => {
+    console.log("triggering to accept oprn It")
+    try {
+      if (!text || text.trim().length < 5) {
+        setSuggestion("");
+        return;
+      }
+      const payload = {
+        text,
+      }
+      // console.log("Trigger")
+      const url = "http://localhost:3001/suggestion"
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${Cookies.get("accessToken")}`,
+        },
+        body: JSON.stringify(payload),
+      };
+      const response = await fetch(url, options)
+      console.log(response, "response Here")
+      setSuggestion(response.choices[0].message.content?.trim() || "");
+    } catch (error) {
+      console.error("AI Suggestion Error:", error);
+      setSuggestion("");
+    }
+  };
 
   useEffect(() => {
+    if (recordId) {
+      getNotificationData()
+    }
     if (id && id !== 'new') {
       getNotificationData()
     }
   }, [])
 
   const getNotificationData = async () => {
-    const url = `${import.meta.env.VITE_HOSTED_API_URL}/notification/${id}`
+    const url = `${import.meta.env.VITE_HOSTED_API_URL}/notification/${recordId}`
     const options = {
       method: 'GET',
     }
 
     const response = await fetch(url, options)
+    // console.log(response, "response")
     const data = await response.json()
-    const parsedData = JSON.parse(data.record.content)
-    setNotificationContent(parsedData)
-    setNotificationData(data.record)
+    console.log(data,"data here")
+    const parsedData = data.record.email_body
+      ? JSON.parse(data.record.email_body)
+      : [];
+
+    setNotificationContent(parsedData); // this will go into <Slate initialValue={notificationContent}>
+    setNotificationData(data.record);
+    setNotificationItem({
+      name:{value:data.record?.name},
+      to:{value:data.record?.to_address},
+      type:{value:data.record?.type},
+      subject:{value:data.record?.subject},
+      cc:{value:data.record?.cc},
+    })
   }
   const onBack = () => {
     navigate(-1)
@@ -184,10 +233,35 @@ const CreateNotification = () => {
     outline: 'none',
   }
 
-  const saveContent = async (e) => {
-    console.log(e,"Slate values here..,")
-    setNotificationContent(e)
-  }
+  const handleChange = (newValue) => {
+    setNotificationContent(newValue);
+    const plainText = Editor.string(editor, []); // Extract plain text from Slate
+    fetchAISuggestion(plainText);
+  };
+  const handleKeyDown = (event) => {
+    // Accept suggestion with Tab
+    if (event.key === "Tab" && suggestion) {
+      event.preventDefault();
+      Transforms.insertText(editor, suggestion);
+      setSuggestion("");
+      return;
+    }
+
+    // Dismiss suggestion with Escape
+    if (event.key === "Escape") {
+      setSuggestion("");
+      return;
+    }
+
+    // Preserve your HOTKEY logic
+    for (const hotkey in HOTKEYS) {
+      if (isHotkey(hotkey, event)) {
+        event.preventDefault();
+        const mark = HOTKEYS[hotkey];
+        toggleMark(editor, mark);
+      }
+    }
+  };
   return (
     <MainContainer>
       {!showPreview ?
@@ -312,66 +386,66 @@ const CreateNotification = () => {
           <div className="relative w-[83vw] min-h-[90%] ">
             <div className="absolute top-6 right-8 z-10">
               <FinishBtn type="button"
-               onClick={() => setShowPreview(true)}>
+                onClick={() => setShowPreview(true)}>
                 Preview
                 {renderIcons('MdDoubleArrow', 25, 'inherit')}
               </FinishBtn>
             </div>
             <div className="flex flex-col items-center justify-center w-full min-h-[100%]">
-            <CreateNotificationContainer>
-              {notificationContent.length !== 0 ? (
-                <Slate
-                  editor={editor}
-                  initialValue={notificationContent}   // ✅ use value not initialValue
-                  onChange={saveContent}
-                >
-                  <Toolbar className='tool-bar'>
-                    <ToolBarContainer id='toolbar-buttons'>
-                      <MarkButton format="bold" icon={<MdFormatBold size={20} />} />
-                      <MarkButton format="italic" icon={<MdFormatItalic size={20} />} />
-                      <MarkButton format="underline" icon={<MdFormatUnderlined size={20} />} />
-                      <MarkButton format="code" icon={<MdOutlineCode size={20} />} />
-                      <BlockButton format="heading-one" icon={<LuHeading1 size={20} />} />
-                      <BlockButton format="heading-two" icon={<LuHeading2 size={20} />} />
-                      <BlockButton format="block-quote" icon={<MdFormatQuote size={20} />} />
-                      <BlockButton format="numbered-list" icon={<MdFormatListNumbered size={20} />} />
-                      <BlockButton format="bulleted-list" icon={<MdFormatListBulleted size={20} />} />
-                      <BlockButton format="left" icon={<MdFormatAlignLeft size={20} />} />
-                      <BlockButton format="center" icon={<MdFormatAlignCenter size={20} />} />
-                      <BlockButton format="right" icon={<MdFormatAlignRight size={20} />} />
-                      <BlockButton format="justify" icon={<MdFormatAlignJustify size={20} />} />
-                      <InsertImageButton icon={<MdImage size={20} />} />
-                    </ToolBarContainer>
-                  </Toolbar>
+              <CreateNotificationContainer>
+                {notificationContent?.length !== 0 ? (
+                  <Slate
+                    editor={editor}
+                    initialValue={notificationContent}   // ✅ use value not initialValue
+                    onChange={handleChange}
+                  >
+                    <Toolbar className='tool-bar'>
+                      <ToolBarContainer id='toolbar-buttons'>
+                        <MarkButton format="bold" icon={<MdFormatBold size={20} />} />
+                        <MarkButton format="italic" icon={<MdFormatItalic size={20} />} />
+                        <MarkButton format="underline" icon={<MdFormatUnderlined size={20} />} />
+                        <MarkButton format="code" icon={<MdOutlineCode size={20} />} />
+                        <BlockButton format="heading-one" icon={<LuHeading1 size={20} />} />
+                        <BlockButton format="heading-two" icon={<LuHeading2 size={20} />} />
+                        <BlockButton format="block-quote" icon={<MdFormatQuote size={20} />} />
+                        <BlockButton format="numbered-list" icon={<MdFormatListNumbered size={20} />} />
+                        <BlockButton format="bulleted-list" icon={<MdFormatListBulleted size={20} />} />
+                        <BlockButton format="left" icon={<MdFormatAlignLeft size={20} />} />
+                        <BlockButton format="center" icon={<MdFormatAlignCenter size={20} />} />
+                        <BlockButton format="right" icon={<MdFormatAlignRight size={20} />} />
+                        <BlockButton format="justify" icon={<MdFormatAlignJustify size={20} />} />
+                        <InsertImageButton icon={<MdImage size={20} />} />
+                      </ToolBarContainer>
+                    </Toolbar>
 
-                  <Editable
-                    style={editorStyles}
-                    renderLeaf={renderLeaf}
-                    spellCheck
-                    autoFocus
-                    onKeyDown={event => {
-                      for (const hotkey in HOTKEYS) {
-                        if (isHotkey(hotkey, event)) {
-                          event.preventDefault();
-                          const mark = HOTKEYS[hotkey];
-                          toggleMark(editor, mark);
-                        }
-                      }
-                    }}
-                    renderElement={props => <Element {...props} />}
-                    placeholder="Enter some text..."
-                  />
-                </Slate>
-              ) : null}
-            </CreateNotificationContainer>
+                    <Editable
+                      style={editorStyles}
+                      renderLeaf={renderLeaf}
+                      spellCheck
+                      autoFocus
+                      renderElement={(props) => <Element {...props} />}
+                      placeholder="Enter some text..."
+                      onKeyDown={handleKeyDown}
+                    />
+
+
+                  </Slate>
+                ) : null}
+              </CreateNotificationContainer>
+              {suggestion && (
+                <div className="absolute bottom-4 left-6 text-gray-400 opacity-60 pointer-events-none select-none">
+                  {suggestion}
+                </div>
+              )}
+
+            </div>
           </div>
-        </div>
 
         </BodyContainer> :
 
-  <PreviewNotification setShowPreview={setShowPreview} previewData={notificationContent} updatingContent={updatingContent} notificationId={id} 
-  notificationItem={notificationItem}/>
-}
+        <PreviewNotification setShowPreview={setShowPreview} previewData={notificationContent} updatingContent={updatingContent} notificationId={id}
+          notificationItem={notificationItem} />
+      }
     </MainContainer>
   )
 

@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Import Quill's CSS for styling
+import 'react-quill/dist/quill.snow.css';
+import Cookies from 'js-cookie'
+import { useNavigate } from 'react-router-dom';
 
 const QuillEditor = () => {
   const [editorContent, setEditorContent] = useState('');
   const [title, setTitle] = useState('')
+  const navigate = useNavigate()
 
   // Custom toolbar options
   const modules = {
@@ -38,12 +41,32 @@ const QuillEditor = () => {
     setEditorContent(content);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    console.log("Logginf here")
     console.log('Saved content:', editorContent);
+    const payload = {
+      title: title,
+      shortDescription: editorContent
+    }
+
+    const url = "http://localhost:3001/alerts/newAlert";
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+      body: JSON.stringify(payload),
+    };
+    const response = await fetch(url, options)
+    console.log(response, "response Here")
     alert('Content saved successfully!');
+
+    navigate('/All Alerts')
+
   };
 
-  console.log(editorContent)
+  console.log(editorContent, "editor Content Hereee..,")
 
   return (
     <EditorContainer>
@@ -64,9 +87,10 @@ const QuillEditor = () => {
         formats={formats}
         theme="snow"
         placeholder="Write the Alert content here..."
-        style={{ height: '95%' }}
+        style={{ height: '85%' }}
       />
       <CreateBtn
+        type="button"
         onClick={handleSave}
         disabled={editorContent === ''}
         idDisabled={
@@ -74,6 +98,7 @@ const QuillEditor = () => {
           editorContent === '<p><br></p>' ||
           title === ''
         }
+        className="!mt-2"
       >
         CREATE
       </CreateBtn>
@@ -142,7 +167,7 @@ const CreateBtn = styled.button`
     background-color:  var(--primary-color);
     color:  var(--secondary-color);
     border: none;
-    
+   
     &:hover {
         background-color: ${({ idDisabled }) => !idDisabled ? ' var(--secondary-color)' : '#ccc'};
         color: ${({ idDisabled }) => !idDisabled ? ' var(--primary-color)' : ' var(--secondary-color)'};

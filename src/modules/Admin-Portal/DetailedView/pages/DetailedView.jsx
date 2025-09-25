@@ -124,6 +124,7 @@ export default function DetailedView({ recordId, tableName }) {
   // console.log(recordData);
 
   return (
+    
     <div
       className='w-full h-fit max-h-[82vh] overflow-hidden flex flex-col grow-1 gap-2 p-0 !rounded-b-[0.5rem] bg-[var(--background-color)] text-[var(--text-color)]'
       style={{ borderRadius: '0.5rem' }}

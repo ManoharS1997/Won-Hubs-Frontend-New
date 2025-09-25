@@ -45,7 +45,7 @@ import DepartmentsListView from "./modules/Admin-Portal/Tables/DepartmentsTable/
 import DesignForm from "./modules/Admin-Portal/Design/pages/CreateDesign.jsx";
 import DesignTemplates from "./modules/Admin-Portal/Design/components/DesignTemplates/DesignTemplates.jsx";
 import EmailModel from "./modules/Admin-Portal/SendEmail/pages/EmailModal.jsx";
-
+import FeedBackTemplate from './modules/Admin-Portal/Feedback/pages/FeedBackTemplate.jsx';
 import FeedbackDetailedView from './modules/Admin-Portal/Feedback/pages/FeedbackDetailedView.jsx';
 import FeedBack from './modules/Admin-Portal/Feedback/pages/Feedback.jsx';
 import FeedbackUserView from './modules/Admin-Portal/Feedback/pages/FeedbackUserView.jsx';
@@ -504,6 +504,10 @@ const router = createBrowserRouter(
             },
             {
               path: '/create/feedback',
+              element: <FeedBackTemplate />
+            },
+            {
+              path: '/feedback/:id',
               element: <CreateFeedback />
             },
             {
