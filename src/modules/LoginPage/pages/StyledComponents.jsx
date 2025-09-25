@@ -220,6 +220,10 @@ export const RegisterBtn = styled.button`
 
 export const LoginBtn = styled.button`
     width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: center;
     align-self: flex-end;
     margin: 0 0 0 auto;
     border-radius: 80px;
