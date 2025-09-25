@@ -7,6 +7,7 @@ import { getTableData, getTableColumnNames } from "../../../../utils/CheckAndExe
 import {
   CustomContainer, CustomViewContainer, FormContent, SideNavNContentContainer, TableContainer,
 } from './StyledComponents';
+import { Feed } from "semantic-ui-react";
 
 const AllFeedbacks = () => {
   const [FeedbacksData, setFeedbacksData] = useState([]) //state for table data 
@@ -21,16 +22,14 @@ const AllFeedbacks = () => {
 
   const fetchFeedBacksData = async () => {
     try {
-      const data = await getTableData('templates')
-      console.log(data,"Data Here..,")
-      const newColumnNames = await getTableColumnNames('templates')
-      console.log(newColumnNames,"Here column names")
-      if (data?.templates?.length === 0) {
-        // setUsersData(ApprovalsDummyData)
-      } else {
-        setFeedbacksData(data?.templates)
-      }
+      const data = await getTableData('feedback')
+      console.log(data, "Data Here..,")
+      const newColumnNames = await getTableColumnNames('feedback')
+      // console.log(newColumnNames, "Here column names")
+
       setTableColumnNames(newColumnNames?.columns)
+      setFeedbacksData(data?.feedback)
+
     } catch {
       console.log('Error fetching Templates Data')
     }
@@ -57,7 +56,7 @@ const AllFeedbacks = () => {
                     <TableComponent
                       tableData={FeedbacksData}
                       recordsPerPage={recordsPerPage}
-                      tableName={'feedback'}
+                      tableName={'feedBack'}
                       TableColumnNames={TableColumnNames}
                       setTableColumnNames={setTableColumnNames}
                       id={'id'}

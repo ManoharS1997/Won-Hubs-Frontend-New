@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Modal from 'react-modal'
+
 import Cookies from 'js-cookie';
 import FormInput from '../../../../shared/UIElements/FormInput';
 
@@ -15,13 +15,11 @@ import {
   NotificationTemplateMainContainer, SideNavAndContentContainer,
   StyledLink, TemplateTile, TemplateTilesContainer, TemplatesContainer,
   TitleContainer, ModalCloseBtn, TemplatesList, TemplateItem
-} from './StyledNotificationTemlates';
+} from '../../Notifications/pages/StyledNotificationTemlates';
 import FormDropdown from '../../../../shared/UIElements/FormDropdown';
-import FormTextarea from '../../../../shared/UIElements/FormTextarea';
 import Swal from 'sweetalert2';
 
-
-const NotificationTemplates = () => {
+const FeedBackTemplate = () => {
   const [templates, setTemplates] = useState([])
   const [isModalOpen, setModalOpen] = useState(false)
   const [selectedTab, setSelectedtab] = useState()
@@ -136,86 +134,7 @@ const NotificationTemplates = () => {
     }
   };
 
-  // return (
-  //   <WonContext.Consumer>
-  //     {value => {
-  //       const { openSettings } = value
 
-  //       return (
-  //         <NotificationTemplateMainContainer>
-  //           <SideNavAndContentContainer>
-  //             <CustomNotificationContainer>
-  //               <TemplatesContainer>
-  //                 <TitleContainer>
-  //                   <BackBtn onClick={GoBack}>
-  //                     <IoIosArrowBack size={30} />
-  //                   </BackBtn>
-  //                 </TitleContainer>
-
-  //                 <TemplateTilesContainer>
-  //                   <CustomContainer>
-  //                     <TemplateTile
-  //                       onClick={() => renderNotificationTemplates('sms')}
-  //                       style={{
-  //                         backgroundImage: "url('https://res.cloudinary.com/dca9sij3n/image/upload/v1706596299/m9wadwyljrnvb5lvlsit.png')"
-  //                       }}>SMS
-  //                     </TemplateTile>
-
-  //                     <TemplateTile onClick={() => renderNotificationTemplates('desktop')} style={{
-  //                       backgroundImage: "url('https://res.cloudinary.com/dca9sij3n/image/upload/v1706595713/wvsf7jr4thhxspdw3jpf.png')"
-  //                     }}>Desktop
-  //                     </TemplateTile>
-
-  //                     <TemplateTile
-  //                       onClick={() => renderNotificationTemplates('tab')}
-  //                       style={{
-  //                         backgroundImage: "url('https://res.cloudinary.com/dca9sij3n/image/upload/v1706596676/cbxuw7wd7ihijebvveru.png')"
-  //                       }}>Tab
-  //                     </TemplateTile>
-
-  //                     <TemplateTile
-  //                       onClick={() => navigate('/notifications/new')}
-  //                       style={{ border: '1px solid #ccc' }}
-  //                     >
-  //                       <AiOutlinePlus
-  //                         size={40}
-  //                         style={{ color: '#000', }}
-  //                       />
-  //                     </TemplateTile>
-  //                   </CustomContainer>
-  //                 </TemplateTilesContainer>
-  //               </TemplatesContainer>
-  //             </CustomNotificationContainer>
-
-  //             <Modal
-  //               isOpen={isModalOpen}
-  //               onRequestClose={() => setModalOpen(false)}
-  //               style={modalStyles}
-  //             >
-  //               <ModalCloseBtn type='button' onClick={() => setModalOpen(false)} title='close'>
-  //                 <IoIosClose size={25} />
-  //               </ModalCloseBtn>
-
-  //               {templates.length > 0 ?
-  //                 <ul className='p-2% grid md:grid-cols-4 list-none gap-4 m-0 p-0'>
-  //                   {templates.map(item => (
-  //                     <TemplateItem key={item.id} onClick={() => navigate(`/notifications/${item.id}`)}>
-  //                       {item.name}
-  //                     </TemplateItem>
-  //                   ))}
-  //                 </ul>
-  //                 : <div className='w-full h-full flex items-center justify-center text-xl text-gray-400'>
-  //                   <p>No Templates Available</p>
-  //                 </div>
-  //               }
-  //             </Modal>
-  //             {/* {openSettings ? <Settings /> : null} */}
-  //           </SideNavAndContentContainer>
-  //         </NotificationTemplateMainContainer>
-  //       )
-  //     }}
-  //   </WonContext.Consumer>
-  // )
   return (
     <WonContext.Consumer>
       {value => {
@@ -238,7 +157,8 @@ const NotificationTemplates = () => {
                           key={index}
                           className={`h-fit w-[100px] !border-b-2 transition-all duration-500 py-2 font-semibold
                           ${selectedTab === item ? '!border-black' : '!border-transparent'}`}
-                          onClick={() => setSelectedtab(item)}
+                          // onClick={() => setSelectedtab(item)}
+                          onClick={()=>navigate('/feedback/:new')}
                         >
                           {item}
                         </button>
@@ -263,9 +183,9 @@ const NotificationTemplates = () => {
                       {/* Add New Tile */}
                       <li
                         onClick={() => {
-                          setModalOpen(true)
+                          // setModalOpen(true)
                           // setSelectedDesign(null) // this indicates a new design
-                          //  navigate('/notifications/new')
+                           navigate('/feedback/new')
                         }}
                         className="w-full h-[200px] bg-gray-50 rounded flex items-center justify-center hover:shadow-lg border-2 !border-dashed cursor-pointer"
                       >
@@ -281,7 +201,7 @@ const NotificationTemplates = () => {
                 </TemplatesContainer>
               </CustomNotificationContainer>
 
-              {/* Configure Modal */}
+              {/* Configure Modal
               {isModalOpen && (
                 <div className="fixed w-screen min-h-screen bg-black/50 top-0 left-0 flex items-center justify-center">
                   <div className="flex flex-col justify-between items-center bg-white py-4 px-7 rounded-lg gap-4 w-[600px] max-w-[90%]">
@@ -373,7 +293,7 @@ const NotificationTemplates = () => {
                     </button>
                   </div>
                 </div>
-              )}
+              )} */}
 
 
             </SideNavAndContentContainer>
@@ -387,4 +307,4 @@ const NotificationTemplates = () => {
 
 }
 
-export default NotificationTemplates
+export default FeedBackTemplate

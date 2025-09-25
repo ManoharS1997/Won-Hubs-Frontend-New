@@ -22,8 +22,10 @@ const AllNotifications = () => {
   const fetchNotificationsData = async () => {
     try {
       const data = await getTableData('notifications')
-      console.log(data,"Data Here")
+      // console.log(data,"Data Here")
       const newColumnNames = await getTableColumnNames('notifications')
+      console.log(newColumnNames,"here cl ")
+
       if (data?.notifications?.length === 0) {
         // setUsersData(ApprovalsDummyData)
       } else {
