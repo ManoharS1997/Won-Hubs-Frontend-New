@@ -70,23 +70,80 @@ export default function BulkImportModal({ isOpen, setIsOpen, tableName }) {
         // Also reset input field in case user selects the same file again
         document.getElementById("bulk_import_upload").value = "";
     };
+    // by kartheek
+    // const handleImport = async () => {
+    //     if (files.length === 0) {
+    //         alert("Please select a file to upload.");
+    //         return;
+    //     }
+
+    //     const formData = new FormData();
+    //     // console.log(files, "files hereee")
+    //     formData.append("file", files[0]); // Sending only the first file
+    //     for (let pair of formData.entries()) {
+    //         console.log(pair[0], pair[1]);
+    //     }
+    //     const resData = await BulkUploadData(formData);
+
+    //     console.log(resData);
+    //     if (resData.errors) {
+    //         const errors = resData.errors.map((error) => ({ error: error.error + ` where field ${Object.keys(error.row)[0]} is ${error.row[Object.keys(error.row)[0]]}` }));
+    //         setBulkImportErrors(errors)
+    //     }
+    // };
+
 
     const handleImport = async () => {
-        if (files.length === 0) {
+        if (!files || files.length === 0) {
             alert("Please select a file to upload.");
             return;
         }
 
-        const formData = new FormData();
-        formData.append("file", files[0]); // Sending only the first file
+        // ensure we really have a File object
+        if (!(files[0] instanceof File)) {
+            console.error("Selected item is not a File object:", files[0]);
+            alert("Invalid file. Please pick the file again.");
+            return;
+        }
 
-        const resData = await BulkUploadData(files[0], tableName)
-        console.log(resData);
-        if (resData.errors) {
-            const errors = resData.errors.map((error) => ({ error: error.error + ` where field ${Object.keys(error.row)[0]} is ${error.row[Object.keys(error.row)[0]]}` }));
-            setBulkImportErrors(errors)
+        const formData = new FormData();
+        formData.append("file", files[0]);            // must match upload.single("file")
+        formData.append("tableName", tableName ?? ""); // backend expects this
+
+        console.group("FormData Debug");
+        for (const [k, v] of formData.entries()) {
+            console.log(k + ":", v instanceof File ? v.name : v);
+        }
+        console.groupEnd();
+
+        try {
+            const resData = await BulkUploadData(formData);
+            console.log("Response:", resData);
+
+            if (resData.success) {
+                const errors = resData.payload?.errors ?? [];
+
+                if (errors.length > 0) {
+                    const mapped = errors.map((error) => ({
+                        error:
+                            error.error +
+                            ` where field ${Object.keys(error.row)[0]} is ${error.row[Object.keys(error.row)[0]]
+                            }`,
+                    }));
+                    setBulkImportErrors(mapped);
+                } else {
+                    alert("Import successful!");
+                    setFiles([]);
+                    setBulkImportErrors([]);
+                    closeModal();
+                }
+            }
+
+        } catch (err) {
+            console.error("Import failed (frontend):", err);
         }
     };
+
 
     return (
         <Modal

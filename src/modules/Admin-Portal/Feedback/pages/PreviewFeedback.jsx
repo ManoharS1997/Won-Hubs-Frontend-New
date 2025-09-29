@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import ReactQuill from "react-quill";
-
+import Cookies from 'js-cookie'
 import "sweetalert2/src/sweetalert2.scss";
 
 //ICON IIMPORTS
@@ -176,9 +176,11 @@ const PreviewFeedback = () => {
         const options = {
             method: "POST",
             headers: {
+                authorization: `Bearer ${Cookies.get("accessToken")}`,
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(data),
+            
         };
 
         try {

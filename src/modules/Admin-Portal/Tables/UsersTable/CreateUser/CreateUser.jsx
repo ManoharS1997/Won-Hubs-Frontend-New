@@ -28,8 +28,9 @@ export default function CreateUser() {
       setLoading(true);
       try {
         // const response = await fetch('http://localhost:3001/AdminPortalForms/User%20Form/Core%20Forms/Global');
-        const data = await GetAddUserFormFields();
+        const data = await GetAddUserFormFields('user');
         if (data?.success === true) {
+          console.log("User Form Fields:", data.data);
           setUserFormFields(data.data)
 
           let updatedFields = {};
@@ -167,6 +168,7 @@ export default function CreateUser() {
   }
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("triggering here to add user")
     try {
       setLoading(true)
       const emptyFields = Object.keys(formFields).filter(
@@ -361,6 +363,7 @@ export default function CreateUser() {
   const allRequiredFilled = Object.keys(formFields).every(
     (field) => !formFields[field].isMandatory || formFields[field].value !== ""
   );
+  console.log("Form Fields State:", formFields);  
 
   return (
     <div className="w-full h-full overflow-auto flex flex-col gap-2 pb-4">
@@ -370,7 +373,7 @@ export default function CreateUser() {
         </button>
         <h3 className="text-2xl font-semibold m-0">New User</h3>
         <button
-          type="submit"
+          onClick={handleSubmit}
           className={`w-fit h-fit py-2 px-4 !rounded-full !ml-auto
             ${allRequiredFilled ? '!bg-blue-600 text-white hover:!bg-blue-700' : '!bg-gray-300 text-gray-500 !cursor-not-allowed'}
           `}

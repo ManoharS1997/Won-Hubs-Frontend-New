@@ -33,11 +33,16 @@ import {
   DropStyles,
 } from "../components/Data";
 import { getCatalog, getAdminForms, replaceData } from "../components/functions";
-import renderIcons from "../../../../shared/functions/renderIcons";
+// import renderIcons from "../../../../shared/functions/renderIcons";
 
 export default function DesignForm() {
   const { id } = useParams();
+
+  // console.log(id,"hereeee")
+  // what are already created getting them
   const location = useLocation()
+  console.log(location,"location Here")
+  console.log(id,"id Here")
   const CatalogDepartment = location.state ? location.state.department : ''
   const CatalogCategory = location.state ? location.state.category : ''
   const CatalogSubcategory = location.state ? location.state.subCategory : ''
@@ -163,7 +168,7 @@ export default function DesignForm() {
     getDepartmentsData()
   }, [])
 
-  const handleDropDownToggle = useCallback(() => {
+     const handleDropDownToggle = useCallback(() => {
     setDropdownOpen(prev => !prev);
   }, []);
 
@@ -482,6 +487,7 @@ export default function DesignForm() {
   };
 
   const onDragEnd = (result, columns, setColumns) => {
+    console.log(result,"hereee")
     console.log(result.destination)
     if (!result.destination) return;
     const { source, destination } = result;

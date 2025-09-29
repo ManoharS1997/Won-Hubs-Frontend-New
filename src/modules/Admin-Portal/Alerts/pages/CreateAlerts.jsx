@@ -6,36 +6,6 @@ import { MainContainer } from "./StyledComponents"
 import TemplatesList from "../../../../shared/components/TemplatesList"
 import AlertEditor from "../components/AlertEditor"
 
-// const DUMMY_TEMPLATES_LIST = [
-//     {
-//         id: '2156',
-//         imageUrl: 'https://htmlemail.io/img/preview-alert-danger-desktop-hd.jpg'
-//     },
-//     {
-//         id: '4548',
-//         imageUrl: 'https://htmlemail.io/img/preview-alert-warning-desktop-hd.jpg'
-//     },
-//     {
-//         id: '58484',
-//         imageUrl: 'https://codedmails.com/notification-email-aleos.61bc2340.jpg'
-//     },
-//     {
-//         id: '887878',
-//         imageUrl: 'https://pandorafms.com/library/files_repository/1492000649.slerena.Alert%20template%20Screenshot.PNG'
-//     },
-//     {
-//         id: '9895',
-//         imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2tGvDLKCHtcseSyrxdjbISQt4oqMeMsnR6A&s'
-//     },
-//     {
-//         id: '54541',
-//         imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTa9Xm8_VrOa_gs1HA5p6SCJi6sNnnVFqNFGw&s'
-//     },
-//     {
-//         id: '6889',
-//         imageUrl: 'https://img.freepik.com/premium-vector/smartphone-screen-emergency-notification-interface-template-design-with-transparent-background_539007-262.jpg'
-//     },
-// ]
 
 const DUMMY_TEMPLATES_LIST = [
     {

@@ -42,13 +42,14 @@ export const BackBtn = styled.button `
 export const BodyContainer = styled.div `
     width: 100vw;
     height: 93vh;
-    margin-top: 7vh;
+    /* margin-top: 7vh; */
+    margin-top:3vh;
     display: flex;
 `
 
 export const ContentPreviewContainer = styled.div `
     width: 80%;
-    height: 100%;
+    height: 85%;
     border-radius: 10px;
     box-shadow: 0px 0px 12px 1px;
     margin: auto;
@@ -62,6 +63,7 @@ export const CustomContainer = styled.div `
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    padding:0;
 `
 
 export const MainContainer = styled.div `

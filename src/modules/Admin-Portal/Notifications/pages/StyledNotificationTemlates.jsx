@@ -60,7 +60,7 @@ export const NotificationTemplateMainContainer = styled.div`
 
 export const SideNavAndContentContainer = styled.div`
     width: 100%;
-    height: fit-content;
+    height: 100%;
     display: flex;
     /* margin-top: 7vh; */
 `;
@@ -93,7 +93,7 @@ export const TemplateTile = styled.button`
 `;
 
 export const TemplateTilesContainer = styled.div`
-    height: 76%;
+    height: 90%;
     margin: 0px;
     padding: 10px;
     border: 1px solid #ccc;
@@ -156,4 +156,30 @@ export const TemplateItem = styled.li`
     &:hover {
         box-shadow: 0px 20px 70px 1px;
     }
+`
+export const FinishBtn = styled.button`
+  background-color: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 15px;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+  border: none;
+  height: 100%;
+  transition: transform 0.5s ease;
+  margin-left: auto;
+  border-radius: 100px;
+
+  svg {
+    left: 0;
+    transition: transform 0.5s ease;
+    transform: translateX(0);
+  }
+
+  &:hover svg {
+    transform: translateX(10px);
+  }
 `

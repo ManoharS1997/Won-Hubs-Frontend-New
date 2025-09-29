@@ -788,7 +788,7 @@ export const RolesDummyData = [
     { id: 10, Name: 'Jack', Age: 38, City: 'San Jose', Occupation: 'Scientist' },
 ];
 
-export const GroupsDummyData = [
+export const DummyData = [
     {
         "group_id": 1,
         "group_name": "Finance Team",

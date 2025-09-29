@@ -46,7 +46,7 @@ const operationList = [
   { id: 7, label: "Is Any Of", value: "IN ('value1', 'value2', ...)" }
 ];
 
-const stackbyIcludedchartTypes = (import.meta.env.VITE_STACKBY_APPLICABLE_LIST).split(',')
+const stackbyIcludedchartTypes = (import.meta.env.VITE_STACKBY_APPLICABLE_LIST)?.split(',')
 
 const InputHighlighter = keyframes`
     from {

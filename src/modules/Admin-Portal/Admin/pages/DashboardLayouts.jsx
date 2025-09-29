@@ -45,7 +45,7 @@ export default function DashboardLayouts() {
   const localUserId = JSON.parse(localStorage.getItem('activeUserData'))?.id
 
   const convertedNames = (name) => {
-    const nameArr = name.split('_')
+    const nameArr = name?.split('_')
     const convertedName = nameArr.map((item,) => item[0].toUpperCase() + item.slice(1))
     return (convertedName.join(' '))
   }
@@ -193,7 +193,7 @@ export default function DashboardLayouts() {
         <ResponsiveGridLayout
           className="layout"
           compactType={'vertical'}
-          layout={layout.layouts}
+          layout={layout?.layouts}
           cols={12}
           onResize={() => { }}
           rowHeight={50}

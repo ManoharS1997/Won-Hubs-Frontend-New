@@ -70,8 +70,8 @@ export default function ReportCardSelection() {
   const formattedData = { chartType: graphType, filterConditions, stackBy, groupBy, aggregation, selectedTable }
 
   const convertName = (name) => {
-    const nameArr = name.split('_')
-    const convertedName = nameArr.map((item,) => item[0].toUpperCase() + item.slice(1))
+    const nameArr = name?.split('_')
+    const convertedName = nameArr?.map((item,) => item[0].toUpperCase() + item.slice(1))
     return (convertedName.join(' '))
   }
 

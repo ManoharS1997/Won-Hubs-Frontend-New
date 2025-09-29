@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import TableComponent from "../../../TableComponent/pages/TableComponent";
 import { getTableColumnNames } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 import { MainContainer, TableContainer } from './EventsStyledComponents'
+import Cookies from 'js-cookie'
+import { getTableData } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 const hostedUrl = import.meta.env.VITE_HOSTED_API_URL
 
 export default function EventsTable() {
@@ -21,17 +23,19 @@ export default function EventsTable() {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+          Authorization: `Bearer ${Cookies.get('accessToken')}`
         }
       }
 
-      const response = await fetch(url, options)
-      const data = await response.json()
+      const response = await getTableData('event_logs')
+      // console.log(response,"response Heree")
+      // const data = await response.json()
       const newColumnNames = await getTableColumnNames('event_logs')
-      if (data?.event_logs?.length === 0) {
+      // console.log(newColumnNames,"NewColumn names Heree")
+      if (response?.event_logs?.length === 0) {
         // setUsersData(ApprovalsDummyData)
       } else {
-        setEventsData(data.event_logs)
+        setEventsData(response?.event_logs)
       }
       setTableColumnNames(newColumnNames.columns)
     } catch {
@@ -55,6 +59,7 @@ export default function EventsTable() {
           fetchTableData={fetchEventsData}
           allowDeleting={true}
           rdtColValue={'id'}
+          createNewPath={'event/'}
         // redirectionPath={`/event/`}
         />
       </TableContainer>

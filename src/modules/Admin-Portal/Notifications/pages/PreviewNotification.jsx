@@ -8,7 +8,7 @@ import {
   createEditor,
   Element as SlateElement
 } from 'slate'
-
+import renderIcons from "../../../../shared/functions/renderIcons";
 import {
   useSlate, Slate, Editable, useSlateStatic, useSelected,
   useFocused, withReact, ReactEditor,
@@ -22,14 +22,16 @@ import { withHistory } from 'slate-history'
 
 //ICON IMPORTS
 import { IoChevronBackSharp } from "react-icons/io5";
-import { IoMdDoneAll } from "react-icons/io";
 import { Button, Icon, } from '../CreateNotification/components'
 
 import {
   ActionBtn, ActionBtnsContainer, BackBtn, BodyContainer, ContentPreviewContainer,
   CustomContainer, MainContainer,
 } from '../CreateNotification/PreviewNotification/StyledComponents';
-
+import { CustomLabel, CustomInput, TextAreaTag } from "../CreateNotification/StyledComponents";
+import { CustomSelect, CustomOption } from "../CreateNotification/StyledComponents";
+import { FinishBtn } from "./StyledNotificationTemlates";
+import Cookies from 'js-cookie'
 
 const defaultFieldsData = {
   to: 'Kartheek.M@nowitservices.com',
@@ -253,65 +255,187 @@ const withImages = editor => {
   return editor
 }
 
-export default function PreviewNotification({ setShowPreview, previewData, notificationId, updatingContent }) {
-  const history = useNavigate();
-  const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
-  const [LocalInitialData, setLocalStorageData] = useState(() => {
-    const storedData = localStorage.getItem('notificationContent');
-    return storedData ? JSON.parse(storedData) : null;
-  });
+export default function PreviewNotification({
+  setShowPreview,
+  previewData,
+  notificationId,
+  updatingContent,
+  notificationItem,
+}) {
+  console.log(notificationItem, "ID here");
+
+  const navigate = useNavigate();
+  const renderElement = useCallback((props) => <Element {...props} />, []);
+  const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
+
+  // ✅ Use state for editable fields
+  const [notificationDetails, setNotificationDetails] = useState(() => ({
+    to: notificationItem?.to?.value || "",
+    cc: notificationItem?.cc?.value || "",
+    name: notificationItem?.name?.value || "",
+    subject: notificationItem?.subject?.value || "",
+    type: notificationItem?.type?.value || "global",
+  }));
+
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
     []
-  )
+  );
 
-  const onBack = () => {
-    /* history(-1); */
+  // ✅ Handle input changes
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setNotificationDetails((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
 
-  }
+  // ✅ Save or create notification with updated data
+  const CreateNotification = async () => {
+    const payload = {
+      emailBody: previewData,
+      toAddress: notificationDetails.to,
+      cc: notificationDetails.cc,
+      subject: notificationDetails.subject,
+      type: notificationDetails.type,
+      name: notificationDetails.name,
+    };
 
-  const updateNotificationData = async () => {
-    await updateTableData('notifications', notificationId, { ...updatingContent, content: JSON.stringify(previewData) })
-    history('/All Notifications')
-  }
+    console.log(payload, "payload");
+
+    const url = "http://localhost:3001/notifications/newNotifications";
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+      body: JSON.stringify(payload),
+    };
+
+    const response = await fetch(url, options);
+    console.log(response, "response Here");
+    localStorage.removeItem("notificationData");
+    navigate("/All Notifications");
+  };
 
   const editorStyles = {
-    width: '100%',
-    height: '100%',
-    padding: ' 10px 15px',
-    flexGrow: '1',
-    overflowY: 'auto',
-    marginLeft: '0px',
-    borderRadius: '5px',
-    outline: 'none',
-  }
+    width: "100%",
+    height: "100%",
+    padding: " 10px 15px",
+    flexGrow: "1",
+    overflowY: "auto",
+    marginLeft: "0px",
+    borderRadius: "5px",
+    outline: "none",
+  };
 
   return (
     <MainContainer>
-      <BodyContainer>
-        <CustomContainer>
-          <BackBtn type='button' onClick={() => setShowPreview(false)}> <IoChevronBackSharp onClick={() => setShowPreview(false)} size={25} /> Edit </BackBtn>
-          <ContentPreviewContainer>
-            <Slate editor={editor} initialValue={previewData ? previewData : initialValue} style={{ width: '100%', height: '100%' }}>
+      <BodyContainer className="flex flex-col">
+        <div className="w-[84%] flex items-center justify-between">
+          <BackBtn type="button" onClick={() => setShowPreview(false)}>
+            <IoChevronBackSharp size={25} /> Edit
+          </BackBtn>
+          <button
+            onClick={CreateNotification}
+            className="!bg-[#04274b] text-white rounded py-2 px-4 flex items-center justify-center w-fit m-0"
+          >
+            Save
+          </button>
+        </div>
 
-              <Editable style={editorStyles}
+        {/* Editable Fields */}
+        <div className="w-full self-center h-[20%] flex flex-col md:flex-row p-2 gap-4">
+          {/* Left Section */}
+          <div className="w-full h-fit flex flex-col gap-4">
+            <div className="flex w-full items-center gap-4">
+              <CustomLabel htmlFor="to">To: </CustomLabel>
+              <CustomInput
+                type="text"
+                id="to"
+                value={notificationDetails.to}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="flex w-full items-center gap-4">
+              <CustomLabel htmlFor="cc">CC: </CustomLabel>
+              <CustomInput
+                type="text"
+                id="cc"
+                value={notificationDetails.cc}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
+          {/* Middle Section */}
+          <div className="w-full h-fit flex flex-col gap-4">
+            <div className="flex w-full items-center gap-4">
+              <CustomLabel htmlFor="name">Name: </CustomLabel>
+              <CustomInput
+                type="text"
+                id="name"
+                value={notificationDetails.name}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="flex w-full items-center gap-4">
+              <CustomLabel htmlFor="subject">Subject: </CustomLabel>
+              <TextAreaTag
+                id="subject"
+                value={notificationDetails.subject}
+                onChange={handleInputChange}
+                cols={40}
+                rows={3}
+              />
+            </div>
+          </div>
+
+          {/* Right Section */}
+          <div className="w-full h-fit flex flex-col gap-4">
+            <div className="flex w-full items-center gap-4">
+              <CustomLabel htmlFor="type">Type: </CustomLabel>
+              <CustomSelect
+                id="type"
+                value={notificationDetails.type}
+                onChange={(e) =>
+                  setNotificationDetails((prev) => ({
+                    ...prev,
+                    type: e.target.value,
+                  }))
+                }
+              >
+                <CustomOption value="global">Global</CustomOption>
+                <CustomOption value="local">Local</CustomOption>
+              </CustomSelect>
+            </div>
+          </div>
+        </div>
+
+        {/* Slate Editor Preview */}
+        <div className="w-[90%] h-full flex items-start justify-start">
+          <ContentPreviewContainer className="h-full w-full">
+            <Slate
+              editor={editor}
+              initialValue={previewData ?? initialValue}
+              style={{ width: "100%", height: "100%" }}
+            >
+              <Editable
+                style={editorStyles}
                 renderLeaf={renderLeaf}
                 spellCheck
                 autoFocus
-                renderElement={props => <Element {...props} />}
+                renderElement={renderElement}
                 placeholder="Enter some text..."
               />
             </Slate>
           </ContentPreviewContainer>
-
-          <ActionBtnsContainer>
-            <ActionBtn type='button' onClick={() => updateNotificationData()} style={{ color: '#000', border: '1px solid #000' }}>
-              <IoMdDoneAll /> Finish
-            </ActionBtn>
-          </ActionBtnsContainer>
-        </CustomContainer>
+        </div>
       </BodyContainer>
     </MainContainer>
-  )
+  );
 }

@@ -59,7 +59,8 @@ const LocationsTableListView = () => {
                                         title='Locations'
                                         fetchTableData={fetchLocationsData}
                                         rdtColValue={'id'}
-                                        // redirectionPath={`/location/`}
+                                        redirectionPath={`/location/`}
+                                        createNewPath={`location`}
                                     />
                                 </FormContent>
                             </CustomContainer>

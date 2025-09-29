@@ -302,7 +302,7 @@ export default function App() {
           showAlert: showAlert,
           alertContent: alertContent,
           selectedTheme: selectedTheme,
-          selectedDesign: selectedDesign,
+          selectedDesign, 
 
           setSideNavScrollPosition: onChangeScrollBarPosition,
           setActiveUserData: setActiveUserData,

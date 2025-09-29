@@ -40,7 +40,7 @@ export default function StackBars({
                     dataset={graphData?.dataset || []}
                     series={graphData?.series || []}
                     xAxis={graphData?.xAxis || []}
-                    slotProps={{ legend: { hidden: true } }}
+                    slotProps={{legend : { hidden: true } }}
                     colors={palletteCategories['stack1']}
                     width={600}
                     height={350}
@@ -48,3 +48,4 @@ export default function StackBars({
             </>
     );
 }
+

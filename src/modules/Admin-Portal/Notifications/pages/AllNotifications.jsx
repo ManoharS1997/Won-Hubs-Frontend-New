@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 // COMPONENT IMPORTS
 import WonContext from "../../../../context/WonContext";
 import TableComponent from "../../../TableComponent/pages/TableComponent";
@@ -23,17 +22,22 @@ const AllNotifications = () => {
   const fetchNotificationsData = async () => {
     try {
       const data = await getTableData('notifications')
+      // console.log(data,"Data Here")
       const newColumnNames = await getTableColumnNames('notifications')
+      console.log(newColumnNames,"here cl ")
+
       if (data?.notifications?.length === 0) {
         // setUsersData(ApprovalsDummyData)
       } else {
-        setNotificationsData(data.notifications)
+        setNotificationsData(data?.notifications)
       }
-      setTableColumnNames(newColumnNames.columns)
-    } catch {
+      setTableColumnNames(newColumnNames?.columns)
+    } catch(e) {
+      console.log(e,"error hereee")
       console.log('Error fetching Notifications Data')
     }
   }
+  // console.log("Triggering Notification Dataa")
 
   return (
     <WonContext.Consumer>

@@ -26,6 +26,21 @@ const templatesData = [
   { name: 'User Settings', category: 'User', mode: 'Mobile', widgetname: 'UserSettings', path: '/create/new/design/UserSettings' },
 ];
 
+const departmentDummyData={
+  "Engineering": {
+    "Software": ["Frontend", "Backend", "DevOps"],
+    "Hardware": ["PCB Design", "Embedded Systems"]
+  },
+  "Design": {
+    "UI/UX": ["Wireframes", "Prototypes"],
+    "Graphic": ["Branding", "Illustration"]
+  },
+  "Marketing": {
+    "Digital": ["SEO", "Content Writing"],
+    "Offline": ["Events", "Print Media"]
+  }
+}//sanju
+
 export default function DesignTemplates() {
 
   const CatalogDepartment = location.state ? location.state.department : ''
@@ -34,7 +49,7 @@ export default function DesignTemplates() {
   const [selectedTab, setSelectedtab] = useState('Desktop')
   const [category, setCategory] = useState('IT')
   const [openConfigure, setOpenConfigure] = useState(false)
-  const [departmentData, setDepartmentData] = useState(null)
+  // const [departmentData, setDepartmentData] = useState(null)// commented by sandhya
   const [selectedDepartments, setSelectedDepartments] = useState({
     department: CatalogDepartment || '',
     category: CatalogCategory || '',
@@ -43,7 +58,9 @@ export default function DesignTemplates() {
   const [views, setViews] = useState(['Super Admin', 'Admin', 'Designer Admin', 'Agent', 'Internal User', 'External User']);
   const [selectedViews, setSelectedViews] = useState([])
   const [departmentName, setDepartmentName] = useState('');
-  const { setSelectedDesign } = useContext(WonContext)
+  const { setSelectedDesign } = useContext(WonContext);
+  const [DesignName,setDesignName]=useState('')// by sandhya
+  const [departmentData, setDepartmentData] = useState(departmentDummyData)
 
   // const { id } = useParams();
   const Navigate = useNavigate()
@@ -113,6 +130,12 @@ export default function DesignTemplates() {
   const onClickView = (selected) => {
     setSelectedViews(selected.map(item => item.value));
   };
+
+  const onChangeInputField = (e) => {
+    console.log(e.target.value,"tRGET FORM NAME")
+    setDepartmentName(e.target.value);
+    setDesignName(e.target.value)// by sandhya
+  }
 
   return (
     <div className='w-full h-full flex flex-col overflow-auto'>
@@ -197,8 +220,8 @@ export default function DesignTemplates() {
                 value={departmentName}
                 placeholder={'Enter Design Name'}
                 isMandatory={true}
-              // onChangeHandler={onChangeInputField}
-              // iconName={'MdPassword'}
+              onChangeHandler={onChangeInputField}
+              iconName={'MdPassword'}
               />
             </div>
 

@@ -56,6 +56,7 @@ const DepartmentsTableListView = () => {
                                         title='Department'
                                         fetchTableData={fetchDepartmentData}
                                         rdtColValue={'id'}
+                                        createNewPath={'department'}
                                         // redirectionPath={`/department/`}
                                     />
                                 </FormContent>

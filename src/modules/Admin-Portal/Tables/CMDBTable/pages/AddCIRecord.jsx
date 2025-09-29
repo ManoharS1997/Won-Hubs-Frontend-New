@@ -190,6 +190,7 @@ const CIRecordForm = ({ mode = 'add', ciId = null }) => {
             customstyles={field.customstyles}
             isMandatory={field.isMandatory}
             onChangeHandler={onChangeInput}
+            iconName={field?.iconName}
           />
         );
       case "toggle":
@@ -235,6 +236,7 @@ const CIRecordForm = ({ mode = 'add', ciId = null }) => {
             onChangeHandler={(option) =>
               onChangeDropdown(option.value, field.name)
             }
+            iconName={field?.iconName}
 
           />
         );

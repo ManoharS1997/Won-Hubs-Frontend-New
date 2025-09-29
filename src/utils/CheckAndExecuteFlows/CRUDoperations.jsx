@@ -95,6 +95,7 @@ export const GetUserDataByUsername = async () => {
 
 // get user dashboards data
 export const GetUserDashboards = async () => {
+  console.log(Cookies.get('accessToken'))
   const response = await fetch(`${apiUrl}/api/users/get/dashboards`, {
     method: 'GET',
     headers: {
@@ -123,25 +124,65 @@ export const CheckEmailAvailability = async (email) => {
 }
 
 // ---------------------------------------------------- to bulk upload data into targeted table ---------------------------------------
-export const BulkUploadData = async (file, tableName) => {
+// export const BulkUploadData = async (file, tableName) => {
+
+//   try {
+//     const url = `${apiUrl}/api/bulk/table/upload`;
+//     // bykartheek
+//     const formData = new FormData();
+//     formData.append("file", file); // ✅ Correct way to send a file
+//     formData.append("tableName", tableName); 
+
+//     console.log(formData, "formdata in api");
+//     const response = await fetch(url, {
+//       method: "POST",
+//       body: formData, // ✅ Send as FormData
+//     });
+
+//     const data = await response.json();
+//     return data;
+//   } catch (err) {
+//     console.error("Error uploading the bulk data.", err);
+//   }
+// };
+
+export const BulkUploadData = async (formData) => {
+  // console.log(Cookies.get('accessToken'))  
+
   try {
     const url = `${apiUrl}/api/bulk/table/upload`;
 
-    const formData = new FormData();
-    formData.append("file", file); // ✅ Correct way to send a file
-    formData.append("tableName", tableName);
-
     const response = await fetch(url, {
       method: "POST",
-      body: formData, // ✅ Send as FormData
+      headers: {
+
+        Authorization: `Bearer ${Cookies.get('accessToken')}`
+      },
+      body: formData, // DO NOT set Content-Type manually
     });
 
-    const data = await response.json();
-    return data;
+    const ct = response.headers.get("content-type") || "";
+    const payload = ct.includes("application/json")
+      ? await response.json()
+      : await response.text();
+
+    console.log("Payload from bulk upload:", payload);
+
+    // ✅ Correct success check
+    if (!response.ok || (payload && payload.success === false)) {
+      throw new Error(
+        `HTTP ${response.status}: ${typeof payload === "string" ? payload : JSON.stringify(payload)
+        }`
+      );
+    }
+
+    return { success: true, payload };
   } catch (err) {
-    console.error("Error uploading the bulk data.", err);
+    console.error("Error uploading the bulk data (frontend):", err);
+    return { success: false, message: "Upload failed", error: String(err) };
   }
 };
+
 
 export const DownloadTemplate = async (tableName) => {
   try {
@@ -393,7 +434,7 @@ export const GetdesignDepartmentData = async () => {
       }
     )
 
-    // console.log('resData: ', results)
+    console.log(' for pre selected resData: ', results)
     return results
   } catch (err) {
     console.error('Error getting the Designs departments data: ', err)
@@ -638,6 +679,7 @@ export const getTableData = async (tableName, componentName) => {
     }
 
     const response = await fetch(url, options)
+    // console.log(response,"response From Table ")
     const data = await response.json()
     return data
   }
@@ -1146,24 +1188,50 @@ export const getAllUsers = async () => {
   return data
 }
 
-// creates new user in the users table
-export const CreateNewUser = async (formData) => {
-  const payload = {
-    user_type: formData.user_type.value,
-    title: formData.title.value,
-    last_name: formData.last_name.value,
-    first_name: formData.first_name.value,
-    department: formData.department.value,
-    email: formData.email.value,
-    phone_no: formData.phone.value,
-    time_zone: formData.timezone.value,
-    // date_format: formData.date_format.value,
-    photo: formData.photo.value,
-    reset_password: formData.password_reset.value,
+function extractValues(formData) {
+  return Object.fromEntries(
+    Object.entries(formData).map(([key, obj]) => [key, obj.value])
+  );
+}
+
+const GetPayload = (formname, formData) => {
+  switch (formname) {
+    case 'users':
+      return {
+        user_type: formData.user_type.value,
+        title: formData.title.value,
+        last_name: formData.last_name.value,
+        first_name: formData.first_name.value,
+        department: formData.department.value,
+        email: formData.email.value,
+        phone_no: formData.phone.value,
+        time_zone: formData.timezone.value,
+        // date_format: formData.date_format.value,
+        photo: formData.photo.value,
+        reset_password: formData.password_reset.value,
+      };
+
+    case 'groups':
+      return extractValues(formData)
+    case 'company' :
+      return extractValues(formData)
+    case 'locations':
+      return extractValues(formData)
+    case 'department':
+      return extractValues(formData)
+
+
   }
+}
 
-  const url = `${apiUrl}/api/users/create/organization/user`
-
+// creates new user in the users table
+export const CreateNewUser = async (formname, formData) => {
+  console.log(formData, "form Data in CRUD")
+  console.log(formname, "name ")
+  const payload = await  GetPayload(formname, formData)
+  console.log(payload,"payload here")
+  // const url = `${apiUrl}/api/users/create/organization/user` commented by me writtenby kartheek 
+  const url=`${apiUrl}/api/${formname}/create/organization/${formname}`
   const options = {
     method: 'POST',
     headers: {
@@ -1174,17 +1242,22 @@ export const CreateNewUser = async (formData) => {
   }
 
   try {
+    console.log("triggering in try block")
     const response = await fetch(url, options);
-    if (response.ok) {
-      console.log('User added successfully!');
-      const data = await response.json()
-      return data
-    } else {
-      console.error('Error adding user:', response.statusText);
-    }
+    console.log(response,"response hereewee")
+    const data = await response?.json()
+    console.log(data,"here")
+    return data
+    // if (response.ok) {
+    //   console.log('User added successfully!');
+      
+    // } else {
+    //   console.error('Error adding user:', response.statusText);
+    // }
   }
   catch (error) {
-    console.error('Error:', error.message);
+    console.log("Triggering in Catch block")
+    console.log('Error:', error.message);
   }
 }
 
@@ -1216,9 +1289,9 @@ export const deleteUser = async (recordId) => {
 }
 
 //get addUserForm fields
-export const GetAddUserFormFields = async () => {
+export const GetAddUserFormFields = async (param) => {
   try {
-    const url = `${apiUrl}/api/add-user/fields`
+    const url = `${apiUrl}/api/add/fields/${param}`
     const options = {
       method: 'GET',
       headers: {

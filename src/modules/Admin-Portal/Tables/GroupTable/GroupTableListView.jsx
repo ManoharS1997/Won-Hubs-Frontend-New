@@ -59,6 +59,7 @@ const GroupsTableListView = () => {
                                     fetchTableData={fetchGroupsData}
                                     rdtColValue={'id'}
                                     // redirectionPath={`/group/`}
+                                    createNewPath={'group'}
                                 />
                             </FormContent>
                         </SideNavNContentContainer>

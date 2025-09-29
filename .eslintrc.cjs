@@ -12,7 +12,6 @@ module.exports = {
   settings: { react: { version: '18.2' } },
   plugins: ['react-refresh'],
   rules: {
-    'no-unused-vars': 'warn', // 🔹 unused vars will be yellow instead of red
     'react/jsx-no-target-blank': 'off',
     'react-refresh/only-export-components': [
       'warn',

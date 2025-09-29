@@ -45,7 +45,7 @@ import DepartmentsListView from "./modules/Admin-Portal/Tables/DepartmentsTable/
 import DesignForm from "./modules/Admin-Portal/Design/pages/CreateDesign.jsx";
 import DesignTemplates from "./modules/Admin-Portal/Design/components/DesignTemplates/DesignTemplates.jsx";
 import EmailModel from "./modules/Admin-Portal/SendEmail/pages/EmailModal.jsx";
-
+import FeedBackTemplate from "./modules/Admin-Portal/Feedback/pages/FeedBackTemplate.jsx";
 import FeedbackDetailedView from "./modules/Admin-Portal/Feedback/pages/FeedbackDetailedView.jsx";
 import FeedBack from "./modules/Admin-Portal/Feedback/pages/Feedback.jsx";
 import FeedbackUserView from "./modules/Admin-Portal/Feedback/pages/FeedbackUserView.jsx";
@@ -161,9 +161,8 @@ import AllAPIKeys from "./modules/Administration/APIKeys/pages/AllAPIKeys.jsx";
 import CreateAPIKey from "./modules/Administration/APIKeys/pages/CreateAPIKey.jsx";
 import LoginUser from "./shared/components/TestLogin.jsx";
 import WebhookHits from "./modules/Administration/Webhooks/pages/WebhookHits.jsx";
+import SourceForm from "./modules/Admin-Portal/SourceForm.jsx";
 import FormDesignerPage from "./modules/Admin-Portal/form/formDesignerPage.jsx";
-
-// Create the router configuration using createBrowserRouter
 const router = createBrowserRouter([
   // Public routes (no authentication required)
   {
@@ -318,6 +317,10 @@ const router = createBrowserRouter([
         children: [
           // Super admin and admin routes
           {
+            path: "/newsourcefile",
+            element: <SourceForm />,
+          },
+          {
             path: "/Super Admin",
             element: <SuperAdminFeatures />,
           },
@@ -425,6 +428,7 @@ const router = createBrowserRouter([
             path: "/Companies",
             element: <CompaniesTable />,
           },
+
           {
             path: "/company/:id",
             element: <CompanyDetailedView />,
@@ -446,15 +450,15 @@ const router = createBrowserRouter([
             element: <CIRecordForm />,
           },
           {
-            path: "/add-company",
+            path: "/create/company",
             element: <CreateCompany />,
           },
           {
-            path: "/create-location",
+            path: "create/location",
             element: <CreateLocations />,
           },
           {
-            path: "/create-department",
+            path: "/create/department",
             element: <CreateDepartment />,
           },
           {
@@ -503,6 +507,10 @@ const router = createBrowserRouter([
           },
           {
             path: "/create/feedback",
+            element: <FeedBackTemplate />,
+          },
+          {
+            path: "/feedback/:id",
             element: <CreateFeedback />,
           },
           {
@@ -518,11 +526,12 @@ const router = createBrowserRouter([
             element: <ReportCardSelection />,
           },
           {
-            path: "/create-group",
+            path: "create/group",
             element: <GroupTableCreateView />,
           },
           {
-            path: "/event/:id",
+            // path: '/event/:id',by kartheek
+            path: "create/event/",
             element: <EventDetailedView />,
           },
           {

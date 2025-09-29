@@ -50,7 +50,12 @@ import { SlLocationPin, SlCloudUpload } from "react-icons/sl";
 import { VscTools } from "react-icons/vsc";
 import { AiOutlineSwap } from "react-icons/ai";
 import { CgArrowsExchangeAltV } from "react-icons/cg";
-
+import { RiKey2Line } from "react-icons/ri";
+import { RiAdminLine } from "react-icons/ri";
+import { FaSitemap ,FaPassport,FaMoneyBills,FaCrosshairs,FaUserTag } from "react-icons/fa6";
+import { BiDetail } from "react-icons/bi";
+import { FaPhoneAlt,FaFax  } from "react-icons/fa";
+import { RiShieldKeyholeLine } from "react-icons/ri";
 const iconMap = {
   BsPersonWorkspace, HiViewBoards, HiUserGroup, RiSettings5Fill, HiDotsHorizontal,
   RxOpenInNewWindow, MdOutlineManageAccounts, RiDeleteBinLine, IoMdAdd, GrRadialSelected,
@@ -70,7 +75,10 @@ const iconMap = {
   BsCalendarDateFill, MdOutlinePhotoCameraFront, TbTimezone, FaHospitalAlt, IoSchool, FaHandshakeSimple,
   FaStore, FaRocket, GiHamburgerMenu, LuSearch, PiBuildingOfficeLight, LuLink2, TfiTimer, RiTeamFill,
   MdOutlineDescription, FaTools, FaUserLarge, RiUserCommunityLine, TbNumber123, CiUser, VscTools,
-  SlCloudUpload, IoGlobe, GoGrabber, IoChevronBackOutline, MdDoubleArrow, AiOutlineSwap, CgArrowsExchangeAltV
+  SlCloudUpload, IoGlobe, GoGrabber, IoChevronBackOutline, MdDoubleArrow, AiOutlineSwap, CgArrowsExchangeAltV,
+  RiKey2Line,RiAdminLine ,FaSitemap,FaPassport,BiDetail,FaPhoneAlt,FaFax ,FaMoneyBills ,RiShieldKeyholeLine,
+  FaCrosshairs ,FaUserTag
+
 };
 
 export default function renderIcons(icon, size = 20, color = "#000") {

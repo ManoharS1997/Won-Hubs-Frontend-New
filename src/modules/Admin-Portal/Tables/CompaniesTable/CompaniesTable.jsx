@@ -30,6 +30,7 @@ const CompaniesTable = () => {
     const fetchCompaniesData = async () => {
         try {
             const data = await getTableData('company')
+            console.log(data,"data Hereeee")
             const newColumnNames = await getTableColumnNames('company')
             if (data?.company?.length === 0) {
                 // setUsersData(ApprovalsDummyData)
@@ -64,6 +65,7 @@ const CompaniesTable = () => {
                                         title='Companies'
                                         fetchTableData={fetchCompaniesData}
                                         rdtColValue={'id'}
+                                        createNewPath={'company'}
                                         // redirectionPath={`/company/`}
                                     />
                                 </FormContent>

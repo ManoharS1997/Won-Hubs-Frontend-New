@@ -25,6 +25,7 @@ import {
 } from './StyledComponents'
 
 const hostedUrl = import.meta.env.VITE_HOSTED_API_URL
+console.log(hostedUrl,"url")
 
 // other service products logos default images data
 const appsLogos = [

@@ -11,7 +11,6 @@ import PropTypes from 'prop-types';
 import SortableItem from './SortableItem';
 import DroppableContainer from './DroppableContainer';
 import { handleDragEndGeneric } from './handleDragEnd ';
-
 import { DropStyles } from './Data';
 
 
@@ -53,6 +52,7 @@ export default function RenderFields({
 
   const addNewField = (e) => {
     e.preventDefault()
+    console.log(newFieldData,"Hereee")
     if (newFieldData.details.name === '' ||
       newFieldData.details.type === '' ||
       newFieldData.details.length === '' ||

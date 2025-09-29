@@ -16,6 +16,12 @@ table {
     border-collapse: collapse;
 }
 
+/* button {
+    background-color: white;
+    border: none;
+    opacity: 1;
+} */
+
 .btnActive {
     opacity: 1;
 }

@@ -4,8 +4,8 @@ export default function FormatChartData({ formattedData, generatedData }) {
     const { chartType, stackBy, groupBy, aggregation } = formattedData
 
     const convertName = (name) => {
-        const nameArr = name.split('_')
-        const convertedName = nameArr.map((item,) => item[0].toUpperCase() + item.slice(1))
+        const nameArr = name?.split('_')
+        const convertedName = nameArr?.map((item,) => item[0].toUpperCase() + item.slice(1))
         return (convertedName.join(' '))
     }
 
@@ -22,10 +22,10 @@ export default function FormatChartData({ formattedData, generatedData }) {
             let stackedData = _.groupBy(dataset, stackBy.name)
             const groupByData = _.groupBy(dataset, groupBy.name)
 
-            Object.keys(groupByData).map(key => {
+            Object.keys(groupByData)?.map(key => {
                 let recordData = { [groupBy.name]: key }
 
-                groupByData[key].map(item => {
+                groupByData[key]?.map(item => {
                     recordData = {
                         ...recordData, [item[stackBy.name] + '_' +
                             aggregation.value]: item[groupBy.name + '_' + aggregation.value]
@@ -37,7 +37,7 @@ export default function FormatChartData({ formattedData, generatedData }) {
 
             dataset = newDataSet
 
-            series = Object.keys(stackedData).map(key => {
+            series = Object.keys(stackedData)?.map(key => {
                 return {
                     label: key,
                     dataKey: `${key + '_' + aggregation.value}`,
@@ -67,10 +67,10 @@ export default function FormatChartData({ formattedData, generatedData }) {
             const newDataSet = []
             let stackedData = _.groupBy(dataset, stackBy.name)
             const groupByData = _.groupBy(dataset, groupBy.name)
-            Object.keys(groupByData).map(key => {
+            Object.keys(groupByData)?.map(key => {
                 let recordData = { [groupBy.name]: key }
 
-                groupByData[key].map(item => {
+                groupByData[key]?.map(item => {
                     recordData = {
                         ...recordData, [item[stackBy.name] + '_' +
                             aggregation.value]: item[groupBy.name + '_' + aggregation.value]
@@ -82,7 +82,7 @@ export default function FormatChartData({ formattedData, generatedData }) {
 
             dataset = newDataSet
 
-            series = Object.keys(stackedData).map(key => {
+            series = Object.keys(stackedData)?.map(key => {
                 return {
                     label: key,
                     dataKey: `${key + '_' + aggregation.value}`,
@@ -101,7 +101,7 @@ export default function FormatChartData({ formattedData, generatedData }) {
     }
 
     function formatPieieSizingChart(generatedReportData) {
-        const convertedData = generatedReportData.map(record => {
+        const convertedData = generatedReportData.length>0?.map(record => {
             return {
                 label: record[groupBy.name].toString(),
                 value: record[groupBy.name + '_' + aggregation.value].toString()
@@ -114,7 +114,7 @@ export default function FormatChartData({ formattedData, generatedData }) {
     }
 
     function formatPieHighlightsChart(generatedReportData) {
-        const convertedData = generatedReportData.map(record => {
+        const convertedData = generatedReportData?.map(record => {
             return {
                 label: `${record[groupBy.name]}`,
                 arcLabel: (item) => `${item.value}%`,
@@ -131,7 +131,7 @@ export default function FormatChartData({ formattedData, generatedData }) {
 
     function formatDataForPieChart(generatedReportData) {
         const data2 = [];
-        const data1 = generatedReportData.map(record => {
+        const data1 = generatedReportData?.map(record => {
             return {
                 label: record[groupBy.name].toString(),
                 value: record[groupBy.name + '_' + aggregation.value].toString()
@@ -145,7 +145,7 @@ export default function FormatChartData({ formattedData, generatedData }) {
     }
 
     function formatLinesInterpolationchart(generatedReportData) {
-        const dataset = generatedReportData.map((item, index) => {
+        const dataset = generatedReportData?.map((item, index) => {
             return { ...item, x: index }
         })
         const seriesData = [{
@@ -162,7 +162,7 @@ export default function FormatChartData({ formattedData, generatedData }) {
     }
 
     function formatLinesPartialChart(generatedReportData) {
-        const dataset = generatedReportData.map((item, index) => {
+        const dataset = generatedReportData?.map((item, index) => {
             return { ...item, x: index }
         })
         const seriesData = [{

@@ -146,7 +146,7 @@ export default function ExecuteFlows(flowType, record) {
                 // console.log(tableData[node.data.table].some(item => item[filter.name]?.toString().toLowerCase() === value.toLowerCase()))
                 return tableData[node.data.table].some(item => {
                     if (item.id === record.id) {
-                        console.log('is state changed:', item[filter.name]?.toString().toLowerCase() === value.toLowerCase(), item[filter.name], node)
+                        // console.log('is state changed:', item[filter.name]?.toString().toLowerCase() === value.toLowerCase(), item[filter.name], node)
                         return item[filter.name]?.toString().toLowerCase() === value.toLowerCase()
                     }
                 });
@@ -500,7 +500,7 @@ export default function ExecuteFlows(flowType, record) {
         const htmlOutput = node.data.mailContent.content ? convertToHTML(JSON.parse(node.data.mailContent.content)) : null;
         try {
             const mailAddress = record.requested_email ? record.requested_email : record.from_address ? record.from_address : 'kartheek.muppiri@nowitservices.com'
-            console.log(mailAddress)
+            // console.log(mailAddress)
 
             const mailOptions = {
                 from: 'testmail@nowitservices.com', // process.env.EMAIL_USER,
@@ -528,7 +528,7 @@ export default function ExecuteFlows(flowType, record) {
             // if (record.type) {
             await updateTableData('ticket', record.id, { state: 'in_progress', flows_stage: JSON.stringify(updatedFlowStage) })
             // }
-            console.log('mail sent')
+            // console.log('mail sent')
             return await sendEmail(mailOptions)
 
         }
@@ -559,7 +559,7 @@ export default function ExecuteFlows(flowType, record) {
     // Function that executes "else" condition logic
     const ExecuteElseLogic = async (node) => {
         // Since else is executed when if conditions fail
-        console.log('Executing else logic');
+        // console.log('Executing else logic');
         return true;
     }
 
@@ -580,7 +580,7 @@ export default function ExecuteFlows(flowType, record) {
         const tableData = await getTableData(node.data.table);
         for (let item of tableData) {
             // Execute logic for each item
-            console.log(`Processing item: ${JSON.stringify(item)}`);
+            // console.log(`Processing item: ${JSON.stringify(item)}`);
 
         }
         return true;
@@ -593,7 +593,7 @@ export default function ExecuteFlows(flowType, record) {
         while (!conditionMet) {
             conditionMet = tableData.some(item => checkCondition(node.data.condition, [item], node));
             if (!conditionMet) {
-                console.log('Condition not met, performing operation');
+                // console.log('Condition not met, performing operation');
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
@@ -606,7 +606,7 @@ export default function ExecuteFlows(flowType, record) {
         const tableData = await getTableData(node.data.table);
         await Promise.all(tableData.map(async (item) => {
             // Execute logic in parallel for each item
-            console.log(`Processing item in parallel: ${JSON.stringify(item)}`);
+            // console.log(`Processing item in parallel: ${JSON.stringify(item)}`);
 
         }));
         return true;
@@ -616,7 +616,7 @@ export default function ExecuteFlows(flowType, record) {
     const ExecuteMakeAdecisionLogic = async (node) => {
         // Logic for making a decision
         const decision = Math.random() > 0.5; // Example decision logic
-        console.log(`Decision made: ${decision}`);
+        // console.log(`Decision made: ${decision}`);
         return decision;
     }
 
@@ -778,7 +778,7 @@ export default function ExecuteFlows(flowType, record) {
                     }
                 }
             } else {
-                console.log(node)
+                // console.log(node)
                 if (await conditionsExecution(node) === true) {
                     await updateFlowStages()
                 }

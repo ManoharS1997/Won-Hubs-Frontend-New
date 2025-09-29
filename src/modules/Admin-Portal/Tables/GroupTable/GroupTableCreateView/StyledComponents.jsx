@@ -44,10 +44,12 @@ export const BtnGroup = styled.button`
 `;
 
 export const CreateGroupTableContainer = styled.div`
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
+    margin:0;
+    padding: 0;
 `;
 
 export const CustomSelect = styled.select`
@@ -62,6 +64,7 @@ export const FormContent = styled.div`
     background-color: #ffffff;
     display: flex;
     flex-direction: column;
+    overflow:auto;
 `;
 
 export const GroupBtnsCon = styled.div`
@@ -100,7 +103,7 @@ export const GroupTableCon = styled.div`
     width: 100%;
     height: 93vh;
     overflow-y: auto;
-    padding: 10px;
+    
     background-color: #e5e5e5;
 `;
 
@@ -154,7 +157,7 @@ export const SaveUpdateCon = styled.div`
 export const SideNavAndContentContainer = styled.div`
     width: 100vw;
     height: 93vh;
-    background-color: #e5e5e5;
+    /* background-color: #e5e5e5; */
     display: flex;
     margin-top: 7vh;
 `;

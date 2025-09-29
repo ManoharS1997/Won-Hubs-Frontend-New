@@ -109,7 +109,7 @@ export default function Admin({ adminOpen, onRequestClose, }) {
 
               <AdminProfileContainer className="gap-2 p-0">
                 <ProfileInitialCon>
-                  <ProfileInitialLabel>{userName.slice(0,1)}</ProfileInitialLabel>
+                  <ProfileInitialLabel>{userName?.slice(0,1)}</ProfileInitialLabel>
                   <ProfileInitialEditBtn>
                     <MdOutlineModeEdit />
                   </ProfileInitialEditBtn>

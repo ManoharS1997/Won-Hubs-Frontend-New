@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { getTableData, UpdateSelectedColumns, DeleteRecord } from '../../../utils/CheckAndExecuteFlows/CRUDoperations'
 // import { Tooltip } from 'react-tooltip';
 
+
 import Checkbox from '@mui/material/Checkbox';
 
 import { GrConfigure } from "react-icons/gr";
@@ -23,6 +24,7 @@ import ConfigureFields from '../../Admin-Portal/ConfigureFields/pages/ConfigureF
 import DetailedView from '../../Admin-Portal/DetailedView/pages/DetailedView';
 import ExportData from '../../../shared/components/ExportTableData';
 import MoreOptions from '../components/MoreOptions';
+import CreateNotification from '../../Admin-Portal/Notifications/pages/CreateNotification';
 
 import {
   TableContainer, CustomTable, CustomThead, CustomTh,
@@ -83,12 +85,13 @@ const selectCustomStyles = {
 
 
 export default function TableComponent({
+
   // selectedColumns,
   // filteredData,
   recordsPerPage, allowDeleting, createNewPath,
   id, tableData, TableColumnNames, setTableColumnNames,
   showConfigurefieldsBtn, selectedRows, tableName, title,
-  fetchTableData, maxPages = 10, rdtColValue, redirectionPath,
+  fetchTableData, rdtColValue, redirectionPath,
 }) {
 
   const [recievedTableData, setTableData] = useState(tableData)
@@ -107,7 +110,7 @@ export default function TableComponent({
   const [selectedTab, setSelectedTab] = useState(tableName)
   const [oppenedRecordsList, setOppenedRecordsList] = useState([])
   const navigate = useNavigate()
-
+  const maxPages = Math.ceil(recievedTableData.length / 10);
   function formatDateForMySQL(isoDateString) {
     const date = new Date(isoDateString);
 
@@ -157,10 +160,12 @@ export default function TableComponent({
 
   const getSelectedColumns = async () => {
     const columns = await getTableData('table_selected_columns')
+    // console.log(columns,"in get selected")
     const displayColumns = columns?.table_selected_columns?.filter(record => {
       // console.log(record.table_name, tableName)
       return record.table_name === tableName
     })[0]?.selected_columns || []
+    // console.log(displayColumns,"in display")
 
     setSelectedColumns(displayColumns)
   }
@@ -204,13 +209,14 @@ export default function TableComponent({
   }
 
   const OnSetFilter = (index, event) => {
-    // console.log(event.value)
+    console.log(event.value)
     const text = event.value.name;
     // Capitalize the filter text
     const snakeCase = text.replace(/([A-Z])/g, (match) => match.toLowerCase());
     // Create a copy of filterConditions array
     const Filters = [...filterConditions];
     // Update the specific filter at the given index
+    console.log(Filters, "Filters Here")
     Filters[index] = {
       ...Filters[index],
       filter: snakeCase,
@@ -222,7 +228,6 @@ export default function TableComponent({
 
   const OnsetCondition = (index, event) => {
     const text = event.value;
-
     // Create a copy of filterConditions array
     const Filters = [...filterConditions];
     // Update the specific filter at the given index with the new condition
@@ -360,18 +365,19 @@ export default function TableComponent({
     setIsLoading(false)
     // console.log('loading stopped');
   }
-
   const onNextPage = () => {
     if (currPage < maxPages) {
-      setCurrentPage(currPage + 1)
+      setCurrentPage(currPage + 1);
     }
-  }
+  };
 
   const onPreviousePage = () => {
-    if (currPage !== 1) {
-      setCurrentPage(currPage - 1)
+    if (currPage > 1) {
+      setCurrentPage(currPage - 1);
     }
-  }
+  };
+
+
 
   const clearSortings = () => {
     setSortingsApplied(false)
@@ -450,9 +456,78 @@ export default function TableComponent({
       setSelectedTab(id);
     }
   };
-  // console.log(isLoading)
+
+  // sanju
+  const applyFilters = (data, filterConditions) => {
+    return data.filter(row => {
+      // Handle empty or no conditions
+      if (!filterConditions || filterConditions.length === 0) return true;
+
+      // Start with first condition result
+      let result = testCondition(row, filterConditions[0]);
+
+      // Apply subsequent conditions based on previous logicalOperator
+      for (let i = 1; i < filterConditions.length; i++) {
+        const prevOp = filterConditions[i - 1].logicalOperator;
+        const condResult = testCondition(row, filterConditions[i]);
+
+        if (prevOp === 'AND') {
+          result = result && condResult;
+        } else if (prevOp === 'OR') {
+          result = result || condResult;
+        } else {
+          // If logicalOperator missing or unknown, default to AND
+          result = result && condResult;
+        }
+      }
+
+      return result;
+    });
+  };
+
+  // Example testCondition helper:
+  function testCondition(row, cond) {
+    if (!cond.filter || !cond.condition || !cond.searchText) return true;
+    const value = row[cond.filter];
+    switch (cond.condition.toLowerCase()) {
+      case 'equals':
+        return value == cond.searchText;
+      case 'contains':
+      case 'like':
+        return value && value.toString().toLowerCase().includes(cond.searchText.toLowerCase());
+      case 'not like':
+      case 'does not contain':
+        return !(value && value.toString().toLowerCase().includes(cond.searchText.toLowerCase()));
+      case 'greaterthan':
+        return Number(value) > Number(cond.searchText);
+      case 'lessthan':
+        return Number(value) < Number(cond.searchText);
+      default:
+        return true;
+    }
+  }
+  const renderTabView = (tableName) => {
+    console.log(tableName,"@@@")
+    switch (tableName) {
+      case "notifications":
+        return <CreateNotification recordId={selectedTab} />
+      default:
+        return <DetailedView recordId={selectedTab} tableName={tableName} />
+
+    }
+  };
 
 
+  useEffect(() => {
+    // Only run if filter is active, optionally
+    if (isFilterActive) {
+      setTableData(applyFilters(tableData, filterConditions));
+    } else {
+      setTableData(tableData); // reset to full
+    }
+  }, [filterConditions, isFilterActive, tableData]);
+
+  // console.log(selectedColumns,"column name here")
   return (
     <MainContainer>
       <div className='w-full h-fit bg-[var(--bakground-color)] pb-[4px] mb-2 overflow-auto scrollbar-hide '>
@@ -736,161 +811,168 @@ export default function TableComponent({
                 <CustomTbody>
                   {/* filteredData().slice(0, recordsPerPage) */}
                   {recievedTableData?.length > 0 &&
-                    (recordsPerPage ? recievedTableData.slice(0, recordsPerPage) : recievedTableData).map((row, index) => {
-                      {/* console.log(`${row[column.name]}`) */ }
-                      return (
-                        <CustomTr
-                          key={index}
-                          isEven={index % 2 === 0}
-                          isSelectedRow={selectedRowIds.includes(
-                            row[`${id}`]
-                          )}
-                        >
-                          <CustomTd>
-                            <Checkbox
-                              style={{ zIndex: "0" }}
-                              size="small"
-                              type="checkbox"
-                              checked={selectedRowIds.includes(
-                                row[`${id}`]
-                              )}
-                              onChange={() =>
-                                CheckboxChange(
+                    // (recordsPerPage ? recievedTableData.slice(0, recordsPerPage) : recievedTableData) commented by sanju
+
+                    (recordsPerPage
+                      ? recievedTableData.slice(
+                        (currPage - 1) * recordsPerPage,
+                        currPage * recordsPerPage
+                      )
+                      : recievedTableData).map((row, index) => {
+                        {/* console.log(`${row[column.name]}`) */ }
+                        return (
+                          <CustomTr
+                            key={index}
+                            isEven={index % 2 === 0}
+                            isSelectedRow={selectedRowIds.includes(
+                              row[`${id}`]
+                            )}
+                          >
+                            <CustomTd>
+                              <Checkbox
+                                style={{ zIndex: "0" }}
+                                size="small"
+                                type="checkbox"
+                                checked={selectedRowIds.includes(
+                                  row[`${id}`]
+                                )}
+                                onChange={() =>
+                                  CheckboxChange(
+                                    row[`${id}`]
+                                  )
+                                }
+                                className={`
+                                ${selectedRowIds.includes(
                                   row[`${id}`]
                                 )
-                              }
-                              className={`
-                                ${selectedRowIds.includes(
-                                row[`${id}`]
-                              )
-                                  ? "!text-inherit"
-                                  : "!text-[var(--text-color)]"
-                                }
+                                    ? "!text-inherit"
+                                    : "!text-[var(--text-color)]"
+                                  }
                               `}
-                            />
-                          </CustomTd>
-
-                          {selectedColumns.map(
-                            (column) => {
-                              {
-                                /* console.log(column.type ) */
-                              }
-                              return rdtColValue ===
-                                column.name ? (
-                                <CustomTd
-                                  key={column.name}
-                                  style={{
-                                    textDecoration:
-                                      "underline",
-                                    color: "blue",
-                                    cursor: "pointer",
-                                  }}
-                                  // onClick={() => navigate(`${redirectionPath}${row[id]}`)}
-                                  onClick={() => {
-                                    setOppenedRecordsList(
-                                      (prevTabs) => {
-                                        const tabId =
-                                          row[
-                                          column.name
-                                          ];
-                                        // Check if the tab already exists
-                                        if (
-                                          prevTabs.some(
-                                            (tab) =>
-                                              tab.id ===
-                                              tabId
-                                          )
-                                        ) {
-                                          setSelectedTab(
-                                            tabId
-                                          ); // Just switch to the existing tab
-                                          return prevTabs;
-                                        } else if (
-                                          prevTabs.length >=
-                                          9
-                                        ) {
-                                          Swal.fire({
-                                            icon: "error",
-                                            title:
-                                              "Oops...",
-                                            text: "Maximum number of tabs reached!",
-                                          });
-                                          return prevTabs;
-                                        } else {
-                                          // If not a duplicate, add the new tab
-                                          const newTab = {
-                                            id: tabId,
-                                            name: `${tabId}`,
-                                            status:
-                                              "Active",
-                                          };
-                                          return [
-                                            ...prevTabs,
-                                            newTab,
-                                          ];
-                                        }
-                                      }
-                                    );
-                                    oppenedRecordsList.length <
-                                      9 &&
-                                      setSelectedTab(
-                                        row[column.name]
-                                      );
-                                  }}
-                                >
-                                  {column.type ===
-                                    "object"
-                                    ? `Object Data`
-                                    : column.type ===
-                                      "timestamp"
-                                      ? formatDateForMySQL(
-                                        row[column.name]
-                                      )
-                                      : column.type ===
-                                        "json"
-                                        ? "json data"
-                                        : row[column.name]}
-                                </CustomTd>
-                              ) : (
-                                <CustomTd
-                                  key={column.name}
-                                >
-                                  {column.type ===
-                                    "object"
-                                    ? `Object Data`
-                                    : column.type ===
-                                      "timestamp"
-                                      ? formatDateForMySQL(
-                                        row[column.name]
-                                      )
-                                      : column.type ===
-                                        "json"
-                                        ? "json data"
-                                        : row[column.name]}
-                                </CustomTd>
-                              );
-                            }
-                          )}
-                          {redirectionPath && (
-                            <span
-                              className="redirectionIcon hidden text-bold"
-                              title="view in editor"
-                              onClick={() =>
-                                navigate(
-                                  redirectionPath +
-                                  `${row[id]}`
-                                )
-                              }
-                            >
-                              <RxOpenInNewWindow
-                                size={18}
-                                className="bg-white p-1 w-6 h-6 rounded-[50%]"
                               />
-                            </span>
-                          )}
-                        </CustomTr>
-                      );
-                    })}
+                            </CustomTd>
+
+                            {selectedColumns.map(
+                              (column) => {
+                                {
+                                  /* console.log(column.type ) */
+                                }
+                                return rdtColValue ===
+                                  column.name ? (
+                                  <CustomTd
+                                    key={column.name}
+                                    style={{
+                                      textDecoration:
+                                        "underline",
+                                      color: "blue",
+                                      cursor: "pointer",
+                                    }}
+                                    // onClick={() => navigate(`${redirectionPath}${row[id]}`)}
+                                    onClick={() => {
+                                      setOppenedRecordsList(
+                                        (prevTabs) => {
+                                          const tabId =
+                                            row[
+                                            column.name
+                                            ];
+                                          // Check if the tab already exists
+                                          if (
+                                            prevTabs.some(
+                                              (tab) =>
+                                                tab.id ===
+                                                tabId
+                                            )
+                                          ) {
+                                            setSelectedTab(
+                                              tabId
+                                            ); // Just switch to the existing tab
+                                            return prevTabs;
+                                          } else if (
+                                            prevTabs.length >=
+                                            9
+                                          ) {
+                                            Swal.fire({
+                                              icon: "error",
+                                              title:
+                                                "Oops...",
+                                              text: "Maximum number of tabs reached!",
+                                            });
+                                            return prevTabs;
+                                          } else {
+                                            // If not a duplicate, add the new tab
+                                            const newTab = {
+                                              id: tabId,
+                                              name: `${tabId}`,
+                                              status:
+                                                "Active",
+                                            };
+                                            return [
+                                              ...prevTabs,
+                                              newTab,
+                                            ];
+                                          }
+                                        }
+                                      );
+                                      oppenedRecordsList.length <
+                                        9 &&
+                                        setSelectedTab(
+                                          row[column.name]
+                                        );
+                                    }}
+                                  >
+                                    {column.type ===
+                                      "object"
+                                      ? `Object Data`
+                                      : column.type ===
+                                        "timestamp"
+                                        ? formatDateForMySQL(
+                                          row[column.name]
+                                        )
+                                        : column.type ===
+                                          "json"
+                                          ? "json data"
+                                          : row[column.name]}
+                                  </CustomTd>
+                                ) : (
+                                  <CustomTd
+                                    key={column.name}
+                                  >
+                                    {column.type ===
+                                      "object"
+                                      ? `Object Data`
+                                      : column.type ===
+                                        "timestamp"
+                                        ? formatDateForMySQL(
+                                          row[column.name]
+                                        )
+                                        : column.type ===
+                                          "json"
+                                          ? "json data"
+                                          : row[column.name]}
+                                  </CustomTd>
+                                );
+                              }
+                            )}
+                            {redirectionPath && (
+                              <span
+                                className="redirectionIcon hidden text-bold"
+                                title="view in editor"
+                                onClick={() =>
+                                  navigate(
+                                    redirectionPath +
+                                    `${row[id]}`
+                                  )
+                                }
+                              >
+                                <RxOpenInNewWindow
+                                  size={18}
+                                  className="bg-white p-1 w-6 h-6 rounded-[50%]"
+                                />
+                              </span>
+                            )}
+                          </CustomTr>
+                        );
+                      })}
                 </CustomTbody>
               </CustomTable>}
             {recievedTableData?.length === 0 && <div
@@ -927,7 +1009,9 @@ export default function TableComponent({
             </PaginationBtnsContainer>
           </TableFooter>
         </div> :
-        <DetailedView recordId={selectedTab} tableName={tableName} />
+
+        // <DetailedView recordId={selectedTab} tableName={tableName} />
+        renderTabView(tableName)
       }
     </MainContainer>
   )

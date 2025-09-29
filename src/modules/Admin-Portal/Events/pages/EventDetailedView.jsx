@@ -14,12 +14,16 @@ export default function EventDetailedView(props) {
     const { id } = useParams()
     useEffect(() => {
         getEventData()
+        getEventTableData()
     }, [])
 
     const getEventData = async () => {
         const eventdata = await getRecordData('event_logs', id, 'Event Detailed View', window.location.href)
-        console.log(eventdata)
+        console.log(eventdata,"daa hereee")
         !eventdata.error && setEventData(eventdata[0])
+    }
+    const getEventTableData=()=>{
+        
     }
 
     const updateEventData = async () => {
@@ -38,7 +42,7 @@ export default function EventDetailedView(props) {
         setEventDataUpdated(true)
         setEventData(updatedData)
     }
-    console.log(eventData)
+    console.log(eventData,"eventData Hereee")
     return (
         <MainContainer>
             <ContentContainer>
