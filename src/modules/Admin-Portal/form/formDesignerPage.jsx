@@ -1,11 +1,11 @@
 import React from "react";
 import FormBuilder from "../Design/components/formDesigner/formBuilder";
 import PreviewModal from "../Design/components/formDesigner/PreviewModal";
-import ModulesSidebar from "../Design/components/formDesigner/ModuleSidebar";
 import TabDesigner from "../Design/components/formDesigner/TabDesigner";
-import SourceForm from "../Design/components/formDesigner/SourceForm";
+import { useLocation } from "react-router-dom";
 
 export default function FormDesignerPage() {
+  const { state } = useLocation();
   const [module, setModule] = React.useState("");
   const [formFields, setFormFields] = React.useState([]);
   const [formButtons, setFormButtons] = React.useState([]);
@@ -62,11 +62,22 @@ export default function FormDesignerPage() {
               Form Designer
             </h1>
             <div className="flex items-center gap-3">
-              <ModulesSidebar module={module} setModule={setModule} />
+              <input
+                type="text"
+                placeholder="Title"
+                className="border-b-2 border-black outline-none"
+                onChange={(e) => setModule(e.target.value)}
+              />
               <button
                 style={{ borderRadius: 8 }}
                 className="px-6 py-2 bg-indigo-600 text-white rounded-lg"
-                onClick={() => setShowPreview((v) => !v)}
+                onClick={() => {
+                  if (module.length > 0) {
+                    setShowPreview((v) => !v);
+                  } else {
+                    alert("Please enter a title for the form");
+                  }
+                }}
                 type="button"
               >
                 {showPreview ? "Hide Preview" : "Show Preview"}
@@ -97,55 +108,6 @@ export default function FormDesignerPage() {
               setFormFields={setFormFields}
             />
           </div>
-
-          <SourceForm
-            formFields={[
-              {
-                type: "radio",
-                label: "Radio",
-                options: ["Option A", "Option B"],
-                name: "Radio-4",
-              },
-              {
-                type: "text",
-                label: "Text",
-                name: "Text-0",
-              },
-              {
-                type: "email",
-                label: "Email",
-                name: "Email-1",
-              },
-              {
-                type: "number",
-                label: "Number",
-                name: "Number-2",
-              },
-              {
-                type: "date",
-                label: "Date",
-                name: "Date-3",
-              },
-              {
-                type: "checkbox",
-                label: "Checkbox",
-                options: ["Check 1", "Check 2"],
-                name: "Checkbox-5",
-              },
-              {
-                label: "gender",
-                type: "radio",
-                name: "gender-6",
-                options: ["man", "women"],
-              },
-              {
-                label: "hell",
-                type: "checkbox",
-                name: "hell-7",
-                options: ["nope", "yes"],
-              },
-            ]}
-          />
         </div>
       </div>
 
@@ -157,6 +119,7 @@ export default function FormDesignerPage() {
           formFields={formFields}
           formButtons={formButtons}
           tabs={tabs}
+          state={state}
         />
       )}
 

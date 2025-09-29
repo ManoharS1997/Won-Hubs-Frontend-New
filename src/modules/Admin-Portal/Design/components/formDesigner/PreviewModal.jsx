@@ -13,6 +13,7 @@ export default function PreviewModal({
   formFields,
   formButtons,
   tabs,
+  state,
 }) {
   const [values, setValues] = useState({});
   const [saving, setSaving] = useState(false);
@@ -167,7 +168,17 @@ export default function PreviewModal({
   const handleSave = async () => {
     try {
       setSaving(true);
-      const payload = { module, formFields, formButtons, tabs };
+      const payload = {
+        module,
+        formFields,
+        formButtons,
+        tabs,
+        departmentName: state?.departmentName,
+        category: state?.category,
+        selectedViews: state?.selectedViews,
+        widgetname: state?.widgetname,
+        selectedDepartments: state?.selectedDepartments,
+      };
 
       const res = await fetch("http://localhost:3001/api/form-designer", {
         method: "POST",
@@ -331,6 +342,7 @@ PreviewModal.propTypes = {
   module: PropTypes.string.isRequired,
   formFields: PropTypes.arrayOf(PropTypes.object).isRequired,
   formButtons: PropTypes.arrayOf(PropTypes.object).isRequired,
+  state: PropTypes.any.isRequired,
   tabs: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
