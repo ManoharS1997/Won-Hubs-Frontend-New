@@ -261,6 +261,7 @@ export default function PreviewNotification({
   notificationId,
   updatingContent,
   notificationItem,
+  recordId
 }) {
   console.log(notificationItem, "ID here");
 
@@ -291,34 +292,46 @@ export default function PreviewNotification({
     }));
   };
 
-  // ✅ Save or create notification with updated data
   const CreateNotification = async () => {
-    const payload = {
-      emailBody: previewData,
-      toAddress: notificationDetails.to,
-      cc: notificationDetails.cc,
-      subject: notificationDetails.subject,
-      type: notificationDetails.type,
-      name: notificationDetails.name,
-    };
+  const payload = {
+    emailBody: previewData,
+    toAddress: notificationDetails.to,
+    cc: notificationDetails.cc,
+    subject: notificationDetails.subject,
+    type: notificationDetails.type,
+    name: notificationDetails.name,
+  };
 
-    console.log(payload, "payload");
+  console.log(payload, "payload");
 
-    const url = "http://localhost:3001/notifications/newNotifications";
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: `Bearer ${Cookies.get("accessToken")}`,
-      },
-      body: JSON.stringify(payload),
-    };
+  const isUpdate = !!recordId; // ✅ Use notificationId to check if this is update
+  const url = isUpdate
+    ? `http://localhost:3001/notifications/update/${recordId}`
+    : `http://localhost:3001/notifications/newNotifications`;
 
+  const options = {
+    method: isUpdate ? "PUT" : "POST", // ✅ Switch method dynamically
+    headers: {
+      "Content-Type": "application/json",
+      authorization: `Bearer ${Cookies.get("accessToken")}`,
+    },
+    body: JSON.stringify(payload),
+  };
+
+  try {
     const response = await fetch(url, options);
-    console.log(response, "response Here");
+    if (!response.ok) {
+      throw new Error(`Failed to ${isUpdate ? "update" : "create"} notification`);
+    }
+    console.log(await response.json(), "response Here");
+
     localStorage.removeItem("notificationData");
     navigate("/All Notifications");
-  };
+  } catch (error) {
+    console.error("Error creating/updating notification:", error);
+  }
+};
+
 
   const editorStyles = {
     width: "100%",
@@ -330,6 +343,8 @@ export default function PreviewNotification({
     borderRadius: "5px",
     outline: "none",
   };
+
+
 
   return (
     <MainContainer>

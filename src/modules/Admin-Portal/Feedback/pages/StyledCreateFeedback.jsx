@@ -309,7 +309,7 @@ export const SectionTag = styled.span`
 `
 
 export const TabsContainer = styled.div`
-    width: 47%;
+    width: 60%;
     height: 100%;
     display: flex;
     justify-content: space-between;

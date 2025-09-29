@@ -27,7 +27,8 @@ import { FaPrint } from "react-icons/fa6";
 import { MdOutgoingMail } from "react-icons/md";
 
 import WonContext from "../../../../context/WonContext.jsx";
-import EmailModel from '../../SendEmail/pages/EmailModal.jsx'
+import EmailModel from '../../SendEmail/pages/EmailModal.jsx';
+import { CustomInput,CustomLabel,CustomOption,CustomSelect } from "../../Notifications/CreateNotification/StyledComponents.jsx";
 
 import {
   ActionBtn,
@@ -169,6 +170,8 @@ const Customstyle = {
 export default function PreviewTemplate() {
   const history = useNavigate()
   const canvasRef = useRef(null)
+  const [topData,setTopData]=useState(JSON.parse(localStorage.getItem('templateData')))
+  const [formValues,setFormValues]=useState()
   const [templateContent, setTemplateContent] = useState(JSON.parse(localStorage.getItem('templateContent')))
   const editor = useMemo(() => withHistory(withEmbeds(withTables(withLinks(withReact(createEditor()))))), []);
   const [isOpenShare, setOpenShare] = useState(false)
@@ -211,6 +214,7 @@ export default function PreviewTemplate() {
 
   const handleSaveAs = () => {
     setShowExports(false)
+    
     window.alert('Template Saved Successfully')
   };
 
@@ -377,7 +381,13 @@ export default function PreviewTemplate() {
       console.error('Error exporting content to JPG:', error);
     }
   }
-
+   const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        setFormValues((prev) => ({
+            ...prev,
+            [id]: value,
+        }));
+    };
 
 
   return (
@@ -390,6 +400,57 @@ export default function PreviewTemplate() {
               <CustomContainer>
                 <BackBtn type='button' onClick={onBack}><IoChevronBackSharp size={25} />Edit </BackBtn>
                 {sendMail ? <EmailModel /> : null}
+
+                <div className="w-full flex flex-col md:flex-row gap-4 p-2  h-[20%]">
+
+                  {/* Left Section */}
+                  <div className="w-full flex flex-col gap-4">
+                    <div className="flex items-center gap-4">
+                      <CustomLabel htmlFor="to">To:</CustomLabel>
+                      <CustomInput id="to" value={topData?.to?.value} onChange={handleInputChange} />
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <CustomLabel htmlFor="cc">CC:</CustomLabel>
+                      <CustomInput id="cc" value={topData?.cc?.value} onChange={handleInputChange} />
+                    </div>
+                  </div>
+
+                  {/* Middle Section */}
+                  <div className="w-full flex flex-col gap-4">
+                    <div className="flex items-center gap-4">
+                      <CustomLabel htmlFor="name">From:</CustomLabel>
+                      <CustomInput id="name" value={topData?.from?.value} onChange={handleInputChange} />
+                    </div>
+
+
+                    <div className="flex items-center gap-4">
+                      <CustomLabel htmlFor="name">Title:</CustomLabel>
+                      <CustomInput id="name" value={topData?.title?.value} onChange={handleInputChange} />
+                    </div>
+
+                  </div>
+
+                  {/* Right Section */}
+                  <div className="w-full flex flex-col gap-4">
+                    <div className="flex items-center gap-4">
+                      <CustomLabel htmlFor="type">Type:</CustomLabel>
+                      <CustomSelect
+                        id="type"
+                        value={topData?.type?.value}
+                        // onChange={(e) =>
+                        //   setFormValues((prev) => ({ ...prev, type: e.target.value }))
+                        // }
+                      >
+                        <CustomOption value="global">Global</CustomOption>
+                        <CustomOption value="local">Local</CustomOption>
+                      </CustomSelect>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <CustomLabel htmlFor="name">Description:</CustomLabel>
+                      <CustomInput id="name" value={topData?.description?.value} onChange={handleInputChange} />
+                    </div>
+                  </div>
+                </div>
                 <EditorContainer>
                   <Slate editor={editor}
                     initialValue={templateContent === null ? initialValue : templateContent}

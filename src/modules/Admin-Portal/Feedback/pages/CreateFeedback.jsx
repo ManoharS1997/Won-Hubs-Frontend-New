@@ -8,16 +8,17 @@ import './index.css';
 import { v4 as uuidv4 } from 'uuid';
 import Swal from 'sweetalert2'
 import 'sweetalert2/src/sweetalert2.scss';
+import renderIcons from '../../../../shared/functions/renderIcons.jsx';
 
 //ICON IMPORTS
 import { FaPlus } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { IoIosClose } from "react-icons/io";
-import { IoIosArrowForward } from "react-icons/io";
 import { IoIosArrowBack } from "react-icons/io";
 import { TbSection } from "react-icons/tb";
 import { IoMdAdd } from "react-icons/io";
 import { IoIosRemoveCircle } from "react-icons/io";
+import { FinishBtn } from '../../Notifications/pages/StyledNotificationTemlates.jsx';
 
 const fieldsList = [
   { fieldName: 'Address', isAdded: false, value: 'India  -6-284-1, Uma Shankar Nagar, Revenue Ward -17 , YSR Tadigadapa, 520007.' },
@@ -48,7 +49,7 @@ import {
 
 const initialState = {
   image: '',
-  formTitle: '',
+  // formTitle: '',
   active: true,
   dateOfSubmission: '',
   responses: [],
@@ -67,7 +68,7 @@ const initialState = {
 
 };
 
-const CreateFeedback = () => {
+const CreateFeedback = ({ recordId }) => {
   const navigate = useNavigate()
   const [fieldsListData, setFieldsListdata] = useState(fieldsList)
   const [lastSelectedInput, setLastSelectedInput] = useState('')
@@ -80,7 +81,11 @@ const CreateFeedback = () => {
   const [activeTab, setActiveTab] = useState('Questions')
   const [formValues, setFormValues] = useState(() => {
     // Get the value from localStorage
-    const storedFeedbackContent = localStorage.getItem('feedbackContent');
+    const storedFeedbackContent = localStorage.getItem('feedbackData');
+    console.log(storedFeedbackContent, "Stored Hereee..,")
+    // by sandhya
+    // const storedData = localStorage.getItem('feedbackData')
+    // console.log(storedData, "hereee fed Store")
 
     // If localStorage is empty, use initial state
     if (!storedFeedbackContent) {
@@ -89,6 +94,7 @@ const CreateFeedback = () => {
       return JSON.parse(storedFeedbackContent);
     }
   });
+  console.log(formValues, "formValues Here")
 
   const modules = {
     toolbar: [
@@ -117,6 +123,7 @@ const CreateFeedback = () => {
 
   const OnTitleText = useMemo(() => {
     return (sectionID, newValue) => {
+      console.log(newValue, "In the UseMemo Sections")
       setFormValues((prev) => ({
         ...prev,
         sections: prev.sections.map((section) =>
@@ -461,17 +468,17 @@ const CreateFeedback = () => {
   const onPreview = () => {
     let alertText = ''
 
-    if (formValues.formTitle.trim() === '') {
-      alertText = 'Fill Form Title';
-      Swal.fire({
-        text: alertText,
-        icon: 'warning',
-        customClass: {
-          confirmButton: 'my-custom-button'
-        }
-      });
-      return false
-    }
+    // if (formValues.formTitle.trim() === '') {
+    //   alertText = 'Fill Form Title';
+    //   Swal.fire({
+    //     text: alertText,
+    //     icon: 'warning',
+    //     customClass: {
+    //       confirmButton: 'my-custom-button'
+    //     }
+    //   });
+    //   return false
+    // }
 
     for (let section of formValues.sections) {
       if (section.sectionTitle.trim() === '') {
@@ -500,34 +507,46 @@ const CreateFeedback = () => {
         }
       }
     }
-
     return true
   }
 
   return (
     <MainContainer>
-      <HeaderContainer>
-        <FeedBackNameContainer>
-          <BackBtn type='button' onClick={GoBack}>
-            <IoIosArrowBack size={30} />
-          </BackBtn>
-          <CustomTitle placeholder='Title...' onChange={(e) => onChangeTitle(e)} value={formValues.formTitle} />
-        </FeedBackNameContainer>
+      <HeaderContainer className="bg-transparent mt-1">
+        {/* <FeedBackNameContainer> */}
+        <BackBtn type='button' onClick={GoBack}>
+          <IoIosArrowBack size={30} />
+        </BackBtn>
+        {/* <CustomTitle placeholder='Title...' onChange={(e) => onChangeTitle(e)} value={formValues.formTitle} /> */}
+        {/* </FeedBackNameContainer> */}
 
         <TabsContainer>
-          <Btn style={{ height: 'fit-content', margin: '5px 5px 0px 5px', background: 'transparent', borderBottom: activeTab === 'Questions' ? '2px solid #000' : '', borderRadius: '0px', color: '#000' }} onClick={() => setActiveTab('Questions')}>Feedback Form</Btn>
+          {/* <Btn style={{
+            height: 'fit-content', margin: '5px 5px 0px 5px', background: 'transparent',
+            // borderBottom: activeTab === 'Questions' ? '2px solid #000' : '', 
+            borderRadius: '0px', color: '#000'
+          }} onClick={() => setActiveTab('Questions')}>Feedback Form</Btn>
+           */}
+          <h2 >FeedBack Form</h2>
           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginRight: '5px' }}>
 
             <Btnsection type='button' style={{ height: '40px', width: '40px' }} onClick={handleAddSection}>
               <TbSection size={20} />
             </Btnsection>
 
-            <Btn style={{ display: 'flex', justifyContent: 'space-between' }} type='button' onClick={() => {
-              if (onPreview()) {
-                localStorage.setItem('feedbackContent', JSON.stringify(formValues));
-                navigate('/PreviewFeedback')
-              }
-            }}>Preview <IoIosArrowForward size={22} /> </Btn>
+            <FinishBtn
+              type="button"
+              onClick={() => {
+                if (onPreview()) {
+                  localStorage.setItem('feedbackContent', JSON.stringify(formValues));
+                  navigate('/PreviewFeedback');
+                }
+              }}
+            >
+              Preview
+              {renderIcons('IoIosArrowForward', 25, 'inherit')}
+            </FinishBtn>
+
           </div>
         </TabsContainer>
       </HeaderContainer>
@@ -560,7 +579,7 @@ const CreateFeedback = () => {
                     <Title>
                       <ReactQuill
                         theme="bubble"
-                        value={item.sectionTitle}
+                        value={formValues?.sections?.[0]?.sectionTitle || ""}
                         onChange={(newValue) => OnTitleText(item.id, newValue)}
                         modules={modules}
                         formats={formats}
