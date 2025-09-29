@@ -247,7 +247,7 @@ export default function CreateTemplate() {
 
         <CustomContainer>
           <BackBtn type='button' title="Back" onClick={onBack}><IoChevronBackSharp size={25} /> Back</BackBtn>
-
+{/* 
           <DefaultFieldlsContainer>
 
             <FieldsContainer>
@@ -299,7 +299,7 @@ export default function CreateTemplate() {
 
             </FieldsContainer>
 
-          </DefaultFieldlsContainer>
+          </DefaultFieldlsContainer> */}
 
           <EditorContainer>
             <Slate

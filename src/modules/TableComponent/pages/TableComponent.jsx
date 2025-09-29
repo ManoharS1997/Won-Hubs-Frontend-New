@@ -37,6 +37,8 @@ import {
   PaginationArrBtn, ColumnOptions, HeadTr, ThContent, ColumnOptionsPopup,
   SortOptBtn, ClearSortingsBtn, RowActionsContainer, RowActionBtn
 } from './StyledComponents'
+import CreateAlerts from '../../Admin-Portal/Alerts/pages/CreateAlerts';
+import CreateFeedback from '../../Admin-Portal/Feedback/pages/CreateFeedback';
 
 const conditions = ['Like', 'Not Like', 'Equals To', 'Not Equals To']
 
@@ -511,6 +513,12 @@ export default function TableComponent({
     switch (tableName) {
       case "notifications":
         return <CreateNotification recordId={selectedTab} />
+      case 'alerts':
+        return <CreateAlerts recordId={selectedTab} />
+      
+      case 'feedback':
+        return <CreateFeedback recordId={selectedTab} />
+      
       default:
         return <DetailedView recordId={selectedTab} tableName={tableName} />
 

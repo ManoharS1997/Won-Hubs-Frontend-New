@@ -163,6 +163,10 @@ import LoginUser from "./shared/components/TestLogin.jsx";
 import WebhookHits from "./modules/Administration/Webhooks/pages/WebhookHits.jsx";
 import SourceForm from "./modules/Admin-Portal/SourceForm.jsx";
 import FormDesignerPage from "./modules/Admin-Portal/form/formDesignerPage.jsx";
+import AlertTemplateView from "./modules/Admin-Portal/Alerts/pages/AlertsTemplateSelection.jsx";
+import PreviewAlerts from "./modules/Admin-Portal/Alerts/pages/AlertsPreview.jsx";
+import TemplateSelectionForTemplate from "./modules/Admin-Portal/Templates/pages/TemplateSelectionForTemplates.jsx";
+
 const router = createBrowserRouter([
   // Public routes (no authentication required)
   {
@@ -382,7 +386,11 @@ const router = createBrowserRouter([
           },
           {
             path: "/create/alert",
-            element: <CreateAlerts />,
+            element: <AlertTemplateView />,
+          },
+          {
+            path: '/alert/new',
+            element: <CreateAlerts />
           },
           {
             path: "/All Designs",
@@ -632,12 +640,17 @@ const router = createBrowserRouter([
           },
           {
             path: "/create/template",
-            element: <TemplateCards />,
+            element: <TemplateSelectionForTemplate />,
           },
+          // {
+          //   path: "/template-creation",
+          //   element: <CreateTemplate />,
+          // },
           {
-            path: "/template-creation",
+            path: "/template/new",
             element: <CreateTemplate />,
           },
+          
           {
             path: "/template-preview",
             element: <PreviewTemplate />,
@@ -657,6 +670,10 @@ const router = createBrowserRouter([
           {
             path: "/PreviewFeedback",
             element: <PreviewFeedback />,
+          },
+             {
+            path: "/PreviewAlert",
+            element: <PreviewAlerts />,
           },
           {
             path: "/catalogs",

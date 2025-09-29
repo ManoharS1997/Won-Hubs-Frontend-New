@@ -12,11 +12,12 @@ const EditorContainer = styled.div`
     
 `
 
-export default function AlertEditor({ show, onClick }) {
+export default function AlertEditor({ show, onClick ,recordData,data}) {
+
     return (
         <EditorContainer show={show} >
             <BackBtn show={show} onClick={onClick} />
-            <QuillEditor />
+            <QuillEditor recordData={recordData} data={data} />
         </EditorContainer>
     )
 } 

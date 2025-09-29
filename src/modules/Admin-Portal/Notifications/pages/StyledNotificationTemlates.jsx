@@ -88,7 +88,7 @@ export const TemplateTile = styled.button`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: #fff;
+    background: transparent;
     background-size: cover;
 `;
 
@@ -96,7 +96,7 @@ export const TemplateTilesContainer = styled.div`
     height: 90%;
     margin: 0px;
     padding: 10px;
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
     border-radius: 8px;
     overflow-y: auto;
     background-color: var(--background-color);

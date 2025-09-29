@@ -125,10 +125,10 @@ const initialValue = [
       },
     ],
   },
-  {
-    type: 'image',
-    children: [{ text: '' }],
-  },
+  // {
+  //   type: 'image',
+  //   children: [{ text: '' }],
+  // },
 ]
 
 const CreateNotification = ({ recordId }) => {
@@ -137,8 +137,8 @@ const CreateNotification = ({ recordId }) => {
   const item = JSON.parse(localStorage.getItem("notificationData"));
   // console.log(notificationItem,"State here ..,")
   // const [notificationContent, setNotificationContent] = useState([])
-  const[notificationItem,setNotificationItem]=useState(item||[])
-  const [notificationContent, setNotificationContent] = useState(() => initialValue)
+  const [notificationItem, setNotificationItem] = useState(item || [])
+  const [notificationContent, setNotificationContent] = useState(initialValue)
   const [notificationData, setNotificationData] = useState([])
   const [fieldsListData, setFieldsListdata] = useState(fieldsList)
   const renderElement = useCallback(props => <Element {...props} />, [])
@@ -152,7 +152,7 @@ const CreateNotification = ({ recordId }) => {
   )
 
   const { id } = useParams()
-  console.log(id, "From useParams")
+  // console.log(id, "From useParams")
   const [suggestion, setSuggestion] = useState("")
 
   const fetchAISuggestion = async (text) => {
@@ -185,38 +185,56 @@ const CreateNotification = ({ recordId }) => {
   };
 
   useEffect(() => {
-    if (recordId) {
-      getNotificationData()
-    }
-    if (id && id !== 'new') {
-      getNotificationData()
-    }
-  }, [])
+    const fetchData = async () => {
+      try {
+        if (recordId) {
+          await getNotificationData();
+        }
+      } catch (error) {
+        console.log("Error fetching notification data:", error);
+      }
+    };
+
+    fetchData();
+  }, [recordId]);
 
   const getNotificationData = async () => {
-    const url = `${import.meta.env.VITE_HOSTED_API_URL}/notification/${recordId}`
-    const options = {
-      method: 'GET',
+    try {
+      console.log("Triggering Hereee");
+
+      const url = `${import.meta.env.VITE_HOSTED_API_URL}/notification/${recordId}`;
+      const options = { method: "GET" };
+
+      const response = await fetch(url, options);
+      console.log(response, "Response Hereee")
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data, "data here");
+
+      const parsedData = data.record?.email_body
+        ? JSON.parse(data.record.email_body)
+        : initialValue;
+
+      console.log(parsedData, "parsed Hereee");
+
+      setNotificationContent(parsedData);
+      setNotificationData(data.record);
+      setNotificationItem({
+        name: { value: data.record?.name || "" },
+        to: { value: data.record?.to_address || "" },
+        type: { value: data.record?.type || "" },
+        subject: { value: data.record?.subject || "" },
+        cc: { value: data.record?.cc || "" },
+      });
+    } catch (error) {
+      console.log("Error fetching notification data:", error);
     }
+  };
 
-    const response = await fetch(url, options)
-    // console.log(response, "response")
-    const data = await response.json()
-    console.log(data,"data here")
-    const parsedData = data.record.email_body
-      ? JSON.parse(data.record.email_body)
-      : [];
-
-    setNotificationContent(parsedData); // this will go into <Slate initialValue={notificationContent}>
-    setNotificationData(data.record);
-    setNotificationItem({
-      name:{value:data.record?.name},
-      to:{value:data.record?.to_address},
-      type:{value:data.record?.type},
-      subject:{value:data.record?.subject},
-      cc:{value:data.record?.cc},
-    })
-  }
   const onBack = () => {
     navigate(-1)
   }
@@ -262,6 +280,7 @@ const CreateNotification = ({ recordId }) => {
       }
     }
   };
+  console.log(notificationContent, "Here notification Content")
   return (
     <MainContainer>
       {!showPreview ?
@@ -394,13 +413,54 @@ const CreateNotification = ({ recordId }) => {
             <div className="flex flex-col items-center justify-center w-full min-h-[100%]">
               <CreateNotificationContainer>
                 {notificationContent?.length !== 0 ? (
+                  // <Slate
+                  //   editor={editor}
+                  //   // initialValue={notificationContent ?? initialValue} 
+                  //   //  // ✅ use value not initialValue
+                  //   initialValue={notificationContent?.length ? notificationContent : initialValue}
+                  //   onChange={handleChange}
+                  // >
+                  //   <Toolbar className='tool-bar'>
+                  //     <ToolBarContainer id='toolbar-buttons'>
+                  //       <MarkButton format="bold" icon={<MdFormatBold size={20} />} />
+                  //       <MarkButton format="italic" icon={<MdFormatItalic size={20} />} />
+                  //       <MarkButton format="underline" icon={<MdFormatUnderlined size={20} />} />
+                  //       <MarkButton format="code" icon={<MdOutlineCode size={20} />} />
+                  //       <BlockButton format="heading-one" icon={<LuHeading1 size={20} />} />
+                  //       <BlockButton format="heading-two" icon={<LuHeading2 size={20} />} />
+                  //       <BlockButton format="block-quote" icon={<MdFormatQuote size={20} />} />
+                  //       <BlockButton format="numbered-list" icon={<MdFormatListNumbered size={20} />} />
+                  //       <BlockButton format="bulleted-list" icon={<MdFormatListBulleted size={20} />} />
+                  //       <BlockButton format="left" icon={<MdFormatAlignLeft size={20} />} />
+                  //       <BlockButton format="center" icon={<MdFormatAlignCenter size={20} />} />
+                  //       <BlockButton format="right" icon={<MdFormatAlignRight size={20} />} />
+                  //       <BlockButton format="justify" icon={<MdFormatAlignJustify size={20} />} />
+                  //       <InsertImageButton icon={<MdImage size={20} />} />
+                  //     </ToolBarContainer>
+                  //   </Toolbar>
+
+                  //   <Editable
+                  //     style={editorStyles}
+                  //     renderLeaf={renderLeaf}
+                  //     spellCheck
+                  //     autoFocus
+                  //     renderElement={(props) => <Element {...props} />}
+                  //     placeholder="Enter some text..."
+                  //     onKeyDown={handleKeyDown}
+
+                  //   />
+
+
+                  // </Slate>
+
                   <Slate
                     editor={editor}
-                    initialValue={notificationContent}   // ✅ use value not initialValue
+                    initialValue={notificationContent ?? initialValue}  // ✅ always provide a valid array
                     onChange={handleChange}
                   >
-                    <Toolbar className='tool-bar'>
-                      <ToolBarContainer id='toolbar-buttons'>
+
+                    <Toolbar className="tool-bar">
+                      <ToolBarContainer id="toolbar-buttons">
                         <MarkButton format="bold" icon={<MdFormatBold size={20} />} />
                         <MarkButton format="italic" icon={<MdFormatItalic size={20} />} />
                         <MarkButton format="underline" icon={<MdFormatUnderlined size={20} />} />
@@ -427,9 +487,8 @@ const CreateNotification = ({ recordId }) => {
                       placeholder="Enter some text..."
                       onKeyDown={handleKeyDown}
                     />
-
-
                   </Slate>
+
                 ) : null}
               </CreateNotificationContainer>
               {suggestion && (
@@ -444,7 +503,7 @@ const CreateNotification = ({ recordId }) => {
         </BodyContainer> :
 
         <PreviewNotification setShowPreview={setShowPreview} previewData={notificationContent} updatingContent={updatingContent} notificationId={id}
-          notificationItem={notificationItem} />
+          notificationItem={notificationItem} recordId={recordId} />
       }
     </MainContainer>
   )

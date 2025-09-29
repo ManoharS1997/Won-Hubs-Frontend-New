@@ -16,6 +16,10 @@ import {
     SubContainer, SubmitBtn, SubmitPopUpText, TemplateImgContainer, Title,
     TitleContainer
 } from "./StyledPreview";
+// import { CustomInput, CustomSelect, CustomLabel } from "./StyledCreateFeedback";
+import { TextAreaTag } from "../../Notifications/CreateNotification/StyledComponents";
+import { CustomOption } from "../../Notifications/CreateNotification/StyledComponents";
+import { CustomInput,CustomLabel, CustomSelect} from "../../Notifications/CreateNotification/StyledComponents";
 
 const modules = {
     toolbar: [
@@ -35,6 +39,9 @@ const PreviewFeedback = () => {
     const navigate = useNavigate();
     const [submitPopText, setSubmitPopText] = useState("");
     const [ispopTextVisible, setPopTextVisible] = useState(false);
+        
+    const [topData,setTopData]=useState(JSON.parse(localStorage.getItem("feedbackData")))
+    console.log(topData,"TopValues here")
 
     useEffect(() => {
         if (submitPopText) {
@@ -172,6 +179,10 @@ const PreviewFeedback = () => {
     };
 
     const onsubmit = async (data) => {
+        const ItemData={
+            ...data,
+            ...topData
+        }
         const url = "http://localhost:3001/feedback/newFeedback";
         const options = {
             method: "POST",
@@ -179,8 +190,8 @@ const PreviewFeedback = () => {
                 authorization: `Bearer ${Cookies.get("accessToken")}`,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(data),
-            
+            body: JSON.stringify(ItemData),
+
         };
 
         try {
@@ -188,6 +199,9 @@ const PreviewFeedback = () => {
             if (response.ok) {
                 console.log("FeedBack Added Successfully!");
                 setSubmitPopText("FeedBack Added Successfully!");
+                navigate('/All Feedbacks',{replace:true})
+                localStorage.clear('feedbackContent')
+                localStorage.clear('feedbackData')
             } else {
                 console.error("Error adding Feedback:", response.statusText);
                 setSubmitPopText("Error adding Feedback:", response.statusText);
@@ -201,15 +215,33 @@ const PreviewFeedback = () => {
     const GoBack = () => {
         navigate(-1)
     };
+    const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        setFormValues((prev) => ({
+            ...prev,
+            [id]: value,
+        }));
+    };
 
+  
     return (
-        <MainContainer>
-            <div style={{ display: 'flex' }}>
+        <MainContainer className="w-full overflow-y-auto">
+
+            {/* Header Section */}
+            <div className="flex justify-between mt-[5px]">
                 <BackBtn onClick={GoBack}>
                     <IoIosArrowBack size={30} />
                 </BackBtn>
-                <HeaderTag>{formValues.formTitle}</HeaderTag>
+                <HeaderTag>{formValues?.formTitle}</HeaderTag>
+                <button
+                    onClick={() => onsubmit(formValues)}
+                    className="!bg-[#04274b] text-white rounded py-2 px-4 flex items-center justify-center border-2"
+                >
+                    Save
+                </button>
             </div>
+
+            {/* Popup (Success / Error) */}
             {ispopTextVisible && (
                 <SubmitPopUpText
                     style={{
@@ -220,230 +252,171 @@ const PreviewFeedback = () => {
                 </SubmitPopUpText>
             )}
 
+            {/* Form Fields: 3-column layout */}
+            <div className="w-full flex flex-col md:flex-row gap-4 p-2  h-[20%]">
+
+                {/* Left Section */}
+                <div className="w-full flex flex-col gap-4">
+                    <div className="flex items-center gap-4">
+                        <CustomLabel htmlFor="to">To:</CustomLabel>
+                        <CustomInput id="to" value={topData?.to?.value} onChange={handleInputChange} />
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <CustomLabel htmlFor="cc">CC:</CustomLabel>
+                        <CustomInput id="cc" value={topData?.cc?.value}onChange={handleInputChange} />
+                    </div>
+                </div>
+
+                {/* Middle Section */}
+                <div className="w-full flex flex-col gap-4">
+                     <div className="flex items-center gap-4">
+                        <CustomLabel htmlFor="name">From:</CustomLabel>
+                        <CustomInput id="name" value={topData?.from?.value} onChange={handleInputChange} />
+                    </div>
+                   
+
+                    <div className="flex items-center gap-4">
+                        <CustomLabel htmlFor="name">Title:</CustomLabel>
+                        <CustomInput id="name" value={topData?.title?.value} onChange={handleInputChange} />
+                    </div>
+                   
+                </div>
+
+                {/* Right Section */}
+                <div className="w-full flex flex-col gap-4">
+                    <div className="flex items-center gap-4">
+                        <CustomLabel htmlFor="type">Type:</CustomLabel>
+                        <CustomSelect
+                            id="type"
+                            value={topData?.type?.value}
+                            onChange={(e) =>
+                                setFormValues((prev) => ({ ...prev, type: e.target.value }))
+                            }
+                        >
+                            <CustomOption value="global">Global</CustomOption>
+                            <CustomOption value="local">Local</CustomOption>
+                        </CustomSelect>
+                    </div>
+                     <div className="flex items-center gap-4">
+                        <CustomLabel htmlFor="name">Description:</CustomLabel>
+                        <CustomInput id="name" value={topData?.description?.value} onChange={handleInputChange} />
+                    </div>
+                </div>
+            </div>
+
+            {/* Sections with Questions */}
             <SubContainer>
                 <CustomContainer>
+
+                    {/* Image Preview */}
                     <TemplateImgContainer
                         style={{
-                            background: formValues.image
-                                ? `url(${formValues.image})`
-                                : "#fff",
+                            background: formValues?.image ? `url(${formValues.image})` : "#fff",
                         }}
-                    ></TemplateImgContainer>
+                    />
 
-                    {formValues.sections.map((item, index) => (
-                        <div
-                            key={item.id}
-                            style={{ marginTop: "15px", height: "fit-content" }}
-                        >
+                    {/* Sections Loop */}
+                    {formValues?.sections?.map((section, index) => (
+                        <div key={section.id} className="mt-[15px] h-fit">
+
+                            {/* Section Header */}
                             {formValues.sections.length > 1 && (
                                 <SectionTag>
                                     Section {index + 1}/{formValues.sections.length}
                                 </SectionTag>
                             )}
-                            <TitleContainer
-                                key={item.id}
-                                style={{
-                                    marginTop: formValues.sections.length <= 1 ? "10px" : "5px",
-                                    height: "180px",
-                                }}
-                            >
-                                <Title style={{ height: "25%" }}>
-                                    <ReactQuill
-                                        theme="bubble"
-                                        readOnly
-                                        value={item.sectionTitle}
-                                        modules={modules}
-                                        formats={formats}
-                                        className="large-text"
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            background: "#f5f3f4",
-                                            borderRadius: "8px",
-                                        }}
-                                    />
-                                </Title>
 
-                                <Description style={{ height: "70%" }}>
-                                    <ReactQuill
-                                        theme="bubble"
-                                        readOnly
-                                        value={item.sectionDescription}
-                                        modules={modules}
-                                        formats={formats}
-                                        className="description-text"
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            padding: "0px",
-                                            background: "#f5f3f4",
-                                            borderRadius: "8px",
-                                        }}
-                                    />
+                            {/* Section Title & Description */}
+                            <TitleContainer
+                                style={{ marginTop: formValues.sections.length <= 1 ? "10px" : "5px" }}
+                            >
+                                <Title>
+                                    <ReactQuill theme="bubble" readOnly value={section.sectionTitle} />
+                                </Title>
+                                <Description>
+                                    <ReactQuill theme="bubble" readOnly value={section.sectionDescription} />
                                 </Description>
                             </TitleContainer>
 
+                            {/* Fields Loop */}
                             <FieldsList>
-                                {item.content.map((each) => (
-                                    <FieldContainer key={each.id}>
-                                        <QuestionDiv
-                                            style={{
-                                                background: "#f5f3f4",
-                                                marginBottom: "5px",
-                                                borderRadius: "10px",
-                                            }}
-                                        >
-                                            <CustomTextField
-                                                style={{ width: "97%", background: "transparent" }}
-                                                type="text"
-                                                placeholder="Question...?"
-                                                readOnly
-                                                value={each.question}
-                                            />
-                                            {each.required ? (
-                                                <RequireSpan>
-                                                    <GoDotFill />
-                                                </RequireSpan>
-                                            ) : null}
+                                {section.content.map((field) => (
+                                    <FieldContainer key={field.id}>
+
+                                        {/* Question */}
+                                        <QuestionDiv>
+                                            <CustomTextField readOnly value={field.question} placeholder="Question...?" />
+                                            {field.required && <RequireSpan><GoDotFill /></RequireSpan>}
                                         </QuestionDiv>
 
-                                        <ResponseDiv style={{ width: "100%" }}>
-                                            {each.type.datatype === "Short Text" && (
+                                        {/* Response Types */}
+                                        <ResponseDiv>
+                                            {field.type.datatype === "Short Text" && (
                                                 <CustomTextField
-                                                    value={each.type.response}
+                                                    value={field.type.response}
                                                     placeholder="Enter Short-Answer Text..."
                                                     onChange={(e) =>
-                                                        OnChangeInResponse(
-                                                            "Short Text",
-                                                            item.id,
-                                                            each.id,
-                                                            e,
-                                                            ""
-                                                        )
+                                                        OnChangeInResponse("Short Text", section.id, field.id, e, "")
                                                     }
-                                                    style={{
-                                                        width: "90%",
-                                                        borderRadius: "0px",
-                                                        height: "35px",
-                                                        background: "#fff",
-                                                        borderBottom: "1px solid #ccc",
-                                                    }}
                                                 />
                                             )}
 
-                                            {each.type.datatype === "Paragraph" && (
+                                            {field.type.datatype === "Paragraph" && (
                                                 <CustomTextArea
-                                                    value={each.type.response}
+                                                    value={field.type.response}
                                                     placeholder="Enter Long-Answer Text..."
                                                     onChange={(e) =>
-                                                        OnChangeInResponse(
-                                                            "Paragraph",
-                                                            item.id,
-                                                            each.id,
-                                                            e,
-                                                            ""
-                                                        )
+                                                        OnChangeInResponse("Paragraph", section.id, field.id, e, "")
                                                     }
                                                 />
                                             )}
 
-                                            {each.type.datatype === "Multiple Choice" && (
-                                                <>
-                                                    <RadioBtnSet>
-                                                        {each.type.data.map((box) => (
-                                                            <RadioBtnContainer key={box.itemID}>
-                                                                <input
-                                                                    id={box.itemID}
-                                                                    name={each.id}
-                                                                    type="radio"
-                                                                    checked={box.isItemChecked}
-                                                                    onChange={(e) =>
-                                                                        OnChangeInResponse(
-                                                                            "Multiple Choice",
-                                                                            item.id,
-                                                                            each.id,
-                                                                            e,
-                                                                            box.itemID
-                                                                        )
-                                                                    }
-                                                                />
-                                                                <input
-                                                                    readOnly
-                                                                    style={{
-                                                                        border: "none",
-                                                                        borderBottom: "1px solid #000",
-                                                                        marginLeft: "5px",
-                                                                        outline: "none",
-                                                                    }}
-                                                                    htmlFor={box.itemID}
-                                                                    type="text"
-                                                                    value={box.itemLabel}
-                                                                />
-                                                            </RadioBtnContainer>
-                                                        ))}
-                                                    </RadioBtnSet>
-                                                </>
+                                            {field.type.datatype === "Multiple Choice" && (
+                                                <RadioBtnSet>
+                                                    {field.type.data.map((option) => (
+                                                        <RadioBtnContainer key={option.itemID}>
+                                                            <input
+                                                                type="radio"
+                                                                name={field.id}
+                                                                checked={option.isItemChecked}
+                                                                onChange={(e) =>
+                                                                    OnChangeInResponse("Multiple Choice", section.id, field.id, e, option.itemID)
+                                                                }
+                                                            />
+                                                            <input readOnly type="text" value={option.itemLabel} />
+                                                        </RadioBtnContainer>
+                                                    ))}
+                                                </RadioBtnSet>
                                             )}
 
-                                            {each.type.datatype === "CheckBox" && (
-                                                <>
-                                                    <RadioBtnSet>
-                                                        {each.type.data.map((eachBox) => (
-                                                            <RadioBtnContainer key={eachBox.itemID}>
-                                                                <input
-                                                                    id={eachBox.itemID}
-                                                                    type="checkbox"
-                                                                    checked={eachBox.isItemChecked}
-                                                                    onChange={(e) =>
-                                                                        OnChangeInResponse(
-                                                                            "CheckBox",
-                                                                            item.id,
-                                                                            each.id,
-                                                                            e,
-                                                                            eachBox.itemID
-                                                                        )
-                                                                    }
-                                                                />
-                                                                <input
-                                                                    readOnly
-                                                                    type="text"
-                                                                    style={{
-                                                                        border: "none",
-                                                                        borderBottom: "1px solid #000",
-                                                                        marginLeft: "5px",
-                                                                        outline: "none",
-                                                                    }}
-                                                                    htmlFor={eachBox.itemID}
-                                                                    value={eachBox.itemLabel}
-                                                                />
-                                                            </RadioBtnContainer>
-                                                        ))}
-                                                    </RadioBtnSet>
-                                                </>
+                                            {field.type.datatype === "CheckBox" && (
+                                                <RadioBtnSet>
+                                                    {field.type.data.map((option) => (
+                                                        <RadioBtnContainer key={option.itemID}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={option.isItemChecked}
+                                                                onChange={(e) =>
+                                                                    OnChangeInResponse("CheckBox", section.id, field.id, e, option.itemID)
+                                                                }
+                                                            />
+                                                            <input readOnly type="text" value={option.itemLabel} />
+                                                        </RadioBtnContainer>
+                                                    ))}
+                                                </RadioBtnSet>
                                             )}
 
-                                            {each.type.datatype === "Dropdown" && (
-                                                <>
-                                                    <div>
-                                                        <select
-                                                            style={{ width: "150px" }}
-                                                            value={each.response}
-                                                            onChange={(e) =>
-                                                                OnChangeInResponse(
-                                                                    "Dropdown",
-                                                                    item.id,
-                                                                    each.id,
-                                                                    e,
-                                                                    ""
-                                                                )
-                                                            }
-                                                        >
-                                                            {each.type.data.map((item) => (
-                                                                <option key={item.id}>{item.itemLabel}</option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                </>
+                                            {field.type.datatype === "Dropdown" && (
+                                                <select
+                                                    value={field.response}
+                                                    onChange={(e) =>
+                                                        OnChangeInResponse("Dropdown", section.id, field.id, e, "")
+                                                    }
+                                                >
+                                                    {field.type.data.map((opt) => (
+                                                        <option key={opt.id}>{opt.itemLabel}</option>
+                                                    ))}
+                                                </select>
                                             )}
                                         </ResponseDiv>
                                     </FieldContainer>
@@ -452,15 +425,12 @@ const PreviewFeedback = () => {
                         </div>
                     ))}
                 </CustomContainer>
-
             </SubContainer>
-
-            <SubmitBtn onClick={() => onsubmit(formValues)} type="button">
-                Submit
-            </SubmitBtn>
 
         </MainContainer>
     );
+
+
 };
 
 export default PreviewFeedback;

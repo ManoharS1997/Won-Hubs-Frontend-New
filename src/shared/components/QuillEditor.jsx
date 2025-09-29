@@ -1,39 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import Cookies from 'js-cookie'
 import { useNavigate } from 'react-router-dom';
-
-const QuillEditor = () => {
-  const [editorContent, setEditorContent] = useState('');
-  const [title, setTitle] = useState('')
-  const navigate = useNavigate()
-
-  // Custom toolbar options
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }], // Header options
-      [{ font: [] }], // Font options
-      [{ size: ['small', false, 'large', 'huge'] }], // Font size options
-      ['bold', 'italic', 'underline', 'strike'], // Formatting options
-      [{ color: [] }, { background: [] }], // Text color and background
-      [{ script: 'sub' }, { script: 'super' }], // Subscript / superscript
-      [{ list: 'ordered' }, { list: 'bullet' }], // Lists
-      [{ indent: '-1' }, { indent: '+1' }], // Indent
-      [{ align: [] }], // Text alignment
-      ['link', 'image', 'video'], // Links, images, and videos
-      ['clean'], // Remove formatting
-    ],
-  };
-
-  const formats = [
+export const modules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }], // Header options
+    [{ font: [] }], // Font options
+    [{ size: ['small', false, 'large', 'huge'] }], // Font size options
+    ['bold', 'italic', 'underline', 'strike'], // Formatting options
+    [{ color: [] }, { background: [] }], // Text color and background
+    [{ script: 'sub' }, { script: 'super' }], // Subscript / superscript
+    [{ list: 'ordered' }, { list: 'bullet' }], // Lists
+    [{ indent: '-1' }, { indent: '+1' }], // Indent
+    [{ align: [] }], // Text alignment
+    ['link', 'image', 'video'], // Links, images, and videos
+    ['clean'], // Remove formatting
+  ],
+};
+ export const formats = [
     'header', 'font', 'size',
     'bold', 'italic', 'underline', 'strike', 'blockquote',
     'color', 'background',
     'list', 'bullet', 'indent',
     'link', 'image', 'video', 'align', 'script'
   ];
+
+const QuillEditor = ({ recordData }) => {
+  console.log(recordData, "rec her")
+  // console.log(data,"From Template View")
+  const [editorContent, setEditorContent] = useState('');
+  const [title, setTitle] = useState('')
+  const navigate = useNavigate()
+
+  // Custom toolbar options
+
+ 
 
   const handleContentChange = (content, delta, source, editor) => {
     // console.log('Content updated:', content); // Log the HTML content
@@ -42,29 +45,66 @@ const QuillEditor = () => {
   };
 
   const handleSave = async () => {
-    console.log("Logginf here")
-    console.log('Saved content:', editorContent);
+    console.log("Saving alert...");
+    console.log("Saved content:", editorContent);
+
     const payload = {
       title: title,
-      shortDescription: editorContent
+      short_description: editorContent, // keep naming consistent with backend
+    };
+
+    let url = "http://localhost:3001/alerts/newAlert";
+    let method = "POST";
+
+    // If editing, switch to update API
+    if (recordData && recordData.record) {
+      url = `http://localhost:3001/alerts/update/${recordData?.record.id}`;
+      method = "PUT"; // or PATCH if your backend supports partial updates
     }
 
-    const url = "http://localhost:3001/alerts/newAlert";
     const options = {
-      method: "POST",
+      method,
       headers: {
         "Content-Type": "application/json",
         authorization: `Bearer ${Cookies.get("accessToken")}`,
       },
       body: JSON.stringify(payload),
     };
-    const response = await fetch(url, options)
-    console.log(response, "response Here")
-    alert('Content saved successfully!');
 
-    navigate('/All Alerts')
-
+    try {
+      const response = await fetch(url, options);
+      console.log(response, "response Hereee")
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      alert(
+        recordData && recordData.record
+          ? "Content updated successfully!"
+          : "Content created successfully!"
+      );
+      navigate("/All Alerts");
+    } catch (error) {
+      console.error("Save failed:", error);
+      alert("Something went wrong while saving!");
+    }
   };
+  const onSubmit = () => {
+    localStorage.setItem('alertContent', JSON.stringify({
+      title: title,
+      editorContent: editorContent,
+    }))
+    navigate('/PreviewAlert', { replace: true })
+  }
+
+
+  useEffect(() => {
+    if (recordData && recordData.record) {
+      console.log(recordData.record, "rec her")
+      setTitle(recordData.record.title || '')
+      setEditorContent(recordData.record.short_description || '')
+    }
+  }, [recordData])
+
 
   console.log(editorContent, "editor Content Hereee..,")
 
@@ -78,6 +118,7 @@ const QuillEditor = () => {
           placeholder='Enetr Title'
           onChange={(e) => setTitle(e.target.value)}
           style={{ textTransform: 'capitalize' }}
+          value={title}
         />
       </InputFiedlContainer>
       <ReactQuill
@@ -87,11 +128,12 @@ const QuillEditor = () => {
         formats={formats}
         theme="snow"
         placeholder="Write the Alert content here..."
-        style={{ height: '85%' }}
+        style={{ height: '50%' }}
+
       />
       <CreateBtn
         type="button"
-        onClick={handleSave}
+        onClick={onSubmit}
         disabled={editorContent === ''}
         idDisabled={
           editorContent === '' ||
@@ -100,8 +142,9 @@ const QuillEditor = () => {
         }
         className="!mt-2"
       >
-        CREATE
+        {recordData && recordData?.record ? "UPDATE" : "CREATE"}
       </CreateBtn>
+
     </EditorContainer>
   );
 };
@@ -167,6 +210,7 @@ const CreateBtn = styled.button`
     background-color:  var(--primary-color);
     color:  var(--secondary-color);
     border: none;
+    margin-top: 10px;
    
     &:hover {
         background-color: ${({ idDisabled }) => !idDisabled ? ' var(--secondary-color)' : '#ccc'};
