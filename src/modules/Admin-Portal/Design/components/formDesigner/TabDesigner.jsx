@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import AddFieldModal from "./AddFieldModal";
+import renderIcons from "../../../../../shared/functions/renderIcons";
 
 const PREDEFINED_TABS = ["History", "Settings"];
 
@@ -148,31 +149,36 @@ function Tab({
           <h3 className="text-xl font-semibold text-indigo-700">{tab.name}</h3>
         </div>
         <div className="flex flex-row items-center gap-5">
-          <div>
+          <div className="inline-flex rounded-xl shadow-sm overflow-hidden">
             <button
               onClick={() => setTabType(tabIdx, "form")}
-              className={`mr-2 px-4 py-2 rounded-md ${
-                tab.type === "form"
-                  ? "bg-indigo-600 text-white"
-                  : "bg-indigo-100 text-indigo-700"
-              }`}
+              className={`px-5 py-2 text-sm font-medium transition-all duration-200
+      ${tab.type === "form"
+                  ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
+                  : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
+                }
+      rounded-l-md
+    `}
             >
               Form
             </button>
             <button
               onClick={() => setTabType(tabIdx, "table")}
-              className={`px-4 py-2 rounded-md ${
-                tab.type === "table"
-                  ? "bg-indigo-600 text-white"
-                  : "bg-indigo-100 text-indigo-700"
-              }`}
+              className={`px-5 py-2 text-sm font-medium transition-all duration-200
+      ${tab.type === "table"
+                  ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
+                  : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
+                }
+      rounded-r-md
+    `}
             >
               Table
             </button>
           </div>
+
           <button
             onClick={() => removeTab(tabIdx)}
-            className="ml-2 text-red-500 hover:text-red-700 rounded focus:outline-none"
+            className="ml-2 text-red-500 hover:text-red-700 rounded focus:outline-none bg-transparent"
             aria-label="Remove Tab"
             title="Remove Tab"
             style={{ fontSize: 30 }}
@@ -203,7 +209,7 @@ function Tab({
               ))}
               <button
                 onClick={() => openAddFieldModal(tabIdx)}
-                className="px-3 py-1 bg-green-600 text-white rounded cursor-pointer hover:bg-green-700"
+                className="px-3 py-1 !bg-green-600 text-white rounded cursor-pointer hover:bg-green-700"
               >
                 + Custom Field
               </button>
@@ -256,7 +262,7 @@ function Tab({
                   const label = prompt("Enter button label");
                   if (label) addTabButton(tabIdx, { type: "custom", label });
                 }}
-                className="px-3 py-1 bg-green-600 text-white rounded cursor-pointer hover:bg-green-700"
+                className="px-3 py-1 !bg-green-600 text-white rounded cursor-pointer hover:bg-green-700"
               >
                 + Custom Button
               </button>
@@ -445,26 +451,67 @@ function TabsDesigner({
 }) {
   return (
     <section className="bg-white rounded-lg p-6 shadow-lg mx-auto mt-6">
+      <div className="flex justify-between mt-0 mb-2">
+        <h3
+          style={{
+            fontSize: 18,
+            color: "#4f39f6",
+            fontWeight: "semibold",
+            marginBottom: 18,
+          }}
+          className="font-semibold text-indigo-600 mb-3 text-lg"
+        >
+          Tabs
+        </h3>
+        <div className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
+              mb-2">
+          <input type="search" placeholder="Search Fields" className=" outline-none px-2 py-1"
+          // onChange={(e) => {
+          // const query = e.target.value.toLowerCase();
+          // setFilteredFields(PREDEFINED_FIELDS.filter(field => field.label.toLowerCase().includes(query)));
+          // }} 
+          />
+          {renderIcons('FaSearch', 15, 'gray')}
+        </div>
+      </div>
       <div className="flex flex-wrap gap-3 mb-6">
         {PREDEFINED_TABS.map((t) => (
           <DraggableButton
+            // style={{ borderRadius: '8px' }}
             key={t}
             item={t}
             category="tab"
             onDragStart={onDragStart}
-            className="px-3 py-1 rounded bg-indigo-100 text-indigo-700 cursor-grab shadow-sm"
+            // className="px-3 py-1 rounded bg-indigo-100 text-indigo-700 cursor-grab shadow-sm"
+            className="
+        bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
+        border border-blue-600/40
+        text-white 
+        font-medium 
+        !rounded-md
+        px-5 py-2.5 
+        shadow-sm 
+        transition-all 
+        duration-300
+        hover:from-blue-700 hover:via-blue-900 hover:to-blue-500
+        hover:shadow-md 
+        active:scale-95
+        whitespace-nowrap
+      "
           >
             {t}
           </DraggableButton>
         ))}
-
+      </div>
+      <div className='flex w-full justify-between items-center mb-4'>
         <button
           onClick={addCustomTab}
-          className="px-3 py-1 rounded bg-green-600 text-white hover:bg-green-700 shadow-sm"
+          className="px-3 py-2  rounded !bg-green-600 text-white hover:bg-green-700 shadow-sm"
           type="button"
         >
-          + Add Tab
+          + Custom
         </button>
+        <button className="bg-transparent p-0 m-0 text-blue-500">+more</button>
       </div>
       <div
         onDrop={onDropTab}
@@ -530,6 +577,7 @@ TabDesigner.propTypes = {
 export default function TabDesigner({ tabs, setTabs }) {
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
   const [fieldModalTabIdx, setFieldModalTabIdx] = useState(null);
+  const [activeTab, setActiveTab] = useState('')
   const onDragStart = (e, item, category) => {
     e.dataTransfer.setData(
       "application/json",
@@ -585,12 +633,12 @@ export default function TabDesigner({ tabs, setTabs }) {
       prev.map((tab, i) =>
         i === idx
           ? {
-              ...tab,
-              fields: [
-                ...tab.fields,
-                { ...field, name: `${field.label}-${tab.fields.length}` },
-              ],
-            }
+            ...tab,
+            fields: [
+              ...tab.fields,
+              { ...field, name: `${field.label}-${tab.fields.length}` },
+            ],
+          }
           : tab
       )
     );
@@ -625,9 +673,9 @@ export default function TabDesigner({ tabs, setTabs }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-              ...tab,
-              buttons: tab.buttons.filter((_, idx) => idx !== buttonIdx),
-            }
+            ...tab,
+            buttons: tab.buttons.filter((_, idx) => idx !== buttonIdx),
+          }
           : tab
       )
     );
@@ -639,12 +687,12 @@ export default function TabDesigner({ tabs, setTabs }) {
       prev.map((tab, i) =>
         i === idx
           ? {
-              ...tab,
-              tableCols: [
-                ...tab.tableCols,
-                { ...column, name: `${column.label}-${tab.tableCols.length}` },
-              ],
-            }
+            ...tab,
+            tableCols: [
+              ...tab.tableCols,
+              { ...column, name: `${column.label}-${tab.tableCols.length}` },
+            ],
+          }
           : tab
       )
     );
@@ -655,9 +703,9 @@ export default function TabDesigner({ tabs, setTabs }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-              ...tab,
-              tableCols: tab.tableCols.filter((_, idx) => idx !== colIdx),
-            }
+            ...tab,
+            tableCols: tab.tableCols.filter((_, idx) => idx !== colIdx),
+          }
           : tab
       )
     );

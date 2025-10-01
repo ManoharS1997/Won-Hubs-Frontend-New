@@ -715,6 +715,9 @@ const router = createBrowserRouter([
             path: "/apps",
             element: <Apps />,
           },
+          {path:'/check-form',
+            element:'/form2-designer'
+          }
         ],
       },
       // User portal layout routes
