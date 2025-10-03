@@ -28,7 +28,8 @@ import { MdOutgoingMail } from "react-icons/md";
 
 import WonContext from "../../../../context/WonContext.jsx";
 import EmailModel from '../../SendEmail/pages/EmailModal.jsx';
-import { CustomInput,CustomLabel,CustomOption,CustomSelect } from "../../Notifications/CreateNotification/StyledComponents.jsx";
+import { CustomInput, CustomLabel, CustomOption, CustomSelect } from "../../Notifications/CreateNotification/StyledComponents.jsx";
+import Cookies from "js-cookie";
 
 import {
   ActionBtn,
@@ -170,8 +171,8 @@ const Customstyle = {
 export default function PreviewTemplate() {
   const history = useNavigate()
   const canvasRef = useRef(null)
-  const [topData,setTopData]=useState(JSON.parse(localStorage.getItem('templateData')))
-  const [formValues,setFormValues]=useState()
+  const [topData, setTopData] = useState(JSON.parse(localStorage.getItem('templateData')))
+  const [formValues, setFormValues] = useState()
   const [templateContent, setTemplateContent] = useState(JSON.parse(localStorage.getItem('templateContent')))
   const editor = useMemo(() => withHistory(withEmbeds(withTables(withLinks(withReact(createEditor()))))), []);
   const [isOpenShare, setOpenShare] = useState(false)
@@ -212,10 +213,27 @@ export default function PreviewTemplate() {
 
   const onBack = () => history.goBack()
 
-  const handleSaveAs = () => {
-    setShowExports(false)
-    
-    window.alert('Template Saved Successfully')
+  const handleSaveAs = async () => {
+    // setShowExports(false)
+    // Here we have to do api call
+    const templateData = { ...topData, content: templateContent }
+    const url = `${import.meta.env.VITE_HOSTED_API_URL}/template/newTemplate`
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+
+      },
+      body: JSON.stringify(templateData)
+    }
+    const response = await fetch(url, options)
+    console.log(response, "Response here")
+    if (response.ok) {
+      const data = await response.json()
+      console.log(data, "data here")
+      window.alert('Template Saved Successfully')
+    }
   };
 
   const saveAsText = () => {
@@ -319,7 +337,6 @@ export default function PreviewTemplate() {
   };
 
   const downloadHTMLZip = () => {
-
     const htmlContent = generateHTML(templateContent);
     const zip = new JSZip();
     zip.file('index.html', htmlContent);
@@ -381,13 +398,13 @@ export default function PreviewTemplate() {
       console.error('Error exporting content to JPG:', error);
     }
   }
-   const handleInputChange = (e) => {
-        const { id, value } = e.target;
-        setFormValues((prev) => ({
-            ...prev,
-            [id]: value,
-        }));
-    };
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormValues((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
 
 
   return (
@@ -437,9 +454,9 @@ export default function PreviewTemplate() {
                       <CustomSelect
                         id="type"
                         value={topData?.type?.value}
-                        // onChange={(e) =>
-                        //   setFormValues((prev) => ({ ...prev, type: e.target.value }))
-                        // }
+                      // onChange={(e) =>
+                      //   setFormValues((prev) => ({ ...prev, type: e.target.value }))
+                      // }
                       >
                         <CustomOption value="global">Global</CustomOption>
                         <CustomOption value="local">Local</CustomOption>
@@ -506,10 +523,11 @@ export default function PreviewTemplate() {
                         style={{ backgroundColor: showExports ? '#e5e5e5' : '', color: showExports ? '#284b63' : '' }}>Export
                         <BiExport size={20} style={{ marginLeft: '15px' }} />
                       </ShareOptionBtn>
-                      <Link to='/All Templates' style={{ width: '100%' }}>
-                        <ShareOptionBtn onClick={handleSaveAs}>Save
-                          <MdOutlineSaveAs size={20} style={{ marginLeft: '15px' }} />
-                        </ShareOptionBtn></Link>
+                      {/* <Link to='/All Templates' style={{ width: '100%' }}> */}
+                      <ShareOptionBtn onClick={handleSaveAs}>Save
+                        <MdOutlineSaveAs size={20} style={{ marginLeft: '15px' }} />
+                      </ShareOptionBtn>
+                      {/* </Link> */}
                       <ShareOptionBtn
                         type="button"
                         onClick={handlePrintContent}>Print

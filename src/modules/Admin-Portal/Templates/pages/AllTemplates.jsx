@@ -21,14 +21,17 @@ const AllTemplates = () => {
   const fetchAllTemplatesData = async () => {
     try {
       const data = await getTableData('templates')
+      // console.log(data,"Templates Data Here")
       const newColumnNames = await getTableColumnNames('templates')
+      // console.log(newColumnNames,"newCol Here")
       if (data?.templates?.length === 0) {
         // setUsersData(ApprovalsDummyData)
       } else {
         setTemplatesData(data.templates)
       }
       setTableColumnNames(newColumnNames.columns)
-    } catch {
+    } catch(e) {
+      console.log(e);
       console.log('Error fetching Templates Data')
     }
   }

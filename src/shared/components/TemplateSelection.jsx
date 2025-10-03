@@ -196,10 +196,10 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                         </CustomNotificationContainer>
 
                         {isModalOpen && (
-                            <div className="fixed w-screen min-h-screen bg-black/50 top-0 left-0 flex items-center justify-center">
-                                <div className="flex flex-col justify-between items-center bg-white py-4 px-7 rounded-lg gap-4 w-[600px] max-w-[90%]">
-                                    <div className="relative w-full flex items-center justify-center">
-                                        <h2 className="text-xl font-semibold text-center w-full">
+                            <div className="fixed w-screen min-h-[80%] bg-black/50 top-0 left-0 flex items-center justify-center">
+                                <div className="flex flex-col py-4 px-3 justify-between items-center bg-white rounded-lg gap-4 w-[600px] max-w-[80%]">
+                                    <div className="relative w-full flex items-center justify-center m-0 p-0">
+                                        <h2 className="text-xl font-semibold text-center w-full m-0 p-0">
                                             {title}
                                         </h2>
                                         <button

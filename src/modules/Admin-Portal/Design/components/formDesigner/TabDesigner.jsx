@@ -433,6 +433,7 @@ Tab.propTypes = {
 };
 
 function TabsDesigner({
+  tabsList,
   tabs,
   addCustomTab,
   setTabType,
@@ -448,7 +449,9 @@ function TabsDesigner({
   onDrop,
   allowDrop,
   removeTab,
+  updateTabFilters
 }) {
+
   return (
     <section className="bg-white rounded-lg p-6 shadow-lg mx-auto mt-6">
       <div className="flex justify-between mt-0 mb-2">
@@ -465,17 +468,25 @@ function TabsDesigner({
         </h3>
         <div className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
               mb-2">
-          <input type="search" placeholder="Search Fields" className=" outline-none px-2 py-1"
-          // onChange={(e) => {
-          // const query = e.target.value.toLowerCase();
-          // setFilteredFields(PREDEFINED_FIELDS.filter(field => field.label.toLowerCase().includes(query)));
-          // }} 
+          <input
+            type="search"
+            placeholder="Search Fields"
+            className="outline-none px-2 py-1"
+            onChange={(e) => {
+              const query = e.target.value.toLowerCase();
+              updateTabFilters(
+                PREDEFINED_TABS.filter(tab =>
+                  tab.label.toLowerCase().includes(query)
+                )
+              );
+            }}
           />
+
           {renderIcons('FaSearch', 15, 'gray')}
         </div>
       </div>
       <div className="flex flex-wrap gap-3 mb-6">
-        {PREDEFINED_TABS.map((t) => (
+        {tabsList.map((t) => (
           <DraggableButton
             // style={{ borderRadius: '8px' }}
             key={t}
@@ -578,6 +589,8 @@ export default function TabDesigner({ tabs, setTabs }) {
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
   const [fieldModalTabIdx, setFieldModalTabIdx] = useState(null);
   const [activeTab, setActiveTab] = useState('')
+  const [filteredTabs, setFilteredTabs] = useState(PREDEFINED_TABS);
+
   const onDragStart = (e, item, category) => {
     e.dataTransfer.setData(
       "application/json",
@@ -734,10 +747,15 @@ export default function TabDesigner({ tabs, setTabs }) {
       setFieldModalTabIdx(null);
     }
   };
+  const updateTabFilters = (tabs) => {
+    setFilteredTabs(tabs);
+    console.log(tabs, 'tabs');
+  };
 
   return (
     <>
       <TabsDesigner
+        tabsList={filteredTabs}
         tabs={tabs}
         addCustomTab={addCustomTab}
         setTabType={setTabType}
@@ -753,6 +771,7 @@ export default function TabDesigner({ tabs, setTabs }) {
         onDrop={(e, idx, type) => onDrop(e, idx, type)}
         allowDrop={allowDrop}
         removeTab={removeTab}
+        updateTabFilters={updateTabFilters}
       />
       <AddFieldModal
         open={showAddFieldModal}

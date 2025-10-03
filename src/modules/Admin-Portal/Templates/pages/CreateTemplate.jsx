@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import Modal from 'react-modal'
 import styled from "styled-components";
 
@@ -35,6 +35,8 @@ import {
   SidebarContainer, TextEditorCustomContainer
 
 } from '../components/CreateTemplate/StyledComponents'
+import { GetAnyRecordFromAnyTable } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations.jsx";
+import SlateEditor from "../../../../shared/components/SlateEditor.jsx";
 
 const Element = (props) => {
 
@@ -179,16 +181,37 @@ const CustomSettings = {
   },
 };
 
-export default function CreateTemplate() {
+export default function CreateTemplate({ recordId }) {
   const history = useNavigate()
   const [templateContent, setTemplateContent] = useState(JSON.parse(localStorage.getItem('templateContent')))
   const editor = useMemo(() => withHistory(withEmbeds(withTables(withLinks(withReact(createEditor()))))), []);
   const [fieldsListData, setFieldsListdata] = useState(fieldsList)
   const [formatSize, setFormatSize] = useState(['2480px', '3580px'])
   const [fullView, setFullView] = useState(false)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'Hello' }],
+    },
+  ])
 
   const openFullView = () => setFullView(true)
   const closeFullView = () => setFullView(false)
+
+  useEffect(() => {
+    if (recordId) {
+      const fetchTemplateContent = async () => {
+        const response = await GetAnyRecordFromAnyTable('templates', recordId);
+        console.log(response, "Single Template Record")
+        if (response.success) {
+          // console.log(response.data[0].content, "Template Content")
+          // setTemplateContent(response.data[0].content);
+          setValue(response.data[0].content)
+        }
+      };
+      fetchTemplateContent();
+    }
+  }, [1]);
 
   const changeFormate = (e) => {
     setFormatSize(e.target.value)
@@ -214,12 +237,7 @@ export default function CreateTemplate() {
     }
   `
 
-  const [initialValue, setValue] = useState([
-    {
-      type: 'paragraph',
-      children: [{ text: 'First line of text in Slate JS. ' }],
-    },
-  ])
+
 
   const renderElement = useCallback(props => <Element {...props} />, [])
 
@@ -230,6 +248,8 @@ export default function CreateTemplate() {
   const onBack = () => {
     history.goBack()
   }
+
+
 
   return (
     <MainContainer>
@@ -247,7 +267,7 @@ export default function CreateTemplate() {
 
         <CustomContainer>
           <BackBtn type='button' title="Back" onClick={onBack}><IoChevronBackSharp size={25} /> Back</BackBtn>
-{/* 
+          {/* 
           <DefaultFieldlsContainer>
 
             <FieldsContainer>
@@ -301,7 +321,7 @@ export default function CreateTemplate() {
 
           </DefaultFieldlsContainer> */}
 
-          <EditorContainer>
+          {/* <EditorContainer>
             <Slate
               editor={editor}
               initialValue={templateContent === null ? initialValue : templateContent}
@@ -368,9 +388,12 @@ export default function CreateTemplate() {
               </div>
             </Modal>
 
-          </EditorContainer>
+          </EditorContainer> */}
+          {/* Adding my new Editor */}
+          <SlateEditor value={value} onChange={newValue => setValue(newValue)} placeholder="Write something..." />
 
           <ActionBtnsContainer>
+
 
             <Link to='/template-preview'>
               <ActionBtn

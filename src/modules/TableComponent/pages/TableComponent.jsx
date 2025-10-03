@@ -25,7 +25,7 @@ import DetailedView from '../../Admin-Portal/DetailedView/pages/DetailedView';
 import ExportData from '../../../shared/components/ExportTableData';
 import MoreOptions from '../components/MoreOptions';
 import CreateNotification from '../../Admin-Portal/Notifications/pages/CreateNotification';
-
+import CreateTemplate from '../../Admin-Portal/Templates/pages/CreateTemplate';
 import {
   TableContainer, CustomTable, CustomThead, CustomTh,
   CustomTr, CustomTbody, CustomTd, CheckBoxTag, MainContainer,
@@ -378,9 +378,6 @@ export default function TableComponent({
       setCurrentPage(currPage - 1);
     }
   };
-
-
-
   const clearSortings = () => {
     setSortingsApplied(false)
     setTableData(tableData)
@@ -425,7 +422,6 @@ export default function TableComponent({
       }
     });
   }
-
   const deleteRecords = () => {
     // deleteFunction()
     for (let id of selectedRowIds) {
@@ -459,7 +455,7 @@ export default function TableComponent({
     }
   };
 
-  // sanju
+  // sandhya
   const applyFilters = (data, filterConditions) => {
     return data.filter(row => {
       // Handle empty or no conditions
@@ -518,7 +514,8 @@ export default function TableComponent({
       
       case 'feedback':
         return <CreateFeedback recordId={selectedTab} />
-      
+      case 'templates':
+        return <CreateTemplate recordId={selectedTab} />
       default:
         return <DetailedView recordId={selectedTab} tableName={tableName} />
 
