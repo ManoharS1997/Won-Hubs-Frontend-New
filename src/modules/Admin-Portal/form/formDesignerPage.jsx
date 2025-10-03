@@ -5,6 +5,9 @@ import TabDesigner from "../Design/components/formDesigner/TabDesigner";
 import { useLocation } from "react-router-dom";
 import AddButtonEventModal from "../Design/components/formDesigner/AddButtonEventModal";
 
+import renderIcons from "../../../shared/functions/renderIcons";
+import { PreviewBtn } from "./styledComponents";
+
 export default function FormDesignerPage() {
   const { state } = useLocation();
   const [module, setModule] = React.useState("");
@@ -76,26 +79,30 @@ export default function FormDesignerPage() {
                 className="border-b-2 border-black outline-none"
                 onChange={(e) => setModule(e.target.value)}
               />
-              <button
-                style={{ borderRadius: 8 }}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-lg"
+              <PreviewBtn
+                // style={{ borderRadius: 8 }}
+                // className="px-6 py-2 !bg-green-600 text-white rounded-lg"
+                onClick={() => setShowTabs((v) => !v)}
+                type="button"
+                className="flex gap-2"
+              >
+                {showTabs ? "Hide Tabs" : "Configure Tabs"}
+                {renderIcons('TiTabsOutline', 25, 'inherit')}
+              </PreviewBtn>
+
+              <PreviewBtn
+                // style={{ borderRadius: 8 }}
+                type='button'
+                // className="px-6 py-2 !bg-indigo-600 !text-white rounded-lg"
                 onClick={() => {
                   if (module.length > 0) setShowPreview((v) => !v);
                   else alert("Please enter a title for the form");
                 }}
-                type="button"
               >
                 {showPreview ? "Hide Preview" : "Show Preview"}
-              </button>
+                {renderIcons('MdDoubleArrow', 25, 'inherit')}
 
-              <button
-                style={{ borderRadius: 8 }}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg"
-                onClick={() => setShowTabs((v) => !v)}
-                type="button"
-              >
-                {showTabs ? "Hide Tabs" : "Show Tabs"}
-              </button>
+              </PreviewBtn>
             </div>
           </header>
 
@@ -135,19 +142,20 @@ export default function FormDesignerPage() {
         >
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/30"></div>
-
           {/* Panel */}
-          <div
-            className={`absolute top-0 right-0 h-full w-1/2 bg-white shadow-2xl transform transition-transform duration-300 ${
-              showTabs ? "translate-x-0" : "translate-x-full"
-            }`}
-            onClick={(e) => e.stopPropagation()}
+          <div className={`absolute top-0 right-0 h-full w-1/2 bg-white shadow-2xl transform transition-transform duration-300 ${showTabs ? "translate-x-0" : "translate-x-full"
+              }`}
+            onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
           >
             <div className="flex justify-between items-center p-4 border-b">
               <h1 style={{ color: "#022052", fontSize: 30, fontWeight: "bolder" }}>
                 Tab Designer
               </h1>
-              <button className="text-red-500 font-semibold" onClick={() => setShowTabs(false)}>
+
+              <button
+                className="text-red-500 font-semibold bg-transparent"
+                onClick={() => setShowTabs(false)}
+              >
                 ✕
               </button>
             </div>

@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import DraggableButton from "./DraggableButton";
 import AddFieldModal from "./AddFieldModal";
 import { useState } from "react";
+import renderIcons from "../../../../../shared/functions/renderIcons";
 
 const PREDEFINED_FIELDS = [
   { type: "text", label: "Text" },
@@ -21,6 +22,8 @@ const PREDEFINED_FIELDS = [
 const PREDEFINED_BUTTONS = [
   { type: "submit", label: "Submit" },
   { type: "reset", label: "Reset" },
+  { type: "update", label: "Update" },
+  { type: "cancel", label: "Cancel" },
 ];
 
 export default function FormBuilder({
@@ -48,44 +51,109 @@ export default function FormBuilder({
     ]);
     setShowAddFieldModal(false);
   };
+  const [filteredFields, setFilteredFields] = useState(PREDEFINED_FIELDS);
 
   return (
-    <section className="bg-white p-6 rounded-2xl shadow-lg border border-indigo-100 flex-grow min-w-[320px] transition">
+    <section className="bg-white p-4 rounded-2xl shadow-lg border border-indigo-100 flex-grow min-w-[320px] transition">
       <div className="mb-8">
-        <h3
-          style={{
-            fontSize: 18,
-            color: "#4f39f6",
-            fontWeight: "semibold",
-            marginBottom: 18,
-          }}
-        >
-          Fields
-        </h3>
+        {/* Header */}
+        <div className="flex justify-between mt-0">
+          <h3
+            style={{
+              fontSize: 18,
+              color: "#4f39f6",
+              fontWeight: "semibold",
+              marginBottom: 18,
+            }}
+          >
+            Fields
+          </h3>
+          {/* Search Bar */}
+          <div className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
+        mb-2">
+            <input type="search" placeholder="Search Fields" className=" outline-none px-2 py-1" onChange={(e) => {
+              const query = e.target.value.toLowerCase();
+              setFilteredFields(PREDEFINED_FIELDS.filter(field => field.label.toLowerCase().includes(query)));
+            }} />
+            {renderIcons('FaSearch', 15, 'gray')}
+          </div>
+        </div>
+        {/* Predefined Fields Section */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          {PREDEFINED_FIELDS.map((f) => (
+          {/* <div className="flex flex-col"> */}
+          {filteredFields.map((f) => (
             <DraggableButton
               key={f.label}
               item={f}
               category="field"
               onDragStart={onDragStart}
-              className="bg-gradient-to-r from-indigo-100 to-indigo-200 text-indigo-800 font-medium rounded-lg px-4 py-2 cursor-grab hover:from-indigo-200 hover:to-indigo-300 active:scale-95 shadow-sm transition whitespace-nowrap"
+              className="
+                bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
+                border border-blue-600/40
+                text-white 
+                font-medium 
+                rounded-md 
+                px-5 py-2.5 
+                shadow-sm 
+                transition-all 
+                duration-300
+                hover:from-blue-700 hover:via-blue-900 hover:to-blue-500
+                hover:shadow-md 
+                active:scale-95
+                whitespace-nowrap
+              "
+            //               className="
+            //   !bg-blue-500
+            //   border border-blue-700 
+            //   text-blue-800 
+            //   font-medium 
+            //   rounded-md 
+            //   px-5 py-2.5 
+            //   shadow-sm 
+            //   transition-all 
+            //   duration-300 
+            //   hover:!bg-blue-100 
+            //   hover:shadow-md 
+            //   active:scale-95 
+            //   whitespace-nowrap
+            // "
+
             >
               {f.label}
             </DraggableButton>
           ))}
-          <button
-            style={{ borderRadius: 8 }}
-            className="px-3 py-1.5 rounded-md bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition"
-            onClick={() => setShowAddFieldModal(true)}
-          >
-            + Custom
-          </button>
-          <AddFieldModal
-            open={showAddFieldModal}
-            onClose={() => setShowAddFieldModal(false)}
-            onSubmit={onAddFieldModalSubmit}
-          />
+          <div className="flex justify-between w-[97%] items-center">
+            <button
+              style={{ borderRadius: 6 }}
+              className="
+      px-4 py-2 
+      rounded-md 
+      bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600
+      border border-blue-600/40
+      text-white 
+      text-sm 
+      font-medium 
+      shadow-sm
+      hover:from-blue-700 hover:via-blue-600 hover:to-blue-500
+      hover:shadow-md
+      active:scale-95
+      transition-all
+      duration-300
+    "
+              onClick={() => setShowAddFieldModal(true)}
+            >
+              + Custom
+            </button>
+
+            <button className="bg-transparent m-0 p-0 text-blue-500">+more</button>
+
+            <AddFieldModal
+              open={showAddFieldModal}
+              onClose={() => setShowAddFieldModal(false)}
+              onSubmit={onAddFieldModalSubmit}
+            />
+          </div>
+          {/* </div> */}
         </div>
 
         {/* Drop Zone for Fields */}
@@ -125,38 +193,71 @@ export default function FormBuilder({
       </div>
 
       {/* Buttons Section */}
-      <div>
-        <h3
-          style={{
-            fontSize: 18,
-            color: "#4f39f6",
-            fontWeight: "semibold",
-            marginBottom: 18,
-          }}
-          className="font-semibold text-indigo-600 mb-3 text-lg"
-        >
-          Buttons
-        </h3>
-        <div className="flex flex-wrap items-center gap-3 mb-4">
+      <div className="flex flex-col">
+        <div className="flex justify-between mt-0 mb-2">
+          <h3
+            style={{
+              fontSize: 18,
+              color: "#4f39f6",
+              fontWeight: "semibold",
+              marginBottom: 18,
+            }}
+            className="font-semibold text-indigo-600 mb-3 text-lg"
+          >
+            Buttons
+          </h3>
+          <div className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
+        mb-2">
+            <input type="search" placeholder="Search Fields" className=" outline-none px-2 py-1" onChange={(e) => {
+              const query = e.target.value.toLowerCase();
+              setFilteredFields(PREDEFINED_FIELDS.filter(field => field.label.toLowerCase().includes(query)));
+            }} />
+            {renderIcons('FaSearch', 15, 'gray')}
+          </div>
+        </div>
+        {/* Predefined Buttons Section */}
+        <div className="flex flex-wrap items-center gap-3 mb-2">
           {PREDEFINED_BUTTONS.map((b) => (
             <DraggableButton
               key={b.label}
               item={b}
               category="button"
               onDragStart={onDragStart}
-              className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 font-medium rounded-lg px-4 py-2 cursor-grab hover:from-gray-200 hover:to-gray-300 active:scale-95 shadow-sm transition whitespace-nowrap"
+              className="
+        bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
+        border border-blue-600/40
+        text-white 
+        font-medium 
+        rounded-md
+        px-5 py-2.5 
+        shadow-sm 
+        transition-all 
+        duration-300
+        hover:from-blue-700 hover:via-blue-900 hover:to-blue-500
+        hover:shadow-md 
+        active:scale-95
+        whitespace-nowrap
+      "
             >
               {b.label}
             </DraggableButton>
           ))}
+        </div>
+
+        {/* Separate row for "+ Custom" and "+more" buttons */}
+        <div className="flex justify-between items-center w-full mt-2 mb-4">
           <button
             style={{ borderRadius: 8 }}
             onClick={addCustomButton}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-green-600 active:scale-95 transition whitespace-nowrap"
+            className="!bg-green-500 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-green-600 active:scale-95 transition whitespace-nowrap"
           >
             + Custom
           </button>
+          <button className="bg-transparent m-0 p-0 text-blue-500 whitespace-nowrap">
+            +more
+          </button>
         </div>
+
 
         {/* Drop Zone for Buttons */}
         <div

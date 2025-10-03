@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 export default function DraggableButton({ item, category, onDragStart, children, className }) {
   return (
     <button
+      style={{ borderRadius: 8 }}
       type="button"
       draggable
       onDragStart={e => onDragStart(e, item, category)}
