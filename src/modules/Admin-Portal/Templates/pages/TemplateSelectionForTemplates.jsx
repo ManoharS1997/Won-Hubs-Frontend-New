@@ -73,12 +73,10 @@ const TemplateSelectionForTemplate = () => {
         { name: "title", label: "Title", type: "text", isMandatory: true }, // Main identifier
         { name: "from", label: "From", type: "text", isMandatory: true }, // Sender
         {
-            name: "to", label: "To", type: "dropdown", isMandatory: true, options: [
-                { label: "Users", value: "users" },
-                { label: "Roles", value: "roles" },
-            ],
+            name: "to", label: "To", type: "text", isMandatory: true,
         }, // Recipient
-        { name: "cc", label: "CC", type: "text", isMandatory: true }, // CC field comes after To
+        { name: "cc", label: "CC", type: "text", isMandatory: true }, 
+        { name: "subject", label: "Subject", type: "text", isMandatory: true }, // CC field comes after To
         {
             name: "type",
             label: "Type",

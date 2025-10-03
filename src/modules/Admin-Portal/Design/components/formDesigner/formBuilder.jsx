@@ -52,6 +52,7 @@ export default function FormBuilder({
     setShowAddFieldModal(false);
   };
   const [filteredFields, setFilteredFields] = useState(PREDEFINED_FIELDS);
+  const [filteredButtons, setFilteredButtons] = useState(PREDEFINED_BUTTONS);
 
   return (
     <section className="bg-white p-4 rounded-2xl shadow-lg border border-indigo-100 flex-grow min-w-[320px] transition">
@@ -80,7 +81,6 @@ export default function FormBuilder({
         </div>
         {/* Predefined Fields Section */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          {/* <div className="flex flex-col"> */}
           {filteredFields.map((f) => (
             <DraggableButton
               key={f.label}
@@ -102,22 +102,6 @@ export default function FormBuilder({
                 active:scale-95
                 whitespace-nowrap
               "
-            //               className="
-            //   !bg-blue-500
-            //   border border-blue-700 
-            //   text-blue-800 
-            //   font-medium 
-            //   rounded-md 
-            //   px-5 py-2.5 
-            //   shadow-sm 
-            //   transition-all 
-            //   duration-300 
-            //   hover:!bg-blue-100 
-            //   hover:shadow-md 
-            //   active:scale-95 
-            //   whitespace-nowrap
-            // "
-
             >
               {f.label}
             </DraggableButton>
@@ -125,21 +109,23 @@ export default function FormBuilder({
           <div className="flex justify-between w-[97%] items-center">
             <button
               style={{ borderRadius: 6 }}
-              className="
-      px-4 py-2 
-      rounded-md 
-      bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600
-      border border-blue-600/40
-      text-white 
-      text-sm 
-      font-medium 
-      shadow-sm
-      hover:from-blue-700 hover:via-blue-600 hover:to-blue-500
-      hover:shadow-md
-      active:scale-95
-      transition-all
-      duration-300
-    "
+              //           className="
+              //   px-4 py-2 
+              //   rounded-md 
+              //   bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600
+              //   border border-blue-600/40
+              //   text-white 
+              //   text-sm 
+              //   font-medium 
+              //   shadow-sm
+              //   hover:from-blue-700 hover:via-blue-600 hover:to-blue-500
+              //   hover:shadow-md
+              //   active:scale-95
+              //   transition-all
+              //   duration-300
+              // "
+              className="!bg-green-500 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-green-600 active:scale-95 transition whitespace-nowrap"
+
               onClick={() => setShowAddFieldModal(true)}
             >
               + Custom
@@ -153,7 +139,6 @@ export default function FormBuilder({
               onSubmit={onAddFieldModalSubmit}
             />
           </div>
-          {/* </div> */}
         </div>
 
         {/* Drop Zone for Fields */}
@@ -208,16 +193,16 @@ export default function FormBuilder({
           </h3>
           <div className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
         mb-2">
-            <input type="search" placeholder="Search Fields" className=" outline-none px-2 py-1" onChange={(e) => {
+            <input type="search" placeholder="Search Fields" className="outline-none px-2 py-1" onChange={(e) => {
               const query = e.target.value.toLowerCase();
-              setFilteredFields(PREDEFINED_FIELDS.filter(field => field.label.toLowerCase().includes(query)));
+              setFilteredButtons(PREDEFINED_BUTTONS.filter(button => button.label.toLowerCase().includes(query)));
             }} />
             {renderIcons('FaSearch', 15, 'gray')}
           </div>
         </div>
         {/* Predefined Buttons Section */}
         <div className="flex flex-wrap items-center gap-3 mb-2">
-          {PREDEFINED_BUTTONS.map((b) => (
+          {filteredButtons.map((b) => (
             <DraggableButton
               key={b.label}
               item={b}

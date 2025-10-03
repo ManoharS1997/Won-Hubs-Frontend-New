@@ -52,8 +52,8 @@ export const CustomNotificationContainer = styled.div`
 `;
 
 export const NotificationTemplateMainContainer = styled.div`
-    height: 100%;
-    width: 100%;
+    height: 50%;
+    width: 80%;
     display: flex;
     background-color: var(--background-color);
 `;

@@ -663,7 +663,6 @@ export const sendEmail = async (mailOptions) => {
 }
 
 // ------------------------------------------------------ to get any tabel data ----------------------------------------------
-
 export const getTableData = async (tableName, componentName) => {
   const token = Cookies.get('accessToken') || null
   // console.log('getting table data....', token);
@@ -797,6 +796,24 @@ export const updateTableData = async (tableName, id, recordData, componentName, 
     return data
   } catch (err) {
     console.log('error udating record data:', err)
+  }
+}
+// get AnyRecord From Any Table
+export const GetAnyRecordFromAnyTable = async (tableName, recordId) => {
+  try {
+    const url = `${apiUrl}/api/table/getRecordData/${tableName}/${recordId}`
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${Cookies.get('accessToken')}`
+      }
+    }
+    const response = await fetch(url, options)
+    const data = await response.json()
+    return data
+  } catch (err) {
+    console.log(err)
   }
 }
 
@@ -1213,7 +1230,7 @@ const GetPayload = (formname, formData) => {
 
     case 'groups':
       return extractValues(formData)
-    case 'company' :
+    case 'company':
       return extractValues(formData)
     case 'locations':
       return extractValues(formData)
@@ -1228,10 +1245,10 @@ const GetPayload = (formname, formData) => {
 export const CreateNewUser = async (formname, formData) => {
   console.log(formData, "form Data in CRUD")
   console.log(formname, "name ")
-  const payload = await  GetPayload(formname, formData)
-  console.log(payload,"payload here")
+  const payload = await GetPayload(formname, formData)
+  console.log(payload, "payload here")
   // const url = `${apiUrl}/api/users/create/organization/user` commented by me writtenby kartheek 
-  const url=`${apiUrl}/api/${formname}/create/organization/${formname}`
+  const url = `${apiUrl}/api/${formname}/create/organization/${formname}`
   const options = {
     method: 'POST',
     headers: {
@@ -1244,13 +1261,13 @@ export const CreateNewUser = async (formname, formData) => {
   try {
     console.log("triggering in try block")
     const response = await fetch(url, options);
-    console.log(response,"response hereewee")
+    console.log(response, "response hereewee")
     const data = await response?.json()
-    console.log(data,"here")
+    console.log(data, "here")
     return data
     // if (response.ok) {
     //   console.log('User added successfully!');
-      
+
     // } else {
     //   console.error('Error adding user:', response.statusText);
     // }
