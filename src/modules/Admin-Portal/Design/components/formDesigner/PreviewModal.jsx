@@ -1,10 +1,14 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
+import { AiOutlineSwap } from "react-icons/ai"; // or MdSwapHoriz / HiOutlineSwitchHorizontal
+
 
 const fieldTypesWithOptions = ["dropdown", "radio", "checkbox"];
 function fieldSupportsOptions(type) {
   return fieldTypesWithOptions.includes(type);
 }
+
+
 
 export default function PreviewModal({
   show,
@@ -17,6 +21,7 @@ export default function PreviewModal({
 }) {
   const [values, setValues] = useState({});
   const [saving, setSaving] = useState(false);
+  const [twoColumn, setTwoColumn] = useState(true);
 
   const handleChange = (name, value) => {
     setValues((prev) => ({ ...prev, [name]: value }));
@@ -26,6 +31,12 @@ export default function PreviewModal({
     "w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none";
 
   const renderField = (field) => {
+    // wrapper classes based on layout
+    const wrapperClasses = `
+    mb-3 w-full 
+    ${twoColumn && field.fullWidth ? "md:col-span-2" : ""}
+  `;
+
     switch (field.type) {
       case "text":
       case "email":
@@ -39,8 +50,8 @@ export default function PreviewModal({
       case "week":
       case "color":
         return (
-          <div key={field.name} className="mb-5">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div key={field.name} className={wrapperClasses}>
+            <label className="block text-sm font-semibold text-gray-700 ">
               {field.label}
             </label>
             <input
@@ -53,9 +64,10 @@ export default function PreviewModal({
             />
           </div>
         );
+
       case "textarea":
         return (
-          <div key={field.name} className="mb-5">
+          <div key={field.name} className={wrapperClasses}>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               {field.label}
             </label>
@@ -68,14 +80,15 @@ export default function PreviewModal({
             />
           </div>
         );
+
       case "dropdown":
       case "multi-select":
         return (
-          <div key={field.name} className="mb-5">
+          <div key={field.name} className={`${wrapperClasses} flex gap-3`}>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               {field.label}
             </label>
-            <select
+            {/* <select
               name={field.name}
               multiple={field.type === "multi-select"}
               value={
@@ -96,21 +109,47 @@ export default function PreviewModal({
                   {opt}
                 </option>
               ))}
+            </select> */}
+            <select
+              name={field.name}
+              multiple={field.type === "multi-select"}
+              value={
+                values[field.name] || (field.type === "multi-select" ? [] : "")
+              }
+              onChange={(e) =>
+                handleChange(
+                  field.name,
+                  field.type === "multi-select"
+                    ? Array.from(e.target.selectedOptions, (o) => o.value)
+                    : e.target.value
+                )
+              }
+              className={`
+    ${baseInputClasses}
+    appearance-none pr-10
+    cursor-pointer
+  
+  `}
+            >
+              {(field.options || []).map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
             </select>
+
           </div>
         );
+
       case "radio":
         return (
-          <div key={field.name} className="mb-5">
+          <div key={field.name} className={`${wrapperClasses} flex gap-3 flex-col`}>
             <div className="text-sm font-semibold text-gray-700 mb-2">
               {field.label}
             </div>
             <div className="flex flex-wrap gap-4">
               {(field.options || []).map((opt) => (
-                <label
-                  key={opt}
-                  className="flex items-center gap-2 text-gray-600"
-                >
+                <div key={opt} className="gap-2 flex">
                   <input
                     type="radio"
                     name={field.name}
@@ -119,30 +158,41 @@ export default function PreviewModal({
                     onChange={() => handleChange(field.name, opt)}
                     className="accent-indigo-600"
                   />
-                  {opt}
-                </label>
+                  <label
+                    className="flex  gap-2 text-gray-600"
+                  >
+                    {opt}
+                  </label>
+
+                </div>
               ))}
             </div>
           </div>
         );
       case "checkbox":
         return (
-          <div key={field.name} className="mb-5">
-            <label className="flex items-center gap-2 text-gray-700">
+          <div key={field.name} className={`${wrapperClasses} mt-2 !border-2`}>
+            <div className="flex justify-between items-center border-2">
+              <label
+                htmlFor={field.name}
+                className="text-sm font-semibold text-gray-700"
+              >
+                {field.label}
+              </label>
               <input
+                id={field.name}
                 type="checkbox"
                 name={field.name}
                 checked={!!values[field.name]}
                 onChange={(e) => handleChange(field.name, e.target.checked)}
-                className="accent-indigo-600"
+                className="w-4 h-4 accent-indigo-600 rounded border-gray-300 cursor-pointer"
               />
-              {field.label}
-            </label>
+            </div>
           </div>
         );
       case "file":
         return (
-          <div key={field.name} className="mb-5">
+          <div key={field.name} className={wrapperClasses}>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               {field.label}
             </label>
@@ -156,7 +206,7 @@ export default function PreviewModal({
         );
       default:
         return (
-          <div key={field.name} className="mb-4 text-red-500">
+          <div key={field.name} className={`${wrapperClasses} text-red-500`}>
             Unsupported field: {field.type}
           </div>
         );
@@ -201,7 +251,7 @@ export default function PreviewModal({
       <div className="bg-white rounded-2xl shadow-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto relative p-8 no-scrollbar">
         {/* Close button */}
         <button
-          className="absolute top-4 right-4 bg-red-500 text-white rounded-full w-9 h-9 flex items-center justify-center text-lg hover:bg-red-600 transition"
+          className="absolute top-4 right-4 !bg-transparent !text-red rounded-full w-9 h-9 flex items-center justify-center text-lg hover:bg-red-600 transition"
           aria-label="Close preview"
           onClick={onClose}
         >
@@ -212,30 +262,44 @@ export default function PreviewModal({
           Preview: {module}
         </h2>
 
+
+        <div className="mb-6 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setTwoColumn(!twoColumn)}
+            className="w-10 h-10 flex items-center justify-center !rounded-full border !border-blue-500 shadow hover:bg-gray-100 transition"
+          >
+            <AiOutlineSwap className="w-5 h-5 text-gray-700" />
+          </button>
+        </div>
+
+
         {/* Main form */}
-        <form className="max-w-3xl mx-auto">
+        <form
+          className={`mx-auto w-full ${twoColumn ? "grid grid-cols-1 md:grid-cols-2 gap-2" : "grid grid-cols-1 "
+            }`}
+        >
           {formFields.map(renderField)}
 
-          <div className="mt-6">
+          <div className={`mt-3 flex gap-6 p-0 m-0 ${twoColumn ? "col-span-2" : ""}`}>
             {formButtons.map((btn) => (
               <button
                 key={btn.label}
                 type={btn.type}
-                className="bg-indigo-600 text-white px-6 py-2 rounded-lg mr-3 shadow hover:bg-indigo-700 transition"
+                className="!bg-indigo-600 text-white px-6 py-2 !rounded-md mr-3 shadow hover:bg-indigo-700 transition "
               >
                 {btn.label}
               </button>
             ))}
           </div>
         </form>
-
         <div className="mt-10">
           <h3 className="text-xl font-semibold text-indigo-700 mb-5">Tabs</h3>
           <div className="flex flex-wrap gap-6 mb-8">
             {tabs.map((tab) => (
               <button
                 key={tab.name}
-                className="bg-indigo-100 text-indigo-800 px-5 py-2 rounded shadow"
+                className="!bg-indigo-100 text-indigo-800 px-5 py-2 rounded shadow"
               >
                 {tab.name}
               </button>
@@ -250,7 +314,10 @@ export default function PreviewModal({
               </h4>
 
               {tab.type === "form" && (
-                <form className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <form
+                  className={`mx-auto w-full ${twoColumn ? "grid grid-cols-1 md:grid-cols-2 gap-2" : "grid grid-cols-1 "
+                    }`}
+                >
                   {tab.fields.map(renderField)}
 
                   <div className="col-span-2 flex gap-4">
@@ -258,7 +325,7 @@ export default function PreviewModal({
                       <button
                         key={i}
                         type={btn.type}
-                        className="px-5 py-2 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700 transition"
+                        className="px-5 py-2 !bg-indigo-600 text-white rounded shadow hover:bg-indigo-700 transition"
                       >
                         {btn.label}
                       </button>
@@ -318,16 +385,14 @@ export default function PreviewModal({
             </section>
           ))}
         </div>
-
         <button
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className={`px-6 py-2 rounded-lg shadow text-white transition ${
-            saving
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700"
-          }`}
+          className={`px-6 py-2 !rounded-lg shadow text-white transition ${saving
+            ? "!bg-gray-400 cursor-not-allowed"
+            : "!bg-green-600 hover:bg-green-700"
+            }`}
         >
           {saving ? "Saving..." : "Save"}
         </button>
@@ -335,6 +400,14 @@ export default function PreviewModal({
     </div>
   );
 }
+
+// Helper needed for table rendering (assumed external or define if needed)
+// function fieldSupportsOptions(type) {
+//   // Simplified check; adjust as required for all option types
+//   const optionTypes = ["dropdown", "multi-select", "radio"];
+//   return optionTypes.includes(type);
+// }
+
 
 PreviewModal.propTypes = {
   show: PropTypes.bool.isRequired,
