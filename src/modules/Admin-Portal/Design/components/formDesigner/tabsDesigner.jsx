@@ -40,7 +40,6 @@ function Tab({
   tab,
   tabIdx,
   setTabType,
-  addCustomField,
   removeField,
   addCustomButton,
   removeButton,
@@ -51,16 +50,61 @@ function Tab({
   onDropButton,
   onDropColumn,
   allowDrop,
-  setFormFields
+  setFormFields,
 }) {
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
+  const [showAddButtonModal, setShowAddButtonModal] = useState(false);
+  const [addButtonModalState, setAddButtonModalState] = useState({
+    open: false,
+    droppedButtonData: null,
+  });
+
     const onAddFieldModalSubmit = ({ label, type }) => {
-      setFormFields((prev) => [
-        ...prev,
-        { label, type, name: `${label}-${prev.length}` },
-      ]);
-      setShowAddFieldModal(false);
+    setFormFields((prev) => [
+      ...prev,
+      { label, type, name: `${label}-${prev.length}` },
+    ]);
+    setShowAddFieldModal(false);
+  };
+
+   const handleAddCustomButtonClick = () => {
+    setAddButtonModalState({ open: true, droppedButtonData: null });
+  };
+
+  const onAddButtonModalSubmit = ({ eventType, apiCallData, labelFromModal }) => {
+    const label = labelFromModal || (addButtonModalState.droppedButtonData?.label || "Custom Button");
+
+    const newButton = {
+      label,
+      type: "button",
+      actionType: eventType,
+      apiEndpoint: apiCallData ? apiCallData.endpoint : null,
+      apiMethod: apiCallData ? apiCallData.method : null,
     };
+
+    // Use setTabs prop to immutably update that tab's buttons array
+    setTabs(prev =>
+      prev.map((t, i) => (i === tabIdx ? { ...t, buttons: [...t.buttons, newButton] } : t))
+    );
+
+    setAddButtonModalState({ open: false, droppedButtonData: null });
+  };
+
+   const onDropButtonInTab = (e) => {
+    e.preventDefault();
+    const data = JSON.parse(e.dataTransfer.getData("application/json"));
+    if (data.category === "button") {
+      setAddButtonModalState({ open: true, droppedButtonData: data.item });
+    }
+  };
+
+  // const onAddFieldModalSubmit = ({ label, type }) => {
+  //   setFormFields((prev) => [
+  //     ...prev,
+  //     { label, type, name: `${label}-${prev.length}` },
+  //   ]);
+  //   setShowAddFieldModal(false);
+  // };
   return (
     <section className="bg-white rounded-xl p-5 w-full shadow-md border border-gray-200 hover:shadow-lg transition">
       {/* Header */}
@@ -116,17 +160,17 @@ function Tab({
                 </DraggableButton>
               ))}
               <button
-                         style={{ borderRadius: 8 }}
-                         className="px-3 py-1.5 rounded-md bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition"
-                         onClick={() => setShowAddFieldModal(true)}
-                       >
-                         + Custom
-                       </button>
-                       <AddFieldModal
-                         open={showAddFieldModal}
-                         onClose={() => setShowAddFieldModal(false)}
-                         onSubmit={onAddFieldModalSubmit}
-                       />
+                style={{ borderRadius: 8 }}
+                className="px-3 py-1.5 rounded-md bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition"
+                onClick={() => setShowAddFieldModal(true)}
+              >
+                + Custom
+              </button>
+              <AddFieldModal
+                open={showAddFieldModal}
+                onClose={() => setShowAddFieldModal(false)}
+                onSubmit={onAddFieldModalSubmit}
+              />
             </div>
             {tab.fields.length === 0 && (
               <p className="italic text-gray-400 text-center">
@@ -181,7 +225,8 @@ function Tab({
                   {b.label}
                 </DraggableButton>
               ))}
-              <button style={{borderRadius:8}}
+              <button
+                style={{ borderRadius: 8 }}
                 className="px-3 py-1.5 rounded-md bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition"
                 onClick={() => addCustomButton(tabIdx)}
               >
@@ -363,7 +408,8 @@ export default function TabsDesigner(props) {
             {t}
           </DraggableButton>
         ))}
-        <button style={{borderRadius:8}}
+        <button
+          style={{ borderRadius: 8 }}
           className="px-3 py-1.5 rounded-md bg-green-500 text-white text-sm font-medium shadow hover:bg-green-600 transition"
           onClick={props.addCustomTab}
         >
@@ -423,7 +469,6 @@ Tab.propTypes = {
   tabIdx: PropTypes.number.isRequired,
   setType: PropTypes.func.isRequired,
   addField: PropTypes.func.isRequired,
-  addCustomField: PropTypes.func.isRequired,
   removeField: PropTypes.func.isRequired,
   addButton: PropTypes.func.isRequired,
   addCustomButton: PropTypes.func.isRequired,
