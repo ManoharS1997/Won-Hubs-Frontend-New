@@ -2,19 +2,66 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 const DUMMY_APIS = [
-  { id: 1, name: "Export Data", endpoint: "/api/x/exportData", method: "POST", description: "Export all data for module X." },
-  { id: 2, name: "Add User", endpoint: "/api/x/addUser", method: "POST", description: "Add a new user in module X." },
-  { id: 3, name: "Update Record", endpoint: "/api/x/updateRecord", method: "PUT", description: "Update existing record in module X." },
-  { id: 4, name: "Delete Item", endpoint: "/api/x/deleteItem", method: "DELETE", description: "Delete item from module X." },
-  { id: 5, name: "Get Report", endpoint: "/api/x/getReport", method: "GET", description: "Retrieve report data from module X." }
+  {
+    id: 1,
+    name: "Export Data",
+    endpoint: "/api/x/exportData",
+    method: "POST",
+    description: "Export all data for module X.",
+  },
+  {
+    id: 2,
+    name: "Add User",
+    endpoint: "/api/x/addUser",
+    method: "POST",
+    description: "Add a new user in module X.",
+  },
+  {
+    id: 3,
+    name: "Update Record",
+    endpoint: "/api/x/updateRecord",
+    method: "PUT",
+    description: "Update existing record in module X.",
+  },
+  {
+    id: 4,
+    name: "Delete Item",
+    endpoint: "/api/x/deleteItem",
+    method: "DELETE",
+    description: "Delete item from module X.",
+  },
+  {
+    id: 5,
+    name: "Get Report",
+    endpoint: "/api/x/getReport",
+    method: "GET",
+    description: "Retrieve report data from module X.",
+  },
 ];
 
-function AddButtonEventModal({ open, onClose, onSubmit }) {
+// Mapping for user-friendly method labels
+const METHOD_LABELS = {
+  POST: "Create",
+  PUT: "Update",
+  DELETE: "Delete",
+  GET: "Fetch",
+};
+
+function AddButtonEventModal({ open, onClose, onSubmit, initialLabel }) {
   const eventTypes = ["None", "API Call", "Custom JavaScript"];
   const [eventType, setEventType] = useState("None");
   const [apiMethod, setApiMethod] = useState("");
+  const [buttonName, setButtonName] = useState("");
   const [filteredApis, setFilteredApis] = useState([]);
   const [selectedApiId, setSelectedApiId] = useState(null);
+
+  const resetForm = () => {
+    setEventType("None");
+    setApiMethod("");
+    setButtonName("");
+    setFilteredApis([]);
+    setSelectedApiId(null);
+  };
 
   useEffect(() => {
     if (eventType === "API Call" && apiMethod) {
@@ -35,23 +82,107 @@ function AddButtonEventModal({ open, onClose, onSubmit }) {
     }
     onSubmit({
       eventType,
-      apiCallData: filteredApis.find(api => api.id === Number(selectedApiId)) || null
+      apiCallData:
+        filteredApis.find((api) => api.id === Number(selectedApiId)) || null,
+      labelFromModal: buttonName.trim() ? buttonName : null,
     });
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 overflow-auto max-h-[90vh]">
-        <h2 className="text-2xl font-semibold mb-6 text-indigo-900">Add Button & Event</h2>
+  const handleCancel = () => {
+    resetForm();
+    onClose();
+  };
 
-        <div className="mb-6">
-          <label className="block mb-2 text-gray-700 font-medium" htmlFor="eventType">
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 50,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "1rem",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "white",
+          borderRadius: "8px",
+          boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+          width: "100%",
+          maxWidth: "450px",
+          padding: "24px",
+          maxHeight: "90vh",
+          overflowY: "auto",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: "22px",
+            fontWeight: "600",
+            marginBottom: "20px",
+            color: "#1e1b4b",
+          }}
+        >
+          Add Button & Event
+        </h2>
+
+        {!initialLabel && (
+          <>
+            <label
+              htmlFor="btnNme"
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                fontWeight: "500",
+                color: "#374151",
+              }}
+            >
+              Button Name
+            </label>
+            <input
+              type="text"
+              name="label"
+              id="btnNme"
+              style={{
+                width: "100%",
+                border: "1px solid #d1d5db",
+                borderRadius: "6px",
+                padding: "8px",
+                outline: "none",
+                height: 40,
+              }}
+              onChange={(e) => setButtonName(e.target.value)}
+            />
+          </>
+        )}
+
+        {/* Event Type Selector */}
+        <div style={{ margin: "24px 0" }}>
+          <label
+            htmlFor="eventType"
+            style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "500",
+              color: "#374151",
+            }}
+          >
             Event Listener Type
           </label>
           <select
             id="eventType"
-            className="w-full border border-gray-300 rounded-md p-2 transition focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+            style={{
+              width: "100%",
+              border: "1px solid #d1d5db",
+              borderRadius: "6px",
+              padding: "8px",
+              outline: "none",
+              height: 40,
+            }}
             value={eventType}
             onChange={(e) => setEventType(e.target.value)}
           >
@@ -63,35 +194,72 @@ function AddButtonEventModal({ open, onClose, onSubmit }) {
           </select>
         </div>
 
+        {/* API Call Section */}
         {eventType === "API Call" && (
-          <div className="space-y-6">
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+          >
+            {/* Method Selector */}
             <div>
-              <label className="block mb-2 text-gray-700 font-medium" htmlFor="apiMethod">
+              <label
+                htmlFor="apiMethod"
+                style={{
+                  display: "block",
+                  marginBottom: "8px",
+                  fontWeight: "500",
+                  color: "#374151",
+                }}
+              >
                 API Method
               </label>
               <select
                 id="apiMethod"
-                className="w-full border border-gray-300 rounded-md p-2 transition focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                style={{
+                  width: "100%",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "6px",
+                  padding: "8px",
+                  outline: "none",
+                  height: 40,
+                }}
                 value={apiMethod}
                 onChange={(e) => setApiMethod(e.target.value)}
               >
-                <option value="">Select HTTP Method</option>
-                {[...new Set(DUMMY_APIS.map((api) => api.method))].map((method) => (
-                  <option key={method} value={method}>
-                    {method}
-                  </option>
-                ))}
+                <option value="">Select Method</option>
+                {[...new Set(DUMMY_APIS.map((api) => api.method))].map(
+                  (method) => (
+                    <option key={method} value={method}>
+                      {METHOD_LABELS[method] || method}
+                    </option>
+                  )
+                )}
               </select>
             </div>
 
+            {/* API Selector */}
             {filteredApis.length > 0 && (
               <div>
-                <label className="block mb-2 text-gray-700 font-medium" htmlFor="apiSelect">
+                <label
+                  htmlFor="apiSelect"
+                  style={{
+                    display: "block",
+                    marginBottom: "8px",
+                    fontWeight: "500",
+                    color: "#374151",
+                  }}
+                >
                   Select API
                 </label>
                 <select
                   id="apiSelect"
-                  className="w-full border border-gray-300 rounded-md p-2 transition focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                  style={{
+                    width: "100%",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "6px",
+                    padding: "8px",
+                    outline: "none",
+                    height: 40,
+                  }}
                   value={selectedApiId || ""}
                   onChange={(e) => setSelectedApiId(e.target.value)}
                 >
@@ -103,9 +271,26 @@ function AddButtonEventModal({ open, onClose, onSubmit }) {
                   ))}
                 </select>
 
+                {/* API Description */}
                 {selectedApiId && (
-                  <div className="mt-4 p-3 bg-indigo-50 text-indigo-800 rounded-md text-sm max-h-32 overflow-auto border border-indigo-200">
-                    {filteredApis.find((api) => api.id === Number(selectedApiId)).description}
+                  <div
+                    style={{
+                      marginTop: "12px",
+                      padding: "12px",
+                      backgroundColor: "#eef2ff",
+                      color: "#3730a3",
+                      borderRadius: "6px",
+                      border: "1px solid #c7d2fe",
+                      fontSize: "14px",
+                      maxHeight: "120px",
+                      overflowY: "auto",
+                    }}
+                  >
+                    {
+                      filteredApis.find(
+                        (api) => api.id === Number(selectedApiId)
+                      ).description
+                    }
                   </div>
                 )}
               </div>
@@ -113,21 +298,47 @@ function AddButtonEventModal({ open, onClose, onSubmit }) {
           </div>
         )}
 
-        <div className="mt-8 flex justify-end space-x-4">
+        {/* Footer Buttons */}
+        <div
+          style={{
+            marginTop: "32px",
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "12px",
+          }}
+        >
           <button
-            onClick={onClose}
-            className="px-5 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-400"
+            onClick={handleCancel}
+            style={{
+              padding: "8px 16px",
+              borderRadius: "6px",
+              backgroundColor: "#e5e7eb",
+              color: "#374151",
+              border: "none",
+              cursor: "pointer",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#d1d5db")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#e5e7eb")}
           >
             Cancel
           </button>
           <button
             disabled={eventType === "API Call" && !selectedApiId}
             onClick={handleSubmit}
-            className={`px-5 py-2 rounded-md text-white transition focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 ${
-              eventType === "API Call" && !selectedApiId
-                ? "bg-indigo-400 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700"
-            }`}
+            style={{
+              padding: "8px 16px",
+              borderRadius: "6px",
+              border: "none",
+              color: "white",
+              cursor:
+                eventType === "API Call" && !selectedApiId
+                  ? "not-allowed"
+                  : "pointer",
+              backgroundColor:
+                eventType === "API Call" && !selectedApiId
+                  ? "#a5b4fc"
+                  : "#4f46e5",
+            }}
           >
             Add Button
           </button>
@@ -141,6 +352,7 @@ AddButtonEventModal.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  initialLabel: PropTypes.any.isRequired,
 };
 
 export default AddButtonEventModal;
