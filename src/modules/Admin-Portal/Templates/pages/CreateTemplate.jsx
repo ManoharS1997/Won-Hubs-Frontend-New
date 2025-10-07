@@ -5,18 +5,18 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import Modal from 'react-modal'
 import styled from "styled-components";
 
-import { createEditor } from 'slate';
-import { withHistory } from "slate-history";
-import { Slate, Editable, withReact } from 'slate-react';
-import Toolbar from '../../SlateEditor/Toolbar/Toolbar.jsx'
-import { sizeMap, fontFamilyMap } from '../../SlateEditor/utils/SlateUtilityFunctions.js'
-import withLinks from '../../SlateEditor/plugins/withLinks.js'
-import withTables from '../../SlateEditor/plugins/withTable.js'
-import withEmbeds from '../../SlateEditor/plugins/withEmbeds.js'
+// import { createEditor } from 'slate';
+// import { withHistory } from "slate-history";
+// import { Slate, Editable, withReact } from 'slate-react';
+// import Toolbar from '../../SlateEditor/Toolbar/Toolbar.jsx'
+// import { sizeMap, fontFamilyMap } from '../../SlateEditor/utils/SlateUtilityFunctions.js'
+// import withLinks from '../../SlateEditor/plugins/withLinks.js'
+// import withTables from '../../SlateEditor/plugins/withTable.js'
+// import withEmbeds from '../../SlateEditor/plugins/withEmbeds.js'
 
-import '../../SlateEditor/Editor.css'
-import Image from '../../SlateEditor/Elements/Image/Image'
-import Video from '../../SlateEditor/Elements/Video/Video'
+// import '../../SlateEditor/Editor.css'
+// import Image from '../../SlateEditor/Elements/Image/Image'
+// import Video from '../../SlateEditor/Elements/Video/Video'
 
 import { useNavigate } from "react-router-dom";
 
@@ -36,7 +36,7 @@ import {
 
 } from '../components/CreateTemplate/StyledComponents'
 import { GetAnyRecordFromAnyTable } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations.jsx";
-import SlateEditor from "../../../../shared/components/SlateEditor.jsx";
+// import SlateEditor from "../../../../shared/components/SlateEditor.jsx";
 
 const Element = (props) => {
 
@@ -390,11 +390,8 @@ export default function CreateTemplate({ recordId }) {
 
           </EditorContainer> */}
           {/* Adding my new Editor */}
-          <SlateEditor value={value} onChange={newValue => setValue(newValue)} placeholder="Write something..." />
-
+          {/* <SlateEditor value={value} onChange={newValue => setValue(newValue)} placeholder="Write something..." />
           <ActionBtnsContainer>
-
-
             <Link to='/template-preview'>
               <ActionBtn
                 type='button'
@@ -404,7 +401,7 @@ export default function CreateTemplate({ recordId }) {
                 Next
                 <TbPlayerTrackNextFilled size={15} style={{ marginLeft: '15px' }} /></ActionBtn>
             </Link>
-          </ActionBtnsContainer>
+          </ActionBtnsContainer> */}
 
         </CustomContainer>
       </BodyContainer>

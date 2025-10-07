@@ -187,7 +187,7 @@ export default function CreateUser() {
           confirmButtonText: "OK",
         });
       } else {
-        const response = await CreateNewUser(formFields)
+        const response = await CreateNewUser("users",formFields)
         if (response.success === true) {
           navigate('/users')
         } else {
