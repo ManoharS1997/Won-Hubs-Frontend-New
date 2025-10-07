@@ -120,21 +120,6 @@ export default function FormBuilder({
           <div className="flex justify-between w-[97%] items-center">
             <button
               style={{ borderRadius: 6 }}
-              //           className="
-              //   px-4 py-2
-              //   rounded-md
-              //   bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600
-              //   border border-blue-600/40
-              //   text-white
-              //   text-sm
-              //   font-medium
-              //   shadow-sm
-              //   hover:from-blue-700 hover:via-blue-600 hover:to-blue-500
-              //   hover:shadow-md
-              //   active:scale-95
-              //   transition-all
-              //   duration-300
-              // "
               className="!bg-green-500 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-green-600 active:scale-95 transition whitespace-nowrap"
               onClick={() => setShowAddFieldModal(true)}
             >
