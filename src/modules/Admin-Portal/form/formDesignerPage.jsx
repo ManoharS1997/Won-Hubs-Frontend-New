@@ -16,10 +16,17 @@ export default function FormDesignerPage() {
   const [showPreview, setShowPreview] = React.useState(false);
   const [showTabs, setShowTabs] = React.useState(false);
   const [tabs, setTabs] = React.useState([]);
-  const [addingButton, setAddingButton] = useState({ open: false, tabIndex: null, buttonData: null });
+  const [addingButton, setAddingButton] = useState({
+    open: false,
+    tabIndex: null,
+    buttonData: null,
+  });
 
   const onDragStart = (e, item, category) => {
-    e.dataTransfer.setData("application/json", JSON.stringify({ item, category }));
+    e.dataTransfer.setData(
+      "application/json",
+      JSON.stringify({ item, category })
+    );
   };
 
   const allowDrop = (e) => e.preventDefault();
@@ -28,7 +35,10 @@ export default function FormDesignerPage() {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
     if (data.category === "field") {
-      setFormFields((prev) => [...prev, { ...data.item, name: `${data.item.label}-${prev.length}` }]);
+      setFormFields((prev) => [
+        ...prev,
+        { ...data.item, name: `${data.item.label}-${prev.length}` },
+      ]);
     }
   };
 
@@ -47,8 +57,13 @@ export default function FormDesignerPage() {
   };
 
   // Submit modal data: add button to formButtons
-  const handleAddButtonModalSubmit = ({ eventType, apiCallData, labelFromModal }) => {
-    let label = labelFromModal || (addingButton.buttonData?.label || "Custom Button");
+  const handleAddButtonModalSubmit = ({
+    eventType,
+    apiCallData,
+    labelFromModal,
+  }) => {
+    let label =
+      labelFromModal || addingButton.buttonData?.label || "Custom Button";
     const newButton = {
       label,
       type: "button",
@@ -60,10 +75,10 @@ export default function FormDesignerPage() {
     setAddingButton({ open: false, tabIndex: null, buttonData: null });
   };
 
-  console.log(formButtons)
-
-  const removeField = (i) => setFormFields((prev) => prev.filter((_, idx) => idx !== i));
-  const removeButton = (i) => setFormButtons((prev) => prev.filter((_, idx) => idx !== i));
+  const removeField = (i) =>
+    setFormFields((prev) => prev.filter((_, idx) => idx !== i));
+  const removeButton = (i) =>
+    setFormButtons((prev) => prev.filter((_, idx) => idx !== i));
 
   return (
     <>
@@ -71,7 +86,11 @@ export default function FormDesignerPage() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <header className="flex justify-between items-center w-full mb-10">
-            <h1 style={{ color: "#022052", fontSize: 30, fontWeight: "bolder" }}>Form Designer</h1>
+            <h1
+              style={{ color: "#022052", fontSize: 30, fontWeight: "bolder" }}
+            >
+              Form Designer
+            </h1>
             <div className="flex items-center gap-3">
               <input
                 type="text"
@@ -87,12 +106,12 @@ export default function FormDesignerPage() {
                 className="flex gap-2"
               >
                 {showTabs ? "Hide Tabs" : "Configure Tabs"}
-                {renderIcons('TiTabsOutline', 25, 'inherit')}
+                {renderIcons("TiTabsOutline", 25, "inherit")}
               </PreviewBtn>
 
               <PreviewBtn
                 // style={{ borderRadius: 8 }}
-                type='button'
+                type="button"
                 // className="px-6 py-2 !bg-indigo-600 !text-white rounded-lg"
                 onClick={() => {
                   if (module.length > 0) setShowPreview((v) => !v);
@@ -100,8 +119,7 @@ export default function FormDesignerPage() {
                 }}
               >
                 {showPreview ? "Hide Preview" : "Show Preview"}
-                {renderIcons('MdDoubleArrow', 25, 'inherit')}
-
+                {renderIcons("MdDoubleArrow", 25, "inherit")}
               </PreviewBtn>
             </div>
           </header>
@@ -136,19 +154,20 @@ export default function FormDesignerPage() {
       )}
 
       {showTabs && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setShowTabs(false)}
-        >
+        <div className="fixed inset-0 z-40" onClick={() => setShowTabs(false)}>
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/30"></div>
           {/* Panel */}
-          <div className={`absolute top-0 right-0 h-full w-1/2 bg-white shadow-2xl transform transition-transform duration-300 ${showTabs ? "translate-x-0" : "translate-x-full"
-              }`}
+          <div
+            className={`absolute top-0 right-0 h-full w-1/2 bg-white shadow-2xl transform transition-transform duration-300 ${
+              showTabs ? "translate-x-0" : "translate-x-full"
+            }`}
             onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
           >
             <div className="flex justify-between items-center p-4 border-b">
-              <h1 style={{ color: "#022052", fontSize: 30, fontWeight: "bolder" }}>
+              <h1
+                style={{ color: "#022052", fontSize: 30, fontWeight: "bolder" }}
+              >
                 Tab Designer
               </h1>
 
@@ -160,7 +179,7 @@ export default function FormDesignerPage() {
               </button>
             </div>
             <div className="px-2.5 overflow-y-auto h-[90%] no-scrollbar">
-              <TabDesigner setTabs={setTabs} tabs={tabs} openAddButtonModal={(tabIndex) => setAddingButton({ open: true, tabIndex, buttonData: null })}/>
+              <TabDesigner setTabs={setTabs} tabs={tabs} />
             </div>
           </div>
         </div>
@@ -168,7 +187,9 @@ export default function FormDesignerPage() {
 
       <AddButtonEventModal
         open={addingButton.open}
-        onClose={() => setAddingButton({ open: false, tabIndex: null, buttonData: null })}
+        onClose={() =>
+          setAddingButton({ open: false, tabIndex: null, buttonData: null })
+        }
         onSubmit={handleAddButtonModalSubmit}
         initialLabel={addingButton.buttonData?.label}
       />

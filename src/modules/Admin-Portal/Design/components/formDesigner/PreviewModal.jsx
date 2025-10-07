@@ -2,13 +2,10 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { AiOutlineSwap } from "react-icons/ai"; // or MdSwapHoriz / HiOutlineSwitchHorizontal
 
-
 const fieldTypesWithOptions = ["dropdown", "radio", "checkbox"];
 function fieldSupportsOptions(type) {
   return fieldTypesWithOptions.includes(type);
 }
-
-
 
 export default function PreviewModal({
   show,
@@ -137,13 +134,15 @@ export default function PreviewModal({
                 </option>
               ))}
             </select>
-
           </div>
         );
 
       case "radio":
         return (
-          <div key={field.name} className={`${wrapperClasses} flex gap-3 flex-col`}>
+          <div
+            key={field.name}
+            className={`${wrapperClasses} flex gap-3 flex-col`}
+          >
             <div className="text-sm font-semibold text-gray-700 mb-2">
               {field.label}
             </div>
@@ -158,12 +157,7 @@ export default function PreviewModal({
                     onChange={() => handleChange(field.name, opt)}
                     className="accent-indigo-600"
                   />
-                  <label
-                    className="flex  gap-2 text-gray-600"
-                  >
-                    {opt}
-                  </label>
-
+                  <label className="flex  gap-2 text-gray-600">{opt}</label>
                 </div>
               ))}
             </div>
@@ -230,6 +224,8 @@ export default function PreviewModal({
         selectedDepartments: state?.selectedDepartments,
       };
 
+      console.log(payload)
+
       const res = await fetch("http://localhost:3001/api/form-designer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -262,7 +258,6 @@ export default function PreviewModal({
           Preview: {module}
         </h2>
 
-
         <div className="mb-6 flex justify-end">
           <button
             type="button"
@@ -273,15 +268,21 @@ export default function PreviewModal({
           </button>
         </div>
 
-
         {/* Main form */}
         <form
-          className={`mx-auto w-full ${twoColumn ? "grid grid-cols-1 md:grid-cols-2 gap-2" : "grid grid-cols-1 "
-            }`}
+          className={`mx-auto w-full ${
+            twoColumn
+              ? "grid grid-cols-1 md:grid-cols-2 gap-2"
+              : "grid grid-cols-1 "
+          }`}
         >
           {formFields.map(renderField)}
 
-          <div className={`mt-3 flex gap-6 p-0 m-0 ${twoColumn ? "col-span-2" : ""}`}>
+          <div
+            className={`mt-3 flex gap-6 p-0 m-0 ${
+              twoColumn ? "col-span-2" : ""
+            }`}
+          >
             {formButtons.map((btn) => (
               <button
                 key={btn.label}
@@ -315,8 +316,11 @@ export default function PreviewModal({
 
               {tab.type === "form" && (
                 <form
-                  className={`mx-auto w-full ${twoColumn ? "grid grid-cols-1 md:grid-cols-2 gap-2" : "grid grid-cols-1 "
-                    }`}
+                  className={`mx-auto w-full ${
+                    twoColumn
+                      ? "grid grid-cols-1 md:grid-cols-2 gap-2"
+                      : "grid grid-cols-1 "
+                  }`}
                 >
                   {tab.fields.map(renderField)}
 
@@ -389,10 +393,11 @@ export default function PreviewModal({
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className={`px-6 py-2 !rounded-lg shadow text-white transition ${saving
-            ? "!bg-gray-400 cursor-not-allowed"
-            : "!bg-green-600 hover:bg-green-700"
-            }`}
+          className={`px-6 py-2 !rounded-lg shadow text-white transition ${
+            saving
+              ? "!bg-gray-400 cursor-not-allowed"
+              : "!bg-green-600 hover:bg-green-700"
+          }`}
         >
           {saving ? "Saving..." : "Save"}
         </button>
@@ -407,7 +412,6 @@ export default function PreviewModal({
 //   const optionTypes = ["dropdown", "multi-select", "radio"];
 //   return optionTypes.includes(type);
 // }
-
 
 PreviewModal.propTypes = {
   show: PropTypes.bool.isRequired,

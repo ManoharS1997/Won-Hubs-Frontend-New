@@ -2,6 +2,7 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import AddFieldModal from "./AddFieldModal";
 import renderIcons from "../../../../../shared/functions/renderIcons";
+import AddButtonEventModal from "./AddButtonEventModal";
 
 const PREDEFINED_TABS = ["History", "Settings"];
 
@@ -139,8 +140,8 @@ function Tab({
   allowDrop,
   openAddFieldModal,
   addTabColumn,
-  addTabButton,
   removeTab,
+  addCustomButton,
 }) {
   return (
     <section className="bg-indigo-50 rounded-lg p-6 shadow-md w-full mb-2.5">
@@ -153,10 +154,11 @@ function Tab({
             <button
               onClick={() => setTabType(tabIdx, "form")}
               className={`px-5 py-2 text-sm font-medium transition-all duration-200
-      ${tab.type === "form"
-                  ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
-                  : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
-                }
+      ${
+        tab.type === "form"
+          ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
+          : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
+      }
       rounded-l-md
     `}
             >
@@ -165,10 +167,11 @@ function Tab({
             <button
               onClick={() => setTabType(tabIdx, "table")}
               className={`px-5 py-2 text-sm font-medium transition-all duration-200
-      ${tab.type === "table"
-                  ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
-                  : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
-                }
+      ${
+        tab.type === "table"
+          ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
+          : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
+      }
       rounded-r-md
     `}
             >
@@ -195,6 +198,7 @@ function Tab({
             onDragOver={allowDrop}
             className="border-2 border-dashed border-indigo-400 p-4 rounded-lg mb-6 min-h-[10rem]"
           >
+            {/* Predefined draggable fields */}
             <div className="flex flex-wrap gap-3 mb-4">
               {PREDEFINED_FIELDS.map((field) => (
                 <DraggableButton
@@ -214,25 +218,29 @@ function Tab({
                 + Custom Field
               </button>
             </div>
+
+            {/* Responsive grid layout for dropped fields */}
             {tab.fields.length > 0 ? (
-              tab.fields.map((field, idx) => (
-                <div
-                  key={field.name}
-                  className="flex justify-between items-center bg-white rounded px-4 py-2 mb-2 shadow-sm"
-                >
-                  <span>
-                    {field.label}{" "}
-                    <small className="text-indigo-500">({field.type})</small>
-                  </span>
-                  <button
-                    onClick={() => removeField(tabIdx, idx)}
-                    className="text-red-600 hover:text-red-800 rounded focus:outline-none"
-                    aria-label="Remove field"
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {tab.fields.map((field, idx) => (
+                  <div
+                    key={field.name}
+                    className="flex justify-between items-center bg-white rounded px-4 py-2 shadow-sm hover:shadow-md transition"
                   >
-                    &times;
-                  </button>
-                </div>
-              ))
+                    <span>
+                      {field.label}{" "}
+                      <small className="text-indigo-500">({field.type})</small>
+                    </span>
+                    <button
+                      onClick={() => removeField(tabIdx, idx)}
+                      className="text-red-600 hover:text-red-800 rounded focus:outline-none"
+                      aria-label="Remove field"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
             ) : (
               <p className="text-center text-gray-500 italic">
                 Drop fields here
@@ -245,6 +253,7 @@ function Tab({
             onDragOver={allowDrop}
             className="border-2 border-dashed border-indigo-400 p-4 rounded-lg min-h-[6rem]"
           >
+            {/* Predefined draggable buttons */}
             <div className="flex flex-wrap gap-3 mb-4">
               {PREDEFINED_BUTTONS.map((button) => (
                 <DraggableButton
@@ -259,30 +268,33 @@ function Tab({
               ))}
               <button
                 onClick={() => {
-                  const label = prompt("Enter button label");
-                  if (label) addTabButton(tabIdx, { type: "custom", label });
+                  addCustomButton(tabIdx);
                 }}
                 className="px-3 py-1 !bg-green-600 text-white rounded cursor-pointer hover:bg-green-700"
               >
                 + Custom Button
               </button>
             </div>
+
+            {/* Responsive grid layout for dropped buttons */}
             {tab.buttons.length > 0 ? (
-              tab.buttons.map((button, idx) => (
-                <div
-                  key={idx}
-                  className="flex justify-between items-center bg-white rounded px-4 py-2 mb-2 shadow-sm"
-                >
-                  <span>{button.label}</span>
-                  <button
-                    onClick={() => removeButton(tabIdx, idx)}
-                    className="text-red-600 hover:text-red-800 rounded focus:outline-none"
-                    aria-label="Remove button"
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {tab.buttons.map((button, idx) => (
+                  <div
+                    key={idx}
+                    className="flex justify-between items-center bg-white rounded px-4 py-2 shadow-sm hover:shadow-md transition"
                   >
-                    &times;
-                  </button>
-                </div>
-              ))
+                    <span>{button.label}</span>
+                    <button
+                      onClick={() => removeButton(tabIdx, idx)}
+                      className="text-red-600 hover:text-red-800 rounded focus:outline-none"
+                      aria-label="Remove button"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
             ) : (
               <p className="text-center text-gray-500 italic">
                 Drop buttons here
@@ -299,6 +311,7 @@ function Tab({
             onDragOver={allowDrop}
             className="border-2 border-dashed border-indigo-400 p-4 rounded-lg mb-6 min-h-[10rem]"
           >
+            {/* Predefined draggable fields & table actions */}
             <div className="flex flex-wrap gap-3 mb-4">
               {PREDEFINED_FIELDS.map((field) => (
                 <DraggableButton
@@ -311,6 +324,7 @@ function Tab({
                   {field.label}
                 </DraggableButton>
               ))}
+
               {TABLE_ACTIONS.map((action) => (
                 <DraggableButton
                   key={action.type}
@@ -322,6 +336,7 @@ function Tab({
                   {action.label}
                 </DraggableButton>
               ))}
+
               <button
                 onClick={() => {
                   const label = prompt("Enter column label");
@@ -332,25 +347,29 @@ function Tab({
                 + Custom Column
               </button>
             </div>
+
+            {/* Responsive grid layout for dropped columns */}
             {tab.tableCols.length > 0 ? (
-              tab.tableCols.map((col, idx) => (
-                <div
-                  key={col.name}
-                  className="flex justify-between items-center bg-white rounded px-4 py-2 mb-2 shadow-sm"
-                >
-                  <span>
-                    {col.label}{" "}
-                    <small className="text-indigo-500">({col.type})</small>
-                  </span>
-                  <button
-                    onClick={() => removeColumn(tabIdx, idx)}
-                    className="text-red-600 hover:text-red-800 rounded focus:outline-none"
-                    aria-label="Remove column"
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {tab.tableCols.map((col, idx) => (
+                  <div
+                    key={col.name}
+                    className="flex justify-between items-center bg-white rounded px-4 py-2 shadow-sm hover:shadow-md transition"
                   >
-                    &times;
-                  </button>
-                </div>
-              ))
+                    <span>
+                      {col.label}{" "}
+                      <small className="text-indigo-500">({col.type})</small>
+                    </span>
+                    <button
+                      onClick={() => removeColumn(tabIdx, idx)}
+                      className="text-red-600 hover:text-red-800 rounded focus:outline-none"
+                      aria-label="Remove column"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
             ) : (
               <p className="text-center text-gray-500 italic">
                 Drop columns here
@@ -430,6 +449,7 @@ Tab.propTypes = {
   addTabColumn: PropTypes.func.isRequired,
   addTabButton: PropTypes.func.isRequired,
   removeTab: PropTypes.func.isRequired,
+  addCustomButton: PropTypes.func.isRequired,
 };
 
 function TabsDesigner({
@@ -449,9 +469,9 @@ function TabsDesigner({
   onDrop,
   allowDrop,
   removeTab,
-  updateTabFilters
+  updateTabFilters,
+  addCustomButton,
 }) {
-
   return (
     <section className="bg-white rounded-lg p-6 shadow-lg mx-auto mt-6">
       <div className="flex justify-between mt-0 mb-2">
@@ -466,8 +486,10 @@ function TabsDesigner({
         >
           Tabs
         </h3>
-        <div className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
-              mb-2">
+        <div
+          className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
+              mb-2"
+        >
           <input
             type="search"
             placeholder="Search Fields"
@@ -475,14 +497,14 @@ function TabsDesigner({
             onChange={(e) => {
               const query = e.target.value.toLowerCase();
               updateTabFilters(
-                PREDEFINED_TABS.filter(tab =>
+                PREDEFINED_TABS.filter((tab) =>
                   tab.label.toLowerCase().includes(query)
                 )
               );
             }}
           />
 
-          {renderIcons('FaSearch', 15, 'gray')}
+          {renderIcons("FaSearch", 15, "gray")}
         </div>
       </div>
       <div className="flex flex-wrap gap-3 mb-6">
@@ -514,7 +536,7 @@ function TabsDesigner({
           </DraggableButton>
         ))}
       </div>
-      <div className='flex w-full justify-between items-center mb-4'>
+      <div className="flex w-full justify-between items-center mb-4">
         <button
           onClick={addCustomTab}
           className="px-3 py-2  rounded !bg-green-600 text-white hover:bg-green-700 shadow-sm"
@@ -553,6 +575,7 @@ function TabsDesigner({
                 addCustomField={addCustomField}
                 openAddFieldModal={addCustomField}
                 removeTab={removeTab}
+                addCustomButton={addCustomButton}
               />
             ))}
           </div>
@@ -578,24 +601,64 @@ TabsDesigner.propTypes = {
   addTabColumn: PropTypes.func.isRequired,
   addCustomField: PropTypes.func.isRequired,
   removeTab: PropTypes.func.isRequired,
+  updateTabFilters: PropTypes.func.isRequired,
+  tabsList: PropTypes.func.isRequired,
+  addCustomButton: PropTypes.func.isRequired,
 };
 
 TabDesigner.propTypes = {
   tabs: PropTypes.any.isRequired,
   setTabs: PropTypes.any.isRequired,
+  openAddButtonModal: PropTypes.any.isRequired,
 };
 
 export default function TabDesigner({ tabs, setTabs }) {
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
   const [fieldModalTabIdx, setFieldModalTabIdx] = useState(null);
-  const [activeTab, setActiveTab] = useState('')
+  // const [activeTab, setActiveTab] = useState('')
   const [filteredTabs, setFilteredTabs] = useState(PREDEFINED_TABS);
+  const [addingButton, setAddingButton] = useState({
+    open: false,
+    tabIndex: null,
+    buttonData: null,
+    tabIdx: null,
+  });
 
   const onDragStart = (e, item, category) => {
     e.dataTransfer.setData(
       "application/json",
       JSON.stringify({ item, category })
     );
+  };
+
+  const handleAddButtonModalSubmit = ({
+    eventType,
+    apiCallData,
+    labelFromModal,
+  }) => {
+    let label =
+      labelFromModal || addingButton.buttonData?.label || "Custom Button";
+    const newButton = {
+      label,
+      type: "button",
+      actionType: eventType,
+      apiEndpoint: apiCallData ? apiCallData.endpoint : null,
+      apiMethod: apiCallData ? apiCallData.method : null,
+    };
+
+    setTabs((prev) =>
+      prev.map((tab, i) =>
+        i === addingButton?.tabIdx
+          ? { ...tab, buttons: [...tab.buttons, newButton] }
+          : tab
+      )
+    );
+    setAddingButton({
+      open: false,
+      tabIndex: null,
+      buttonData: null,
+      tabIdx: null,
+    });
   };
 
   const allowDrop = (e) => e.preventDefault();
@@ -646,12 +709,12 @@ export default function TabDesigner({ tabs, setTabs }) {
       prev.map((tab, i) =>
         i === idx
           ? {
-            ...tab,
-            fields: [
-              ...tab.fields,
-              { ...field, name: `${field.label}-${tab.fields.length}` },
-            ],
-          }
+              ...tab,
+              fields: [
+                ...tab.fields,
+                { ...field, name: `${field.label}-${tab.fields.length}` },
+              ],
+            }
           : tab
       )
     );
@@ -674,6 +737,7 @@ export default function TabDesigner({ tabs, setTabs }) {
 
   // Buttons
   const addTabButton = (idx, button) => {
+    // openAddButtonModal();
     setTabs((prev) =>
       prev.map((tab, i) =>
         i === idx ? { ...tab, buttons: [...tab.buttons, button] } : tab
@@ -686,9 +750,9 @@ export default function TabDesigner({ tabs, setTabs }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-            ...tab,
-            buttons: tab.buttons.filter((_, idx) => idx !== buttonIdx),
-          }
+              ...tab,
+              buttons: tab.buttons.filter((_, idx) => idx !== buttonIdx),
+            }
           : tab
       )
     );
@@ -700,12 +764,12 @@ export default function TabDesigner({ tabs, setTabs }) {
       prev.map((tab, i) =>
         i === idx
           ? {
-            ...tab,
-            tableCols: [
-              ...tab.tableCols,
-              { ...column, name: `${column.label}-${tab.tableCols.length}` },
-            ],
-          }
+              ...tab,
+              tableCols: [
+                ...tab.tableCols,
+                { ...column, name: `${column.label}-${tab.tableCols.length}` },
+              ],
+            }
           : tab
       )
     );
@@ -716,12 +780,21 @@ export default function TabDesigner({ tabs, setTabs }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-            ...tab,
-            tableCols: tab.tableCols.filter((_, idx) => idx !== colIdx),
-          }
+              ...tab,
+              tableCols: tab.tableCols.filter((_, idx) => idx !== colIdx),
+            }
           : tab
       )
     );
+  };
+
+  const addCustomButton = (tabIdx) => {
+    setAddingButton({
+      open: true,
+      tabIndex: null,
+      buttonData: null,
+      tabIdx: tabIdx,
+    });
   };
 
   // Drop handlers
@@ -730,8 +803,17 @@ export default function TabDesigner({ tabs, setTabs }) {
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
     if (type === "field" && data.category === "field")
       addTabField(idx, data.item);
-    if (type === "button" && data.category === "button")
-      addTabButton(idx, data.item);
+
+    if (type === "button" && data.category === "button") {
+      // trigger modal for both predefined and custom
+      setAddingButton({
+        open: true,
+        tabIndex: null,
+        buttonData: data.item,
+        tabIdx: idx, // to know where to add after submit
+      });
+      return; // do NOT call addTabButton directly!
+    }
     if (
       type === "column" &&
       (data.category === "field" || data.category === "action")
@@ -749,7 +831,6 @@ export default function TabDesigner({ tabs, setTabs }) {
   };
   const updateTabFilters = (tabs) => {
     setFilteredTabs(tabs);
-    console.log(tabs, 'tabs');
   };
 
   return (
@@ -772,11 +853,25 @@ export default function TabDesigner({ tabs, setTabs }) {
         allowDrop={allowDrop}
         removeTab={removeTab}
         updateTabFilters={updateTabFilters}
+        addCustomButton={addCustomButton}
       />
       <AddFieldModal
         open={showAddFieldModal}
         onClose={() => setShowAddFieldModal(false)}
         onSubmit={onAddFieldSubmit}
+      />
+      <AddButtonEventModal
+        open={addingButton.open}
+        onClose={() =>
+          setAddingButton({
+            open: false,
+            tabIndex: null,
+            buttonData: null,
+            tabIdx: null,
+          })
+        }
+        onSubmit={handleAddButtonModalSubmit}
+        initialLabel={addingButton.buttonData?.label}
       />
     </>
   );

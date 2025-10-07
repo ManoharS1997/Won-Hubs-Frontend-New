@@ -70,13 +70,24 @@ export default function FormBuilder({
             Fields
           </h3>
           {/* Search Bar */}
-          <div className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
-        mb-2">
-            <input type="search" placeholder="Search Fields" className=" outline-none px-2 py-1" onChange={(e) => {
-              const query = e.target.value.toLowerCase();
-              setFilteredFields(PREDEFINED_FIELDS.filter(field => field.label.toLowerCase().includes(query)));
-            }} />
-            {renderIcons('FaSearch', 15, 'gray')}
+          <div
+            className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
+        mb-2"
+          >
+            <input
+              type="search"
+              placeholder="Search Fields"
+              className=" outline-none px-2 py-1"
+              onChange={(e) => {
+                const query = e.target.value.toLowerCase();
+                setFilteredFields(
+                  PREDEFINED_FIELDS.filter((field) =>
+                    field.label.toLowerCase().includes(query)
+                  )
+                );
+              }}
+            />
+            {renderIcons("FaSearch", 15, "gray")}
           </div>
         </div>
         {/* Predefined Fields Section */}
@@ -110,13 +121,13 @@ export default function FormBuilder({
             <button
               style={{ borderRadius: 6 }}
               //           className="
-              //   px-4 py-2 
-              //   rounded-md 
+              //   px-4 py-2
+              //   rounded-md
               //   bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600
               //   border border-blue-600/40
-              //   text-white 
-              //   text-sm 
-              //   font-medium 
+              //   text-white
+              //   text-sm
+              //   font-medium
               //   shadow-sm
               //   hover:from-blue-700 hover:via-blue-600 hover:to-blue-500
               //   hover:shadow-md
@@ -125,13 +136,14 @@ export default function FormBuilder({
               //   duration-300
               // "
               className="!bg-green-500 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-green-600 active:scale-95 transition whitespace-nowrap"
-
               onClick={() => setShowAddFieldModal(true)}
             >
               + Custom
             </button>
 
-            <button className="bg-transparent m-0 p-0 text-blue-500">+more</button>
+            <button className="bg-transparent m-0 p-0 text-blue-500">
+              +more
+            </button>
 
             <AddFieldModal
               open={showAddFieldModal}
@@ -143,7 +155,7 @@ export default function FormBuilder({
 
         {/* Drop Zone for Fields */}
         <div
-          className="border-2 border-dashed border-indigo-300 rounded-xl h-44 overflow-auto p-4 flex flex-col justify-start bg-indigo-50/30 hover:bg-indigo-50 transition"
+          className="border-2 border-dashed border-indigo-300 rounded-xl h-44 overflow-auto p-4 bg-indigo-50/30 hover:bg-indigo-50 transition"
           onDrop={onDropField}
           onDragOver={allowDrop}
         >
@@ -152,28 +164,32 @@ export default function FormBuilder({
               Drag & drop fields here
             </p>
           )}
-          {formFields.map((field, i) => (
-            <div
-              key={field.name}
-              className="flex justify-between items-center bg-white border border-indigo-100 rounded-lg px-4 py-2 mb-2 shadow-sm hover:shadow-md transition"
-            >
-              <div>
-                <span className="font-medium">{field.label}</span>{" "}
-                <span className="text-gray-500 italic text-sm">
-                  ({field.type})
-                </span>
-              </div>
-              <button
-                style={{ borderRadius: 8 }}
-                onClick={() => removeField(i)}
-                className="text-red-500 hover:text-red-700 text-lg font-bold transition"
-                type="button"
-                aria-label="Remove field"
+
+          {/* Responsive grid layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {formFields.map((field, i) => (
+              <div
+                key={field.name}
+                className="flex justify-between items-center bg-white border border-indigo-100 rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition"
               >
-                ×
-              </button>
-            </div>
-          ))}
+                <div>
+                  <span className="font-medium">{field.label}</span>{" "}
+                  <span className="text-gray-500 italic text-sm">
+                    ({field.type})
+                  </span>
+                </div>
+                <button
+                  style={{ borderRadius: 8 }}
+                  onClick={() => removeField(i)}
+                  className="text-red-500 hover:text-red-700 text-lg font-bold transition"
+                  type="button"
+                  aria-label="Remove field"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -191,13 +207,24 @@ export default function FormBuilder({
           >
             Buttons
           </h3>
-          <div className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
-        mb-2">
-            <input type="search" placeholder="Search Fields" className="outline-none px-2 py-1" onChange={(e) => {
-              const query = e.target.value.toLowerCase();
-              setFilteredButtons(PREDEFINED_BUTTONS.filter(button => button.label.toLowerCase().includes(query)));
-            }} />
-            {renderIcons('FaSearch', 15, 'gray')}
+          <div
+            className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
+        mb-2"
+          >
+            <input
+              type="search"
+              placeholder="Search Fields"
+              className="outline-none px-2 py-1"
+              onChange={(e) => {
+                const query = e.target.value.toLowerCase();
+                setFilteredButtons(
+                  PREDEFINED_BUTTONS.filter((button) =>
+                    button.label.toLowerCase().includes(query)
+                  )
+                );
+              }}
+            />
+            {renderIcons("FaSearch", 15, "gray")}
           </div>
         </div>
         {/* Predefined Buttons Section */}
@@ -243,10 +270,9 @@ export default function FormBuilder({
           </button>
         </div>
 
-
         {/* Drop Zone for Buttons */}
         <div
-          className="border-2 border-dashed border-indigo-300 rounded-xl h-32 overflow-auto p-4 flex flex-col justify-start bg-indigo-50/30 hover:bg-indigo-50 transition"
+          className="border-2 border-dashed border-indigo-300 rounded-xl h-32 overflow-auto p-4 bg-indigo-50/30 hover:bg-indigo-50 transition"
           onDrop={onDropButton}
           onDragOver={allowDrop}
         >
@@ -255,22 +281,26 @@ export default function FormBuilder({
               Drag & drop buttons here
             </p>
           )}
-          {formButtons.map((btn, i) => (
-            <div
-              key={`${btn.label}-${i}`}
-              className="flex justify-between items-center bg-white border border-indigo-100 rounded-lg px-4 py-2 mb-2 shadow-sm hover:shadow-md transition"
-            >
-              <div className="font-medium">{btn.label}</div>
-              <button
-                onClick={() => removeButton(i)}
-                className="text-red-500 hover:text-red-700 text-lg font-bold transition"
-                type="button"
-                aria-label="Remove button"
+
+          {/* Responsive grid layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {formButtons.map((btn, i) => (
+              <div
+                key={`${btn.label}-${i}`}
+                className="flex justify-between items-center bg-white border border-indigo-100 rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition"
               >
-                ×
-              </button>
-            </div>
-          ))}
+                <div className="font-medium">{btn.label}</div>
+                <button
+                  onClick={() => removeButton(i)}
+                  className="text-red-500 hover:text-red-700 text-lg font-bold transition"
+                  type="button"
+                  aria-label="Remove button"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
