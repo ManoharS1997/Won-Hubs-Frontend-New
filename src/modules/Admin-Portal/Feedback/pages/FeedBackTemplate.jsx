@@ -390,8 +390,9 @@ const FeedBackTemplateView = () => {
         { label: "Users", value: "users" },
         { label: "Roles", value: "roles" },
       ],
-    }, // Recipient
-    { name: "cc", label: "CC", type: "text", isMandatory: true }, // CC field comes after To
+    }, 
+    
+    { name: "subject", label: "Subject", type: "text", isMandatory: true }, // CC field comes after To
     {
       name: "type",
       label: "Type",

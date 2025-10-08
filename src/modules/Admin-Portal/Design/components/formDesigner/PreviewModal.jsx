@@ -7,6 +7,7 @@ function fieldSupportsOptions(type) {
   return fieldTypesWithOptions.includes(type);
 }
 
+
 export default function PreviewModal({
   show,
   onClose,
@@ -20,6 +21,8 @@ export default function PreviewModal({
   const [saving, setSaving] = useState(false);
   const [twoColumn, setTwoColumn] = useState(true);
 
+  if (!show) return null;
+
   const handleChange = (name, value) => {
     setValues((prev) => ({ ...prev, [name]: value }));
   };
@@ -28,11 +31,10 @@ export default function PreviewModal({
     "w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none";
 
   const renderField = (field) => {
-    // wrapper classes based on layout
     const wrapperClasses = `
-    mb-3 w-full 
-    ${twoColumn && field.fullWidth ? "md:col-span-2" : ""}
-  `;
+      mb-3 w-full 
+      ${twoColumn && field.fullWidth ? "md:col-span-2" : ""}
+    `;
 
     switch (field.type) {
       case "text":
@@ -48,7 +50,7 @@ export default function PreviewModal({
       case "color":
         return (
           <div key={field.name} className={wrapperClasses}>
-            <label className="block text-sm font-semibold text-gray-700 ">
+            <label className="block text-sm font-semibold text-gray-700">
               {field.label}
             </label>
             <input
@@ -81,32 +83,10 @@ export default function PreviewModal({
       case "dropdown":
       case "multi-select":
         return (
-          <div key={field.name} className={`${wrapperClasses} flex gap-3`}>
+          <div key={field.name} className={wrapperClasses}>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               {field.label}
             </label>
-            {/* <select
-              name={field.name}
-              multiple={field.type === "multi-select"}
-              value={
-                values[field.name] || (field.type === "multi-select" ? [] : "")
-              }
-              onChange={(e) =>
-                handleChange(
-                  field.name,
-                  field.type === "multi-select"
-                    ? Array.from(e.target.selectedOptions, (o) => o.value)
-                    : e.target.value
-                )
-              }
-              className={baseInputClasses}
-            >
-              {(field.options || []).map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select> */}
             <select
               name={field.name}
               multiple={field.type === "multi-select"}
@@ -121,12 +101,7 @@ export default function PreviewModal({
                     : e.target.value
                 )
               }
-              className={`
-    ${baseInputClasses}
-    appearance-none pr-10
-    cursor-pointer
-  
-  `}
+              className={`${baseInputClasses} appearance-none pr-10 cursor-pointer`}
             >
               {(field.options || []).map((opt) => (
                 <option key={opt} value={opt}>
@@ -139,16 +114,13 @@ export default function PreviewModal({
 
       case "radio":
         return (
-          <div
-            key={field.name}
-            className={`${wrapperClasses} flex gap-3 flex-col`}
-          >
+          <div key={field.name} className={`${wrapperClasses}`}>
             <div className="text-sm font-semibold text-gray-700 mb-2">
               {field.label}
             </div>
             <div className="flex flex-wrap gap-4">
               {(field.options || []).map((opt) => (
-                <div key={opt} className="gap-2 flex">
+                <label key={opt} className="flex gap-2 items-center text-gray-600">
                   <input
                     type="radio"
                     name={field.name}
@@ -157,33 +129,28 @@ export default function PreviewModal({
                     onChange={() => handleChange(field.name, opt)}
                     className="accent-indigo-600"
                   />
-                  <label className="flex  gap-2 text-gray-600">{opt}</label>
-                </div>
+                  {opt}
+                </label>
               ))}
             </div>
           </div>
         );
+
       case "checkbox":
         return (
-          <div key={field.name} className={`${wrapperClasses} mt-2 !border-2`}>
-            <div className="flex justify-between items-center border-2">
-              <label
-                htmlFor={field.name}
-                className="text-sm font-semibold text-gray-700"
-              >
-                {field.label}
-              </label>
+          <div key={field.name} className={wrapperClasses}>
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <input
-                id={field.name}
                 type="checkbox"
-                name={field.name}
                 checked={!!values[field.name]}
                 onChange={(e) => handleChange(field.name, e.target.checked)}
-                className="w-4 h-4 accent-indigo-600 rounded border-gray-300 cursor-pointer"
+                className="w-4 h-4 accent-indigo-600 border-gray-300 rounded"
               />
-            </div>
+              {field.label}
+            </label>
           </div>
         );
+
       case "file":
         return (
           <div key={field.name} className={wrapperClasses}>
@@ -198,6 +165,7 @@ export default function PreviewModal({
             />
           </div>
         );
+
       default:
         return (
           <div key={field.name} className={`${wrapperClasses} text-red-500`}>
@@ -206,8 +174,6 @@ export default function PreviewModal({
         );
     }
   };
-
-  if (!show) return null;
 
   const handleSave = async () => {
     try {
@@ -224,7 +190,7 @@ export default function PreviewModal({
         selectedDepartments: state?.selectedDepartments,
       };
 
-      console.log(payload)
+      console.log(payload);
 
       const res = await fetch("http://localhost:3001/api/form-designer", {
         method: "POST",
@@ -243,73 +209,65 @@ export default function PreviewModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6 overflow-auto">
-      <div className="bg-white rounded-2xl shadow-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto relative p-8 no-scrollbar">
-        {/* Close button */}
-        <button
-          className="absolute top-4 right-4 !bg-transparent !text-red rounded-full w-9 h-9 flex items-center justify-center text-lg hover:bg-red-600 transition"
-          aria-label="Close preview"
-          onClick={onClose}
-        >
-          ×
-        </button>
-
-        <h2 className="text-2xl font-bold text-indigo-700 mb-6 border-b pb-3">
-          Preview: {module}
+    <div className="bg-white rounded-xl p-2 w-full">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-indigo-700 text-centerm align-center">
+          {module}
         </h2>
+        <button
+          type="button"
+          onClick={() => setTwoColumn(!twoColumn)}
+          className="w-10 h-10 flex items-center justify-center !rounded-full border !border-blue-500 shadow hover:bg-gray-100 transition"
+        >
+          <AiOutlineSwap className="w-5 h-5 text-gray-700" />
+        </button>
+      </div>
 
-        <div className="mb-6 flex justify-end">
-          <button
-            type="button"
-            onClick={() => setTwoColumn(!twoColumn)}
-            className="w-10 h-10 flex items-center justify-center !rounded-full border !border-blue-500 shadow hover:bg-gray-100 transition"
-          >
-            <AiOutlineSwap className="w-5 h-5 text-gray-700" />
-          </button>
-        </div>
+      {/* Form preview */}
+      <form
+        className={`mx-auto w-full ${
+          twoColumn
+            ? "grid grid-cols-1 md:grid-cols-2 gap-4"
+            : "grid grid-cols-1"
+        }`}
+      >
+        {formFields.map(renderField)}
 
-        {/* Main form */}
-        <form
-          className={`mx-auto w-full ${
-            twoColumn
-              ? "grid grid-cols-1 md:grid-cols-2 gap-2"
-              : "grid grid-cols-1 "
+        <div
+          className={`mt-4 flex gap-4 ${
+            twoColumn ? "col-span-2 justify-start" : ""
           }`}
         >
-          {formFields.map(renderField)}
+          {formButtons.map((btn) => (
+            <button
+              key={btn.label}
+              type={btn.type}
+              className="!bg-indigo-600 text-white px-6 py-2 !rounded-md shadow hover:bg-indigo-700 transition"
+            >
+              {btn.label}
+            </button>
+          ))}
+        </div>
+      </form>
 
-          <div
-            className={`mt-3 flex gap-6 p-0 m-0 ${
-              twoColumn ? "col-span-2" : ""
-            }`}
-          >
-            {formButtons.map((btn) => (
-              <button
-                key={btn.label}
-                type={btn.type}
-                className="!bg-indigo-600 text-white px-6 py-2 !rounded-md mr-3 shadow hover:bg-indigo-700 transition "
-              >
-                {btn.label}
-              </button>
-            ))}
-          </div>
-        </form>
+      {/* Tabs preview */}
+      {tabs.length > 0 && (
         <div className="mt-10">
-          <h3 className="text-xl font-semibold text-indigo-700 mb-5">Tabs</h3>
-          <div className="flex flex-wrap gap-6 mb-8">
+          <h3 className="text-xl font-semibold text-indigo-700 mb-4">Tabs</h3>
+          <div className="flex flex-wrap gap-3 mb-8">
             {tabs.map((tab) => (
               <button
                 key={tab.name}
-                className="!bg-indigo-100 text-indigo-800 px-5 py-2 rounded shadow"
+                className="!bg-indigo-100 text-indigo-800 px-5 py-2 !rounded shadow"
               >
                 {tab.name}
               </button>
             ))}
           </div>
 
-          {/* Render each tab details */}
           {tabs.map((tab) => (
-            <section key={tab.name} className="mb-12">
+            <section key={tab.name} className="mb-10">
               <h4 className="text-lg font-bold text-indigo-600 mb-4">
                 {tab.name} ({tab.type})
               </h4>
@@ -319,17 +277,16 @@ export default function PreviewModal({
                   className={`mx-auto w-full ${
                     twoColumn
                       ? "grid grid-cols-1 md:grid-cols-2 gap-2"
-                      : "grid grid-cols-1 "
+                      : "grid grid-cols-1"
                   }`}
                 >
                   {tab.fields.map(renderField)}
-
                   <div className="col-span-2 flex gap-4">
                     {tab.buttons.map((btn, i) => (
                       <button
                         key={i}
                         type={btn.type}
-                        className="px-5 py-2 !bg-indigo-600 text-white rounded shadow hover:bg-indigo-700 transition"
+                        className="px-5 py-2 bg-indigo-600 text-white !rounded shadow hover:bg-indigo-700 transition"
                       >
                         {btn.label}
                       </button>
@@ -339,9 +296,9 @@ export default function PreviewModal({
               )}
 
               {tab.type === "table" && (
-                <table className="w-full text-center border border-gray-300 border-collapse mb-6">
-                  <thead>
-                    <tr className="bg-indigo-200">
+                <table className="w-full border border-gray-300 border-collapse text-center">
+                  <thead className="bg-indigo-100">
+                    <tr>
                       {tab.tableCols.map((col) => (
                         <th
                           key={col.name}
@@ -350,38 +307,18 @@ export default function PreviewModal({
                           {col.label}
                         </th>
                       ))}
-                      {tab.tableCols.some((c) => c.type === "action") && (
-                        <th className="border border-gray-300 p-2">Actions</th>
-                      )}
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      {tab.tableCols
-                        .filter((c) => c.type !== "action")
-                        .map((col) => (
-                          <td
-                            key={col.name}
-                            className="border border-gray-300 p-2"
-                          >
-                            {fieldSupportsOptions(col.type)
-                              ? (col.options || []).join(", ")
-                              : `[${col.type}]`}
-                          </td>
-                        ))}
-                      {tab.tableCols.some((c) => c.type === "action") && (
-                        <td className="border border-gray-300 p-2 space-x-2">
-                          <button className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition">
-                            Edit
-                          </button>
-                          <button className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition">
-                            Delete
-                          </button>
-                          <button className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition">
-                            Update
-                          </button>
+                      {tab.tableCols.map((col) => (
+                        <td
+                          key={col.name}
+                          className="border border-gray-300 p-2 text-gray-700"
+                        >
+                          [{col.type}]
                         </td>
-                      )}
+                      ))}
                     </tr>
                   </tbody>
                 </table>
@@ -389,13 +326,17 @@ export default function PreviewModal({
             </section>
           ))}
         </div>
+      )}
+
+      {/* Save button */}
+      <div className="mt-6">
         <button
           type="button"
           onClick={handleSave}
           disabled={saving}
           className={`px-6 py-2 !rounded-lg shadow text-white transition ${
             saving
-              ? "!bg-gray-400 cursor-not-allowed"
+              ? "bg-gray-400 cursor-not-allowed"
               : "!bg-green-600 hover:bg-green-700"
           }`}
         >
@@ -405,6 +346,7 @@ export default function PreviewModal({
     </div>
   );
 }
+
 
 // Helper needed for table rendering (assumed external or define if needed)
 // function fieldSupportsOptions(type) {

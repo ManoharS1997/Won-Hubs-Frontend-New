@@ -196,22 +196,41 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                         </CustomNotificationContainer>
 
                         {isModalOpen && (
-                            <div className="fixed w-screen min-h-[80%] bg-black/50 top-0 left-0 flex items-center justify-center">
-                                <div className="flex flex-col py-4 px-3 justify-between items-center bg-white rounded-lg gap-4 w-[600px] max-w-[80%]">
-                                    <div className="relative w-full flex items-center justify-center m-0 p-0">
-                                        <h2 className="text-xl font-semibold text-center w-full m-0 p-0">
+                            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/20 backdrop-blur-sm">
+                                <div
+                                    className="flex flex-col py-3 px-4 justify-between items-center bg-white rounded-lg gap-3 w-[400px] max-w-[90%]
+                 max-h-[75vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500
+                 scrollbar-thumb-rounded-md transition-all duration-300"
+                                    style={{
+                                        scrollbarWidth: "thin",
+                                        scrollbarColor: "#9ca3af transparent", // ✅ no visible scrollbar track
+                                    }}
+                                >
+                                    {/* Header */}
+                                    <div className="relative w-full flex items-center justify-center">
+                                        <h2 className="!text-md font-semibold text-center w-full text-gray-800">
                                             {title}
                                         </h2>
                                         <button
                                             type="button"
                                             onClick={() => setModalOpen(false)}
-                                            className="absolute right-0 top-0 border rounded-full hover:bg-red-500 hover:text-white transition-all duration-500"
+                                            className="absolute right-0 top-0 text-red-500 hover:!bg-red-500 hover:!rounded-full hover:text-white 
+               rounded-full p-[2px] transition-all duration-300"
                                         >
-                                            <IoIosClose size={20} />
+                                            <IoIosClose size={18} />
                                         </button>
                                     </div>
 
-                                    <div className="w-full flex flex-col gap-2">
+
+                                    {/* Content */}
+                                    <div
+                                        className="w-full flex flex-col gap-2 overflow-y-auto max-h-[55vh] scrollbar-thin 
+                   scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500 scroll-smooth pr-1"
+                                        style={{
+                                            scrollbarWidth: "thin",
+                                            scrollbarColor: "#9ca3af transparent",
+                                        }}
+                                    >
                                         {configureFields.map((field, index) => {
                                             if (field.type === "dropdown") {
                                                 return (
@@ -227,8 +246,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                                         placeholder={`Select ${capitalize(field.label)}`}
                                                     />
                                                 );
-                                            }
-                                            else if (field.type === 'textarea') {
+                                            } else if (field.type === "textarea") {
                                                 return (
                                                     <FormTextarea
                                                         key={index}
@@ -236,7 +254,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                                         name={field.name}
                                                         isMandatory={field.isMandatory}
                                                         onChangeHandler={onChangeInput}
-                                                        placeholder={`Select ${capitalize(field.label)}`}
+                                                        placeholder={`Enter ${capitalize(field.label)}`}
                                                     />
                                                 );
                                             }
@@ -255,11 +273,12 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                         })}
                                     </div>
 
+                                    {/* Footer Button */}
                                     <button
                                         type="submit"
                                         disabled={!isCreateBtnActive}
                                         onClick={handleSave}
-                                        className={`border w-full px-4 py-2 rounded transition-all duration-500 ${isCreateBtnActive
+                                        className={`border w-full px-4 py-2 rounded transition-all duration-500 !text-white ${isCreateBtnActive
                                             ? "!bg-[var(--primary-color)] hover:text-[var(--background-color)] hover:!bg-[var(--primary-color)]/90"
                                             : "bg-gray-300 cursor-not-allowed opacity-50"
                                             }`}
@@ -269,6 +288,8 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                 </div>
                             </div>
                         )}
+
+
                     </SideNavAndContentContainer>
                 </NotificationTemplateMainContainer>
             )}

@@ -39,6 +39,7 @@ import {
 } from './StyledComponents'
 import CreateAlerts from '../../Admin-Portal/Alerts/pages/CreateAlerts';
 import CreateFeedback from '../../Admin-Portal/Feedback/pages/CreateFeedback';
+import { selectedGridRowsCountSelector } from '@mui/x-data-grid';
 
 const conditions = ['Like', 'Not Like', 'Equals To', 'Not Equals To']
 
@@ -505,15 +506,17 @@ export default function TableComponent({
     }
   }
   const renderTabView = (tableName) => {
-    console.log(tableName,"@@@")
+    // console.log(tableName,"@@@")
+    console.log(selectedTab, tableName, "###")
     switch (tableName) {
       case "notifications":
         return <CreateNotification recordId={selectedTab} />
       case 'alerts':
         return <CreateAlerts recordId={selectedTab} />
       
-      case 'feedback':
+      case 'feedBack':
         return <CreateFeedback recordId={selectedTab} />
+      
       case 'templates':
         return <CreateTemplate recordId={selectedTab} />
       default:
@@ -532,7 +535,7 @@ export default function TableComponent({
     }
   }, [filterConditions, isFilterActive, tableData]);
 
-  // console.log(selectedColumns,"column name here")
+  
   return (
     <MainContainer>
       <div className='w-full h-fit bg-[var(--bakground-color)] pb-[4px] mb-2 overflow-auto scrollbar-hide '>

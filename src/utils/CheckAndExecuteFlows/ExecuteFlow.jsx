@@ -43,7 +43,7 @@ export default function ExecuteFlows(flowType, record) {
 
   // switching the flow by it's type
   const switchFlowType = async (flowType) => {
-    console.log("flowType:", flowType);
+    // console.log("flowType:", flowType);
     const allFlowsData = await getTableData("flows");
     const activeFlows = allFlowsData.flows.filter(
       (flow) => flow.active === "true"

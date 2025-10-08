@@ -7,7 +7,6 @@ import isHotkey from 'is-hotkey'
 import {
   Editor, Transforms, createEditor, Element as SlateElement
 } from 'slate'
-
 import {
   useSlate, Slate, Editable, useSlateStatic, useSelected,
   useFocused, withReact, ReactEditor,
@@ -42,6 +41,7 @@ import {
   FieldContainer, FieldsContainer, FieldsList, MainContainer,
   SidebarContainer, TextAreaTag, ToolBarContainer
 } from '../CreateNotification/StyledComponents';
+// import SlateEditor from '../../../../shared/components/SlateNew/SlateEditor/Editor'
 
 
 const fieldsList = [
@@ -152,7 +152,6 @@ const CreateNotification = ({ recordId }) => {
   )
 
   const { id } = useParams()
-  // console.log(id, "From useParams")
   const [suggestion, setSuggestion] = useState("")
 
   const fetchAISuggestion = async (text) => {
@@ -202,25 +201,16 @@ const CreateNotification = ({ recordId }) => {
     try {
       console.log("Triggering Hereee");
 
-      const url = `${import.meta.env.VITE_HOSTED_API_URL}/notification/${recordId}`;
+      const url = `${import.meta.env.VITE_HOSTED_API_URL}/notifications/${recordId}`;
       const options = { method: "GET" };
-
       const response = await fetch(url, options);
-      console.log(response, "Response Hereee")
-
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-
+      // console.log(response, "Response Hereee")
       const data = await response.json();
       console.log(data, "data here");
-
       const parsedData = data.record?.email_body
         ? JSON.parse(data.record.email_body)
         : initialValue;
-
       console.log(parsedData, "parsed Hereee");
-
       setNotificationContent(parsedData);
       setNotificationData(data.record);
       setNotificationItem({
@@ -300,162 +290,22 @@ const CreateNotification = ({ recordId }) => {
             </FieldsList>
           </div>
 
-          {/* <div
-            className='w-[83vw] h-full grow flex flex-col overflow-y-auto'
-          >
-            <BackBtn type='button' onClick={() => onBack()}><IoChevronBackSharp size={25} /> Back </BackBtn>
-
-            <div
-              className='w-full self-center h-full flex flex-col md:flex-row p-2 gap-4'
-            >
-              <div
-                className='w-full h-fit flex flex-col gap-4'
-              >
-                <div
-                  className='flex w-full items-center gap-4'
-                >
-                  <CustomLabel htmlFor='to'>To: </CustomLabel>
-                  <CustomInput type='text' id='to' value={defaultFieldsData.to} />
-                </div>
-
-                <div
-                  className='flex w-full items-center gap-4'
-                >
-                  <CustomLabel htmlFor='cc'>CC: </CustomLabel>
-                  <CustomInput type='text' id='cc' value={defaultFieldsData.cc} />
-                </div>
-              </div>
-
-              <div
-                className='w-full h-fit flex flex-col gap-4'
-              >
-                <div
-                  className='flex w-full items-center gap-4'
-                >
-                  <CustomLabel htmlFor='notification-name'>Name: </CustomLabel>
-                  <CustomInput type='text' id='notification-name' value={updatingContent.name ? updatingContent.name : notificationData.name} onChange={(e) => setUpdatingContent({ ...updatingContent, name: e.target.value })} />
-                </div>
-
-                <div
-                  className='flex w-full items-center gap-4'
-                >
-                  <CustomLabel htmlFor='subject'>Subject: </CustomLabel>
-                  <TextAreaTag id='subject' value={defaultFieldsData.subject} cols={40} rows={3} />
-                </div>
-              </div>
-
-              <div
-                className='w-full h-fit flex flex-col gap-4'
-              >
-                <div
-                  className='flex w-full items-center gap-4'
-                >
-                  <CustomLabel htmlFor='type'>Type: </CustomLabel>
-
-                  <CustomSelect id='type' value={defaultFieldsData.type}>
-                    <CustomOption selected={defaultFieldsData.type === 'global'} value='global'>Global</CustomOption>
-                    <CustomOption selected={defaultFieldsData.type === 'local'} value='local'>Local</CustomOption>
-                  </CustomSelect>
-                </div>
-              </div>
-            </div>
-
-            {/* <CreateNotificationContainer>
-              {notificationContent.length !== 0 ?
-                <Slate editor={editor} initialValue={notificationContent} onChange={saveContent}>
-                  <Toolbar className='tool-bar'>
-                    <ToolBarContainer id='toolbar-buttons'>
-                      <MarkButton format="bold" icon={<MdFormatBold size={20} />} />
-                      <MarkButton format="italic" icon={<MdFormatItalic size={20} />} />
-                      <MarkButton format="underline" icon={<MdFormatUnderlined size={20} />} />
-                      <MarkButton format="code" icon={<MdOutlineCode size={20} />} />
-                      <BlockButton format="heading-one" icon={<LuHeading1 size={20} />} />
-                      <BlockButton format="heading-two" icon={<LuHeading2 size={20} />} />
-                      <BlockButton format="block-quote" icon={<MdFormatQuote size={20} />} />
-                      <BlockButton format="numbered-list" icon={<MdFormatListNumbered size={20} />} />
-                      <BlockButton format="bulleted-list" icon={<MdFormatListBulleted size={20} />} />
-                      <BlockButton format="left" icon={<MdFormatAlignLeft size={20} />} />
-                      <BlockButton format="center" icon={<MdFormatAlignCenter size={20} />} />
-                      <BlockButton format="right" icon={<MdFormatAlignRight size={20} />} />
-                      <BlockButton format="justify" icon={<MdFormatAlignJustify size={20} />} />
-                      <InsertImageButton icon={<MdImage size={20} />} />
-                    </ToolBarContainer>
-                  </Toolbar>
-
-                  <Editable style={editorStyles}
-                    renderLeaf={renderLeaf}
-                    spellCheck
-                    autoFocus
-                    onKeyDown={event => {
-                      for (const hotkey in HOTKEYS) {
-                        if (isHotkey(hotkey, event)) {
-                          event.preventDefault()
-                          const mark = HOTKEYS[hotkey]
-                          toggleMark(editor, mark)
-                        }
-                      }
-                    }}
-                    renderElement={props => <Element {...props} />}
-                    placeholder="Enter some text..."
-                  />
-                </Slate> :
-                null
-              }
-            </CreateNotificationContainer> */}
+         
           <div className="relative w-[83vw] min-h-[90%] ">
-            <div className="absolute top-6 right-8 z-10">
+            <div className="absolute right-8 z-10">
               <FinishBtn type="button"
                 onClick={() => setShowPreview(true)}>
                 Preview
                 {renderIcons('MdDoubleArrow', 25, 'inherit')}
               </FinishBtn>
             </div>
-            <div className="flex flex-col items-center justify-center w-full min-h-[100%]">
+            <div className="flex flex-col items-center justify-center w-full mt-12">
               <CreateNotificationContainer>
-                {notificationContent?.length !== 0 ? (
-                  // <Slate
-                  //   editor={editor}
-                  //   // initialValue={notificationContent ?? initialValue} 
-                  //   //  // ✅ use value not initialValue
-                  //   initialValue={notificationContent?.length ? notificationContent : initialValue}
-                  //   onChange={handleChange}
-                  // >
-                  //   <Toolbar className='tool-bar'>
-                  //     <ToolBarContainer id='toolbar-buttons'>
-                  //       <MarkButton format="bold" icon={<MdFormatBold size={20} />} />
-                  //       <MarkButton format="italic" icon={<MdFormatItalic size={20} />} />
-                  //       <MarkButton format="underline" icon={<MdFormatUnderlined size={20} />} />
-                  //       <MarkButton format="code" icon={<MdOutlineCode size={20} />} />
-                  //       <BlockButton format="heading-one" icon={<LuHeading1 size={20} />} />
-                  //       <BlockButton format="heading-two" icon={<LuHeading2 size={20} />} />
-                  //       <BlockButton format="block-quote" icon={<MdFormatQuote size={20} />} />
-                  //       <BlockButton format="numbered-list" icon={<MdFormatListNumbered size={20} />} />
-                  //       <BlockButton format="bulleted-list" icon={<MdFormatListBulleted size={20} />} />
-                  //       <BlockButton format="left" icon={<MdFormatAlignLeft size={20} />} />
-                  //       <BlockButton format="center" icon={<MdFormatAlignCenter size={20} />} />
-                  //       <BlockButton format="right" icon={<MdFormatAlignRight size={20} />} />
-                  //       <BlockButton format="justify" icon={<MdFormatAlignJustify size={20} />} />
-                  //       <InsertImageButton icon={<MdImage size={20} />} />
-                  //     </ToolBarContainer>
-                  //   </Toolbar>
-
-                  //   <Editable
-                  //     style={editorStyles}
-                  //     renderLeaf={renderLeaf}
-                  //     spellCheck
-                  //     autoFocus
-                  //     renderElement={(props) => <Element {...props} />}
-                  //     placeholder="Enter some text..."
-                  //     onKeyDown={handleKeyDown}
-
-                  //   />
-
-
-                  // </Slate>
-
+                {notificationContent?.length !== 0 ? 
+                (
                   <Slate
                     editor={editor}
-                    initialValue={notificationContent ?? initialValue}  // ✅ always provide a valid array
+                    value={notificationContent ?? initialValue}  // ✅ always provide a valid array
                     onChange={handleChange}
                   >
 
@@ -488,8 +338,9 @@ const CreateNotification = ({ recordId }) => {
                       onKeyDown={handleKeyDown}
                     />
                   </Slate>
-
-                ) : null}
+                )
+                // <SlateEditor />
+                 : null}
               </CreateNotificationContainer>
               {suggestion && (
                 <div className="absolute bottom-4 left-6 text-gray-400 opacity-60 pointer-events-none select-none">
