@@ -383,6 +383,11 @@ button:focus-visible {
   background: grey;
   border-radius: 50px;
 } */
+ ::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
+  width: 0;
+}
 
 #main_container {
   width: 100vw;

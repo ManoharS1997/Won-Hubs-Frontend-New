@@ -263,7 +263,7 @@ export default function PreviewNotification({
   notificationItem,
   recordId
 }) {
-  console.log(notificationItem, "ID here");
+  // console.log(notificationItem, "ID here");
 
   const navigate = useNavigate();
   const renderElement = useCallback((props) => <Element {...props} />, []);
@@ -276,7 +276,9 @@ export default function PreviewNotification({
     name: notificationItem?.name?.value || "",
     subject: notificationItem?.subject?.value || "",
     type: notificationItem?.type?.value || "global",
+    description: notificationItem?.description?.value || "",
   }));
+  const [showDetails,setShowDetails]=useState(false);
 
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
@@ -300,6 +302,8 @@ export default function PreviewNotification({
     subject: notificationDetails.subject,
     type: notificationDetails.type,
     name: notificationDetails.name,
+    description: notificationDetails.description,
+  
   };
 
   console.log(payload, "payload");
@@ -320,14 +324,17 @@ export default function PreviewNotification({
 
   try {
     const response = await fetch(url, options);
-    if (!response.ok) {
+    console.log(response,"notification response");
+    const data=await response.json();
+    console.log(data,"notification data");
+    if (!data.success) {
       throw new Error(`Failed to ${isUpdate ? "update" : "create"} notification`);
     }
-    console.log(await response.json(), "response Here");
-
-    localStorage.removeItem("notificationData");
+    // console.log(await response.json(), "response Here");
+   {!isUpdate && localStorage.removeItem("notificationData")}
     navigate("/All Notifications");
   } catch (error) {
+    console.log(error);
     console.error("Error creating/updating notification:", error);
   }
 };
@@ -344,15 +351,19 @@ export default function PreviewNotification({
     outline: "none",
   };
 
-
-
   return (
     <MainContainer>
       <BodyContainer className="flex flex-col">
-        <div className="w-[84%] flex items-center justify-between">
+        <div className="w-[90%] flex justify-between">
+          <div className="flex">
           <BackBtn type="button" onClick={() => setShowPreview(false)}>
-            <IoChevronBackSharp size={25} /> Edit
+            <IoChevronBackSharp size={25} /> 
+            Edit
           </BackBtn>
+          <button onClick={()=>setShowDetails(!showDetails)} >
+          {showDetails ? renderIcons('BsFillCaretDownFill', 20, 'black') : renderIcons('BsFillCaretUpFill', 20, 'black')} 
+          </button>
+          </div>
           <button
             onClick={CreateNotification}
             className="!bg-[#04274b] text-white rounded py-2 px-4 flex items-center justify-center w-fit m-0"
@@ -361,7 +372,7 @@ export default function PreviewNotification({
           </button>
         </div>
 
-        {/* Editable Fields */}
+        {showDetails &&
         <div className="w-full self-center h-[20%] flex flex-col md:flex-row p-2 gap-4">
           {/* Left Section */}
           <div className="w-full h-fit flex flex-col gap-4">
@@ -428,15 +439,17 @@ export default function PreviewNotification({
                 <CustomOption value="local">Local</CustomOption>
               </CustomSelect>
             </div>
+     
           </div>
         </div>
+}
 
         {/* Slate Editor Preview */}
         <div className="w-[90%] h-full flex items-start justify-start">
           <ContentPreviewContainer className="h-full w-full">
             <Slate
               editor={editor}
-              initialValue={previewData ?? initialValue}
+              value={previewData ?? initialValue}
               style={{ width: "100%", height: "100%" }}
             >
               <Editable

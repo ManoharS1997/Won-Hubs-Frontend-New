@@ -46,6 +46,7 @@ import {
   ResponseContainer, ResponseDiv, SectionTag, TabsContainer, TemplateImgContainer, Title,
   TitleContainer, ToggleSwitch
 } from './StyledCreateFeedback.jsx';
+import { GetAnyRecordFromAnyTable } from '../../../../utils/CheckAndExecuteFlows/CRUDoperations.jsx';
 
 const initialState = {
   image: '',
@@ -60,10 +61,9 @@ const initialState = {
       sectionDescription: '',
       content: [
         { id: uuidv4(), question: '', type: { datatype: 'Short Text', data: [] }, required: false },
-        // Add more questions as needed
       ]
     },
-    // Add more sections as needed
+
   ],
 
 };
@@ -83,11 +83,7 @@ const CreateFeedback = ({ recordId }) => {
     // Get the value from localStorage
     const storedFeedbackContent = localStorage.getItem('feedbackData');
     console.log(storedFeedbackContent, "Stored Hereee..,")
-    // by sandhya
-    // const storedData = localStorage.getItem('feedbackData')
-    // console.log(storedData, "hereee fed Store")
-
-    // If localStorage is empty, use initial state
+  
     if (!storedFeedbackContent) {
       return initialState;
     } else {
@@ -467,19 +463,6 @@ const CreateFeedback = ({ recordId }) => {
 
   const onPreview = () => {
     let alertText = ''
-
-    // if (formValues.formTitle.trim() === '') {
-    //   alertText = 'Fill Form Title';
-    //   Swal.fire({
-    //     text: alertText,
-    //     icon: 'warning',
-    //     customClass: {
-    //       confirmButton: 'my-custom-button'
-    //     }
-    //   });
-    //   return false
-    // }
-
     for (let section of formValues.sections) {
       if (section.sectionTitle.trim() === '') {
         alertText = 'Fill All Section Titles'
@@ -509,24 +492,30 @@ const CreateFeedback = ({ recordId }) => {
     }
     return true
   }
+  const getFeedBackData=async ()=>{
+    const response=await GetAnyRecordFromAnyTable('feedback',recordId)
+    console.log(response,'FeedBack Data')
+    const feedbackData=response?.data[0]
+  }
+
+  useEffect(
+    () => { 
+      if(recordId){ 
+        getFeedBackData()
+      }
+    },[]
+
+  )
 
   return (
     <MainContainer>
       <HeaderContainer className="bg-transparent mt-1">
-        {/* <FeedBackNameContainer> */}
+    
         <BackBtn type='button' onClick={GoBack}>
           <IoIosArrowBack size={30} />
         </BackBtn>
-        {/* <CustomTitle placeholder='Title...' onChange={(e) => onChangeTitle(e)} value={formValues.formTitle} /> */}
-        {/* </FeedBackNameContainer> */}
-
+        
         <TabsContainer>
-          {/* <Btn style={{
-            height: 'fit-content', margin: '5px 5px 0px 5px', background: 'transparent',
-            // borderBottom: activeTab === 'Questions' ? '2px solid #000' : '', 
-            borderRadius: '0px', color: '#000'
-          }} onClick={() => setActiveTab('Questions')}>Feedback Form</Btn>
-           */}
           <h2 >FeedBack Form</h2>
           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginRight: '5px' }}>
 

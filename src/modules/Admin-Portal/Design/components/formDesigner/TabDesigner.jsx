@@ -473,7 +473,7 @@ function TabsDesigner({
   addCustomButton,
 }) {
   return (
-    <section className="bg-white rounded-lg p-6 shadow-lg mx-auto mt-6">
+    <section className="bg-white rounded-lg  mx-auto mt-2 min-h-full">
       <div className="flex justify-between mt-0 mb-2">
         <h3
           style={{
