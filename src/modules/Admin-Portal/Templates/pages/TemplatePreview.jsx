@@ -173,7 +173,27 @@ export default function PreviewTemplate() {
   const canvasRef = useRef(null)
   const [topData, setTopData] = useState(JSON.parse(localStorage.getItem('templateData')))
   const [formValues, setFormValues] = useState()
-  const [templateContent, setTemplateContent] = useState(JSON.parse(localStorage.getItem('templateContent')))
+  const [templateContent, setTemplateContent] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('templateContent'));
+      return Array.isArray(stored) && stored.length > 0
+        ? stored
+        : [
+          {
+            type: 'paragraph',
+            children: [{ text: ' ' }],
+          },
+        ];
+    } catch {
+      return [
+        {
+          type: 'paragraph',
+          children: [{ text: ' ' }],
+        },
+      ];
+    }
+  });
+
   const editor = useMemo(() => withHistory(withEmbeds(withTables(withLinks(withReact(createEditor()))))), []);
   const [isOpenShare, setOpenShare] = useState(false)
 
@@ -233,6 +253,7 @@ export default function PreviewTemplate() {
       const data = await response.json()
       console.log(data, "data here")
       window.alert('Template Saved Successfully')
+      history('/All Templates')
     }
   };
 
@@ -406,7 +427,7 @@ export default function PreviewTemplate() {
     }));
   };
 
-
+  console.log(templateContent, 'templateContent')
   return (
     <WonContext.Consumer>
       {value => {
@@ -470,7 +491,8 @@ export default function PreviewTemplate() {
                 </div>
                 <EditorContainer>
                   <Slate editor={editor}
-                    initialValue={templateContent === null ? initialValue : templateContent}
+                    // value={templateContent === null ? initialValue : templateContent}
+                    value={templateContent || initialValue}
                     onChange={newValue => setValue(newValue)}
                   >
                     <div

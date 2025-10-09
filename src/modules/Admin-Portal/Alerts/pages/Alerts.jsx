@@ -9,6 +9,7 @@ import {
   CustomContainer, CustomViewContainer, FormContent, SideNavNContentContainer,
 } from './StyledComponents'
 
+
 const Alerts = () => {
   const [AlertsData, setAlertsData] = useState([]) //state for table data  
   const [TableColumnNames, setTableColumnNames] = useState([])
