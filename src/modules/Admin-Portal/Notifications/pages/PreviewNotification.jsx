@@ -452,7 +452,7 @@ export default function PreviewNotification({
               value={previewData ?? initialValue}
               style={{ width: "100%", height: "100%" }}
             >
-              <Editable
+              <Editable 
                 style={editorStyles}
                 renderLeaf={renderLeaf}
                 spellCheck

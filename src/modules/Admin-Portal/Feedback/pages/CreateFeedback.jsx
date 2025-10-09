@@ -496,6 +496,14 @@ const CreateFeedback = ({ recordId }) => {
     const response=await GetAnyRecordFromAnyTable('feedback',recordId)
     console.log(response,'FeedBack Data')
     const feedbackData=response?.data[0]
+    setFormValues({
+      image: feedbackData.image || '',
+      // formTitle: feedbackData.formTitle || '',
+      active: feedbackData.active || true,
+      dateOfSubmission: feedbackData.dateOfSubmission || '',
+      responses: feedbackData.responses || [],
+      sections: feedbackData.sections || [],
+    })
   }
 
   useEffect(
@@ -707,5 +715,6 @@ const CreateFeedback = ({ recordId }) => {
     </MainContainer>
   );
 };
-
 export default CreateFeedback;
+
+ 

@@ -8,15 +8,16 @@ import styled from "styled-components";
 import { createEditor } from 'slate';
 import { withHistory } from "slate-history";
 import { Slate, Editable, withReact } from 'slate-react';
-import Toolbar from '../../SlateEditor/Toolbar/Toolbar.jsx'
-import { sizeMap, fontFamilyMap } from '../../SlateEditor/utils/SlateUtilityFunctions.js'
-import withLinks from '../../SlateEditor/plugins/withLinks.js'
-import withTables from '../../SlateEditor/plugins/withTable.js'
-import withEmbeds from '../../SlateEditor/plugins/withEmbeds.js'
+import Toolbar from '../../modules/Admin-Portal/SlateEditor/Toolbar/Toolbar.jsx'
+import { sizeMap, fontFamilyMap } from '../../modules/Admin-Portal/SlateEditor/utils/SlateUtilityFunctions.js'
+import withLinks from '../../modules/Admin-Portal/SlateEditor/plugins/withLinks.js'
+import withTables from '../../modules/Admin-Portal/SlateEditor/plugins/withTable.js'
+import withEmbeds from '../../modules/Admin-Portal/SlateEditor/plugins/withEmbeds.js'
 
-import '../../SlateEditor/Editor.css'
-import Image from '../../SlateEditor/Elements/Image/Image'
-import Video from '../../SlateEditor/Elements/Video/Video'
+import '../../modules/Admin-Portal/SlateEditor/Editor.css'
+// import Image from '../../SlateEditor/Elements/Image/Image'
+import Image from '../../modules/Admin-Portal/SlateEditor/Elements/Image/Image.jsx'
+import Video from '../../modules/Admin-Portal/SlateEditor/Elements/Video/Video'
 
 import { useNavigate } from "react-router-dom";
 
@@ -33,8 +34,9 @@ import {
   FieldContainer, FieldsContainer, FieldsList, MainContainer,
   SidebarContainer, TextEditorCustomContainer
 
-} from '../components/CreateTemplate/StyledComponents'
-import { GetAnyRecordFromAnyTable } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations.jsx";
+} from '../../modules/Admin-Portal/Templates/components/CreateTemplate/StyledComponents.jsx'
+// from '../components/CreateTemplate/StyledComponents'
+// import { GetAnyRecordFromAnyTable } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations.jsx";
 
 // import SlateEditor from "../../../../shared/components/SlateEditor.jsx";
 
@@ -185,7 +187,7 @@ const initialValue = [
     children: [{ text: 'Hello' }],
   },
 ]
-export default function CreateTemplate({ recordId }) {
+export default function CreateEditor({ recordId }) {
   const history = useNavigate()
   const [templateContent, setTemplateContent] = useState(JSON.parse(localStorage.getItem('templateContent')))
 
@@ -203,40 +205,6 @@ export default function CreateTemplate({ recordId }) {
   const openFullView = () => setFullView(true)
   const closeFullView = () => setFullView(false)
 
-  useEffect(() => {
-    if (recordId) {
-      const fetchTemplateContent = async () => {
-        const response = await GetAnyRecordFromAnyTable('templates', recordId);
-        console.log(response.data, "Single Template Record");
-        
-        if (response.success && response.data?.length > 0) {
-          const data = response.data[0].content;
-        const{cc,name,subject,who_will_receive}=response.data[0];
-        console.log(cc,"CC")
-          // ✅ Parse if it's a string, else use as-is
-          let parsedContent;
-          try {
-            parsedContent = typeof data === "string" ? JSON.parse(data) : data;
-          } catch (error) {
-            console.error("Error parsing template content:", error);
-            parsedContent = [
-              { type: "paragraph", children: [{ text: "" }] }
-            ];
-          }
-          // ✅ Assign safely to Slate value
-          setValue(parsedContent);
-          // const obj={
-          //   to:{value:who_will_receive},
-          //   cc:{value:cc},
-          //   subject:{value:subject},
-          //   name:{value:name}
-          // }
-          // localStorage.setItem('templateData', JSON.stringify(obj));
-        }
-      };
-      fetchTemplateContent();
-    }
-  }, [recordId]);
 
 
   const changeFormate = (e) => {
@@ -306,128 +274,7 @@ export default function CreateTemplate({ recordId }) {
             </ActionBtnsContainer>
           </div>
 
-          {/*           
-          <DefaultFieldlsContainer>
-
-            <FieldsContainer>
-              <FieldContainer>
-                <CustomLabel htmlFor='notification-name'> Name : </CustomLabel>
-                <CustomInput type='text' id='notification-name' value={defaultFieldsData.templateName} />
-              </FieldContainer>
-
-              <FieldContainer>
-                <CustomLabel htmlFor='subject'>Short Description : </CustomLabel>
-                <CustomTextarea id='subject' value={defaultFieldsData.shortDescription} cols={2} rows={2} >
-
-                </CustomTextarea>
-              </FieldContainer>
-
-            </FieldsContainer>
-
-            <FieldsContainer>
-
-              <FieldContainer style={{ justifyContent: 'flex-end' }}>
-                <CustomLabel right={true} htmlFor='type'>Type : </CustomLabel>
-                <CustomSelect id='type' value={'defaultFieldsData'.type}>
-                  <CustomOption selected={'defaultFieldsData'.type === 'global'} value='global'>Global</CustomOption>
-                  <CustomOption selected={'defaultFieldsData'.type === 'local'} value='local'>Local</CustomOption>
-                </CustomSelect>
-              </FieldContainer>
-
-              <FieldContainer style={{ justifyContent: 'flex-end' }}>
-                <CustomLabel right={true} htmlFor='type'>Style : </CustomLabel>
-                <CustomSelect id='type' onChange={changeFormate}>
-                  <CustomOption selected={'defaultFieldsData'.type === 'a4'} value={['2480px', '3508px']}>Landscape</CustomOption>
-                  <CustomOption selected={'defaultFieldsData'.type === 'a5'} value={['1754px', '2480px']}>Portrait</CustomOption>
-                  <CustomOption selected={'defaultFieldsData'.type === 'letter'} value={['1100px', '850px']}>Executive</CustomOption>
-                  <CustomOption selected={'defaultFieldsData'.type === 'letter'} value={['1100px', '850px']}>Envelop</CustomOption>
-                  <CustomOption selected={'defaultFieldsData'.type === 'a4'} value={['2480px', '3508px']}>A4</CustomOption>
-                  <CustomOption selected={'defaultFieldsData'.type === 'a5'} value={['1754px', '2480px']}>A5</CustomOption>
-                  <CustomOption selected={'defaultFieldsData'.type === 'letter'} value={['1100px', '850px']}>Letter</CustomOption>
-                </CustomSelect>
-              </FieldContainer>
-
-              <FieldContainer style={{ justifyContent: 'flex-end' }}>
-                <CheckboxLabel right={true} htmlFor='active'>Active : </CheckboxLabel>
-                <CustomInput
-                  style={{ flexGrow: '0', width: 'fit-content', marginRight: 'auto' }}
-                  type='checkbox' id='active' checked={'defaultFieldsData'.active}
-                />
-              </FieldContainer>
-
-
-            </FieldsContainer>
-
-          </DefaultFieldlsContainer>  */}
-
-          {/* <EditorContainer>
-            <Slate
-              editor={editor}
-              value={templateContent === null ? initialValue : templateContent}
-              onChange={newValue => setValue(newValue)}
-            >
-              <Toolbar openFullView={openFullView} />
-              <TextEditorCustomContainer className="editor-wrapper">
-                <StyledEditor
-                  placeholder='Write something'
-                  renderElement={renderElement}
-                  renderLeaf={renderLeaf}
-                  spellCheck
-                  autoFocus
-                />
-                {/* <ExpandBtn type='button' title="Expand in Full View"><LuExpand size={15} onClick={() => openFullView()} /> </ExpandBtn> */}
-          {/* </TextEditorCustomContainer> */}
-          {/* </Slate> */}
-
-          {/* <Modal
-              isOpen={fullView}
-              onRequestClose={closeFullView}
-              style={CustomSettings}
-            >
-              <CloseFullViewBtn type='button' title="Expand in Full View"><CgClose size={15} onClick={closeFullView} /></CloseFullViewBtn>
-              <div style={{ display: 'flex', height: '96%' }}>
-                <SidebarContainer>
-                  <CustomHeading>Additional Fields</CustomHeading>
-
-                  <FieldsList>{fieldsListData.map(item => (
-                    item.isAdded ? null : (
-                      <AddFieldBtn key={item.fieldName} id={item.fieldName} onClick={() => { editor.insertText(`${item.value}`) }} >
-                        {item.fieldName}<AddIcon ><IoMdAdd id={item.fieldName} /></AddIcon>
-                      </AddFieldBtn>)
-                  ))}</FieldsList>
-                </SidebarContainer>
-                <div style={{ width: '100%', height: '85vh', padding: ' 0px 15px' }}>
-                  <Slate
-                    editor={editor}
-                    value={templateContent === null ? initialValue : templateContent}
-                    onChange={newValue => setValue(newValue)}
-                  >
-                    <Toolbar />
-                    <div
-                      className="editor-wrapper"
-                      style={{
-                        border: '1px solid #f3f3f3',
-                        padding: '10px',
-                        margin: '0px',
-                        width: '100%',
-                        height: '100%',
-                        overflow: 'auto'
-                      }}>
-                      <StyledEditor
-                        placeholder='Write something'
-                        renderElement={renderElement}
-                        renderLeaf={renderLeaf}
-                        spellCheck
-                        autoFocus
-                      />
-
-                    </div>
-                  </Slate>
-                </div>
-              </div>
-            </Modal> */}
-
-          {/* </EditorContainer> */}
+       
           <EditorContainer>
             <Slate editor={editor} value={value} onChange={handleChange}>
               <Toolbar />

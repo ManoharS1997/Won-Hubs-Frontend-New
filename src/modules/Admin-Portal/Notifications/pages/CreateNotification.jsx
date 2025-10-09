@@ -11,16 +11,11 @@ import {
   useSlate, Slate, Editable, useSlateStatic, useSelected,
   useFocused, withReact, ReactEditor,
 } from 'slate-react'
-
 import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
-
 import { Button, Icon, Toolbar } from '../CreateNotification/components'
 import { useNavigate } from 'react-router-dom'
-
-// import WonContext from '../../../../context/WonContext'
 import PreviewNotification from './PreviewNotification'
-
 import { IoMdAdd } from "react-icons/io";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import { IoChevronBackSharp } from "react-icons/io5";
@@ -80,55 +75,11 @@ const HOTKEYS = {
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify']
-const initialValue = [
-  {
-    type: 'heading-two',
-    children: [
-      {
-        text: `Notification name:  ${defaultFieldsData.notificationName}`,
-      },
-    ],
-  },
-  {
-    type: 'image',
-    children: [{ text: '' }],
-  },
+  const initialValue = [
   {
     type: 'paragraph',
-    children: [
-      {
-        text: `Receivers:  ${defaultFieldsData.to}, ${defaultFieldsData.cc}`,
-      },
-    ],
+    children: [{ text: 'Hello' }],
   },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: 'Notification Content:  ',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: 'Hi <Assigned Member>,',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '<You can write your notification here>',
-      },
-    ],
-  },
-  // {
-  //   type: 'image',
-  //   children: [{ text: '' }],
-  // },
 ]
 
 const CreateNotification = ({ recordId }) => {
@@ -270,6 +221,8 @@ const CreateNotification = ({ recordId }) => {
       }
     }
   };
+
+
   console.log(notificationContent, "Here notification Content")
   return (
     <MainContainer>
@@ -339,7 +292,7 @@ const CreateNotification = ({ recordId }) => {
                     />
                   </Slate>
                 )
-                // <SlateEditor />
+
                  : null}
               </CreateNotificationContainer>
               {suggestion && (

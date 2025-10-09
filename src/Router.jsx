@@ -166,6 +166,7 @@ import FormDesignerPage from "./modules/Admin-Portal/form/formDesignerPage.jsx";
 import AlertTemplateView from "./modules/Admin-Portal/Alerts/pages/AlertsTemplateSelection.jsx";
 import PreviewAlerts from "./modules/Admin-Portal/Alerts/pages/AlertsPreview.jsx";
 import TemplateSelectionForTemplate from "./modules/Admin-Portal/Templates/pages/TemplateSelectionForTemplates.jsx";
+import CreateEditor from "./shared/CreationEditor/CreateEditor.jsx";
 
 
 const router = createBrowserRouter([
@@ -716,8 +717,8 @@ const router = createBrowserRouter([
             path: "/apps",
             element: <Apps />,
           },
-          {path:'/check-form',
-            element:'/form2-designer'
+          {path:'/testing',
+            element:<CreateEditor />
           }
         ],
       },
