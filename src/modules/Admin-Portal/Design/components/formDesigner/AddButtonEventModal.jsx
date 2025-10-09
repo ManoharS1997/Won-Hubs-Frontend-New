@@ -1,45 +1,6 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-const DUMMY_APIS = [
-  {
-    id: 1,
-    name: "Export Data",
-    endpoint: "/api/x/exportData",
-    method: "POST",
-    description: "Export all data for module X.",
-  },
-  {
-    id: 2,
-    name: "Add User",
-    endpoint: "/api/x/addUser",
-    method: "POST",
-    description: "Add a new user in module X.",
-  },
-  {
-    id: 3,
-    name: "Update Record",
-    endpoint: "/api/x/updateRecord",
-    method: "PUT",
-    description: "Update existing record in module X.",
-  },
-  {
-    id: 4,
-    name: "Delete Item",
-    endpoint: "/api/x/deleteItem",
-    method: "DELETE",
-    description: "Delete item from module X.",
-  },
-  {
-    id: 5,
-    name: "Get Report",
-    endpoint: "/api/x/getReport",
-    method: "GET",
-    description: "Retrieve report data from module X.",
-  },
-];
-
-// Mapping for user-friendly method labels
 const METHOD_LABELS = {
   POST: "Create",
   PUT: "Update",
@@ -47,13 +8,21 @@ const METHOD_LABELS = {
   GET: "Fetch",
 };
 
-function AddButtonEventModal({ open, onClose, onSubmit, initialLabel }) {
+function AddButtonEventModal({
+  open,
+  onClose,
+  onSubmit,
+  initialLabel,
+  moduleName,
+}) {
   const eventTypes = ["None", "API Call", "Custom JavaScript"];
   const [eventType, setEventType] = useState("None");
   const [apiMethod, setApiMethod] = useState("");
   const [buttonName, setButtonName] = useState("");
+  const [apis, setApis] = useState([]);
   const [filteredApis, setFilteredApis] = useState([]);
   const [selectedApiId, setSelectedApiId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const resetForm = () => {
     setEventType("None");
@@ -63,15 +32,43 @@ function AddButtonEventModal({ open, onClose, onSubmit, initialLabel }) {
     setSelectedApiId(null);
   };
 
+  // ✅ Fetch APIs from backend
+  useEffect(() => {
+    if (open && moduleName) {
+      const fetchApis = async () => {
+        try {
+          setLoading(true);
+          const res = await fetch(`http://localhost:3001/form-designer/api/list/${moduleName}`);
+          const result = await res.json();
+
+          if (result.success && result.data?.apis) {
+            setApis(result.data.apis);
+          } else {
+            console.error("Invalid response:", result);
+            setApis([]);
+          }
+        } catch (err) {
+          console.error("Error fetching APIs:", err);
+          setApis([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchApis();
+    }
+  }, [open, moduleName]);
+
+  // Filter APIs by method when eventType or method changes
   useEffect(() => {
     if (eventType === "API Call" && apiMethod) {
-      setFilteredApis(DUMMY_APIS.filter((api) => api.method === apiMethod));
+      setFilteredApis(apis.filter((api) => api.method === apiMethod));
       setSelectedApiId(null);
     } else {
       setFilteredApis([]);
       setSelectedApiId(null);
     }
-  }, [eventType, apiMethod]);
+  }, [eventType, apiMethod, apis]);
 
   if (!open) return null;
 
@@ -83,7 +80,7 @@ function AddButtonEventModal({ open, onClose, onSubmit, initialLabel }) {
     onSubmit({
       eventType,
       apiCallData:
-        filteredApis.find((api) => api.id === Number(selectedApiId)) || null,
+        filteredApis.find((api) => api._id === selectedApiId) || null,
       labelFromModal: buttonName.trim() ? buttonName : null,
     });
     onClose();
@@ -136,7 +133,7 @@ function AddButtonEventModal({ open, onClose, onSubmit, initialLabel }) {
               htmlFor="btnNme"
               style={{
                 display: "block",
-                marginBottom: "8px",
+                marginBottom: "4px",
                 fontWeight: "500",
                 color: "#374151",
               }}
@@ -161,7 +158,7 @@ function AddButtonEventModal({ open, onClose, onSubmit, initialLabel }) {
         )}
 
         {/* Event Type Selector */}
-        <div style={{ margin: "24px 0" }}>
+        <div style={{ margin: "12px 0" }}>
           <label
             htmlFor="eventType"
             style={{
@@ -196,106 +193,117 @@ function AddButtonEventModal({ open, onClose, onSubmit, initialLabel }) {
 
         {/* API Call Section */}
         {eventType === "API Call" && (
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-          >
-            {/* Method Selector */}
-            <div>
-              <label
-                htmlFor="apiMethod"
+          <>
+            {loading ? (
+              <p style={{ textAlign: "center", color: "#6b7280" }}>
+                Loading APIs...
+              </p>
+            ) : (
+              <div
                 style={{
-                  display: "block",
-                  marginBottom: "8px",
-                  fontWeight: "500",
-                  color: "#374151",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
                 }}
               >
-                API Method
-              </label>
-              <select
-                id="apiMethod"
-                style={{
-                  width: "100%",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "6px",
-                  padding: "8px",
-                  outline: "none",
-                  height: 40,
-                }}
-                value={apiMethod}
-                onChange={(e) => setApiMethod(e.target.value)}
-              >
-                <option value="">Select Method</option>
-                {[...new Set(DUMMY_APIS.map((api) => api.method))].map(
-                  (method) => (
-                    <option key={method} value={method}>
-                      {METHOD_LABELS[method] || method}
-                    </option>
-                  )
-                )}
-              </select>
-            </div>
-
-            {/* API Selector */}
-            {filteredApis.length > 0 && (
-              <div>
-                <label
-                  htmlFor="apiSelect"
-                  style={{
-                    display: "block",
-                    marginBottom: "8px",
-                    fontWeight: "500",
-                    color: "#374151",
-                  }}
-                >
-                  Select API
-                </label>
-                <select
-                  id="apiSelect"
-                  style={{
-                    width: "100%",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "6px",
-                    padding: "8px",
-                    outline: "none",
-                    height: 40,
-                  }}
-                  value={selectedApiId || ""}
-                  onChange={(e) => setSelectedApiId(e.target.value)}
-                >
-                  <option value="">Select an API</option>
-                  {filteredApis.map((api) => (
-                    <option key={api.id} value={api.id}>
-                      {api.name}
-                    </option>
-                  ))}
-                </select>
-
-                {/* API Description */}
-                {selectedApiId && (
-                  <div
+                {/* Method Selector */}
+                <div>
+                  <label
+                    htmlFor="apiMethod"
                     style={{
-                      marginTop: "12px",
-                      padding: "12px",
-                      backgroundColor: "#eef2ff",
-                      color: "#3730a3",
-                      borderRadius: "6px",
-                      border: "1px solid #c7d2fe",
-                      fontSize: "14px",
-                      maxHeight: "120px",
-                      overflowY: "auto",
+                      display: "block",
+                      marginBottom: "2px",
+                      fontWeight: "500",
+                      color: "#374151",
                     }}
                   >
-                    {
-                      filteredApis.find(
-                        (api) => api.id === Number(selectedApiId)
-                      ).description
-                    }
+                    API Method
+                  </label>
+                  <select
+                    id="apiMethod"
+                    style={{
+                      width: "100%",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      padding: "8px",
+                      outline: "none",
+                      height: 40,
+                    }}
+                    value={apiMethod}
+                    onChange={(e) => setApiMethod(e.target.value)}
+                  >
+                    <option value="">Select Method</option>
+                    {[...new Set(apis.map((api) => api.method))].map(
+                      (method) => (
+                        <option key={method} value={method}>
+                          {METHOD_LABELS[method] || method}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </div>
+
+                {/* API Selector */}
+                {filteredApis.length > 0 && (
+                  <div>
+                    <label
+                      htmlFor="apiSelect"
+                      style={{
+                        display: "block",
+                        marginBottom: "8px",
+                        fontWeight: "500",
+                        color: "#374151",
+                      }}
+                    >
+                      Select API
+                    </label>
+                    <select
+                      id="apiSelect"
+                      style={{
+                        width: "100%",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                        padding: "8px",
+                        outline: "none",
+                        height: 40,
+                      }}
+                      value={selectedApiId || ""}
+                      onChange={(e) => setSelectedApiId(e.target.value)}
+                    >
+                      <option value="">Select an API</option>
+                      {filteredApis.map((api) => (
+                        <option key={api._id} value={api._id}>
+                          {api.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    {/* API Description */}
+                    {selectedApiId && (
+                      <div
+                        style={{
+                          marginTop: "12px",
+                          padding: "12px",
+                          backgroundColor: "#eef2ff",
+                          color: "#3730a3",
+                          borderRadius: "6px",
+                          border: "1px solid #c7d2fe",
+                          fontSize: "14px",
+                          maxHeight: "120px",
+                          overflowY: "auto",
+                        }}
+                      >
+                        {
+                          filteredApis.find((api) => api._id === selectedApiId)
+                            ?.description
+                        }
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             )}
-          </div>
+          </>
         )}
 
         {/* Footer Buttons */}
@@ -317,8 +325,6 @@ function AddButtonEventModal({ open, onClose, onSubmit, initialLabel }) {
               border: "none",
               cursor: "pointer",
             }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = "#d1d5db")}
-            onMouseOut={(e) => (e.target.style.backgroundColor = "#e5e7eb")}
           >
             Cancel
           </button>
@@ -353,7 +359,7 @@ AddButtonEventModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   initialLabel: PropTypes.any.isRequired,
+  moduleName: PropTypes.string.isRequired, // ✅ Add this prop
 };
 
 export default AddButtonEventModal;
-export { DUMMY_APIS };

@@ -609,10 +609,10 @@ TabsDesigner.propTypes = {
 TabDesigner.propTypes = {
   tabs: PropTypes.any.isRequired,
   setTabs: PropTypes.any.isRequired,
-  openAddButtonModal: PropTypes.any.isRequired,
+  module: PropTypes.any.isRequired,
 };
 
-export default function TabDesigner({ tabs, setTabs }) {
+export default function TabDesigner({ tabs, setTabs, module }) {
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
   const [fieldModalTabIdx, setFieldModalTabIdx] = useState(null);
   // const [activeTab, setActiveTab] = useState('')
@@ -872,6 +872,7 @@ export default function TabDesigner({ tabs, setTabs }) {
         }
         onSubmit={handleAddButtonModalSubmit}
         initialLabel={addingButton.buttonData?.label}
+        moduleName={module}
       />
     </>
   );

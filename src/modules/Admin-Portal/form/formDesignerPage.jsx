@@ -5,7 +5,6 @@ import TabDesigner from "../Design/components/formDesigner/TabDesigner";
 import { useLocation } from "react-router-dom";
 import AddButtonEventModal from "../Design/components/formDesigner/AddButtonEventModal";
 import { TabsContainer, TabItem } from "../MyTickets/pages/StyledComponents";
-import renderIcons from "../../../shared/functions/renderIcons";
 
 export default function FormDesignerPage() {
   const { state } = useLocation();
@@ -15,10 +14,8 @@ export default function FormDesignerPage() {
   const [showPreview, setShowPreview] = React.useState(false);
   const [showTabs, setShowTabs] = React.useState(false);
   const [tabs, setTabs] = React.useState([]);
-  const [showTitleDropdown, setShowTitleDropdown] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState([]);
 
-  const titleOptions = ["Users", "Admin", "Tickets"];
+  const titleOptions = ["Users", "Admin", "Tickets", "My Items"];
   const [addingButton, setAddingButton] = useState({
     open: false,
     tabIndex: null,
@@ -212,7 +209,9 @@ export default function FormDesignerPage() {
           {/* Header Tabs */}
           <div>
             <div className="flex items-center w-full justify-between mb-2">
-             <h3 className="font-semibold !text-blue-800 !text-[22px]">Form Designer</h3>
+              <h3 className="font-semibold !text-blue-800 !text-[22px]">
+                Form Designer
+              </h3>
               {/* Center: Tab Buttons */}
               <div className="flex-1 flex justify-center">
                 <TabsContainer style={{ marginBottom: 20 }}>
@@ -248,21 +247,21 @@ export default function FormDesignerPage() {
                   </TabItem>
                 </TabsContainer>
               </div>
-                <div className="relative">
-                  <select
-                    value={module}
-                    onChange={(e) => setModule(e.target.value)}
-                    className="w-48 p-2 border rounded"
-                    placeholder="Select Title"
-                  >
-                    <option value="">Select Title</option>
-                    {titleOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="relative">
+                <select
+                  value={module}
+                  onChange={(e) => setModule(e.target.value)}
+                  className="w-48 p-2 border rounded"
+                  placeholder="Select Title"
+                >
+                  <option value="">Select Title</option>
+                  {titleOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
@@ -287,7 +286,11 @@ export default function FormDesignerPage() {
             {/* Tab Designer */}
             {showTabs && (
               <section className="bg-white p-4 rounded-2xl shadow-lg border border-indigo-100 flex-grow min-w-[320px] transition">
-                <TabDesigner setTabs={setTabs} tabs={tabs} />
+                <TabDesigner
+                  setTabs={setTabs}
+                  tabs={tabs}
+                  module={module?.replace(/\s+/g, "").toLowerCase()}
+                />
               </section>
             )}
 
@@ -317,11 +320,8 @@ export default function FormDesignerPage() {
         }
         onSubmit={handleAddButtonModalSubmit}
         initialLabel={addingButton.buttonData?.label}
+        moduleName={module?.replace(/\s+/g, "").toLowerCase()}
       />
     </>
   );
-
-
-
-
 }
