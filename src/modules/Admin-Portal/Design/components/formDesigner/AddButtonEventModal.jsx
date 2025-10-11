@@ -15,7 +15,7 @@ function AddButtonEventModal({
   initialLabel,
   moduleName,
 }) {
-  const eventTypes = ["None", "API Call", "Custom JavaScript"];
+  const eventTypes = ["None", "API Call"];
   const [eventType, setEventType] = useState("None");
   const [apiMethod, setApiMethod] = useState("");
   const [buttonName, setButtonName] = useState("");
@@ -38,7 +38,11 @@ function AddButtonEventModal({
       const fetchApis = async () => {
         try {
           setLoading(true);
-          const res = await fetch(`http://localhost:3001/form-designer/api/list/${moduleName}`);
+          const res = await fetch(
+            `${
+              import.meta.env.VITE_HOSTED_API_URL
+            }/form-designer/api/list/${moduleName}`
+          );
           const result = await res.json();
 
           if (result.success && result.data?.apis) {
