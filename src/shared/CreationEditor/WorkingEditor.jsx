@@ -43,6 +43,7 @@ const EditorRichUI = () => {
 
   const fontFamilies = ['Arial', 'Times New Roman', 'Courier New', 'Georgia', 'Verdana', 'Poppins', 'Roboto'];
   const fontSizes = ['12px', '14px', '16px', '18px', '20px', '24px', '28px'];
+  const savedCollection = useRef(null)
 
   // Expanded color palette
   const colorPalette = [
@@ -83,8 +84,28 @@ const EditorRichUI = () => {
     return () => document.removeEventListener('selectionchange', updateActive);
   }, []);
 
+  useEffect(() => {
+    const saveSelection = () => {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        savedCollection.current = sel.getRangeAt(0);
+      }
+    };
+    document.addEventListener('selectionchange', saveSelection);
+    return () => document.removeEventListener('selectionchange', saveSelection);
+  }, []);
+
+
   const exec = (cmd, val = null) => {
     editorRef.current?.focus();
+
+    // Restore saved selection (important)
+    const sel = window.getSelection();
+    if (savedCollection.current) {
+      sel.removeAllRanges();
+      sel.addRange(savedCollection.current);
+    }
+
     document.execCommand(cmd, false, val);
     document.dispatchEvent(new Event('selectionchange'));
   };
@@ -180,126 +201,157 @@ const EditorRichUI = () => {
     </div>
   );
 
-  const Dropdown = ({ keyName, Icon, title, options, renderItem, labelRender }) => (
-    <div style={{ position: 'relative', margin: 4 }}>
-      <button
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => setOpenDropdown((p) => (p === keyName ? null : keyName))}
-        title={title}
+ const Dropdown = ({ keyName, Icon, title, options, renderItem, labelRender, onOptionClick }) => (
+  <div style={{ position: 'relative', margin: 4 }}>
+    <button
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={() => setOpenDropdown((p) => (p === keyName ? null : keyName))}
+      title={title}
+      style={{
+        cursor: 'pointer',
+        padding: '6px 10px',
+        borderRadius: 6,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        border: '1px solid transparent',
+      }}
+    >
+      {Icon && <Icon />}
+      <span style={{ fontSize: 14 }}>{labelRender ? labelRender() : title}</span>
+    </button>
+
+    {openDropdown === keyName && (
+      <div
         style={{
-          cursor: 'pointer',
-          padding: '6px 10px',
-          borderRadius: 6,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          border: '1px solid transparent',
+          position: 'absolute',
+          top: 48,
+          left: 0,
+          border: '1px solid #ddd',
+          background: '#fff',
+          zIndex: 50,
+          boxShadow: '0 8px 24px rgba(0,0,0,.12)',
+          borderRadius: 8,
+          padding: 10,
+          width: keyName === 'color' || keyName === 'emoji' ? 260 : 'auto',
+          maxHeight: 200,
+          overflowY: 'auto',
+          display: 'grid',
+          gridTemplateColumns: keyName === 'color' ? 'repeat(10, 22px)' : keyName === 'emoji' ? 'repeat(8, 1fr)' : 'auto',
+          gap: 6,
         }}
       >
-        {Icon && <Icon />}
-        <span style={{ fontSize: 14 }}>{labelRender ? labelRender() : title}</span>
-      </button>
+        {/* pointer triangle */}
+        <div style={{
+          position: 'absolute',
+          top: -8,
+          left: 20,
+          width: 0,
+          height: 0,
+          borderLeft: '6px solid transparent',
+          borderRight: '6px solid transparent',
+          borderBottom: '8px solid #fff',
+          filter: 'drop-shadow(0 -1px 1px rgba(0,0,0,0.08))'
+        }} />
 
-      {openDropdown === keyName && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 48,
-            left: 0,
-            border: '1px solid #ddd',
-            background: '#fff',
-            zIndex: 50,
-            boxShadow: '0 8px 24px rgba(0,0,0,.12)',
-            borderRadius: 8,
-            padding: 10,
-            width: keyName === 'color' || keyName === 'emoji' ? 260 : 'auto',
-            maxHeight: 200,
-            overflowY: 'auto',
-            display: 'grid',
-            gridTemplateColumns: keyName === 'color' ? 'repeat(10, 22px)' : keyName === 'emoji' ? 'repeat(8, 1fr)' : 'auto',
-            gap: 6,
-          }}
-        >
-          {/* top small pointer triangle */}
-          <div style={{
-            position: 'absolute',
-            top: -8,
-            left: 20,
-            width: 0,
-            height: 0,
-            borderLeft: '6px solid transparent',
-            borderRight: '6px solid transparent',
-            borderBottom: '8px solid #fff',
-            filter: 'drop-shadow(0 -1px 1px rgba(0,0,0,0.08))'
-          }} />
+        {options.map((opt) => (
+          <div
+            key={opt}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              if (onOptionClick) onOptionClick(opt);  // ✅ FIX: handle external click callback
 
-          {options.map((opt) => (
-            <div
-              key={opt}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => {
-                if (keyName === 'color') applyColor(opt);
-                else if (keyName === 'emoji') insertEmoji(opt);
-                else if (keyName === 'font-family') applyFontFamily(opt);
-                else if (keyName === 'font-size') applyFontSize(opt);
-                setOpenDropdown(null);
-              }}
-              style={
-                keyName === 'color'
-                  ? { width: 22, height: 22, borderRadius: 4, background: opt, border: opt === '#FFFFFF' ? '1px solid #ccc' : 'none', cursor: 'pointer' }
-                  : { padding: 6, textAlign: 'center', cursor: 'pointer', fontSize: keyName === 'emoji' ? 20 : 14 }
-              }
-            >
-              {renderItem ? renderItem(opt) : keyName !== 'color' ? opt : ''}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+              if (keyName === 'color') applyColor(opt);
+              else if (keyName === 'emoji') insertEmoji(opt);
+              else if (keyName === 'font-family') applyFontFamily(opt);
+              else if (keyName === 'font-size') applyFontSize(opt);
+
+              setOpenDropdown(null);
+            }}
+            style={
+              keyName === 'color'
+                ? { width: 22, height: 22, borderRadius: 4, background: opt, border: opt === '#FFFFFF' ? '1px solid #ccc' : 'none', cursor: 'pointer' }
+                : { padding: 6, textAlign: 'center', cursor: 'pointer', fontSize: keyName === 'emoji' ? 20 : 14 }
+            }
+          >
+            {renderItem ? renderItem(opt) : keyName !== 'color' ? opt : ''}
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
+
+//   // const parentList = window.getSelection()?.anchorNode?.closest("ul, ol");
+// if (parentList) return; // already inside a list
+
   const applyListStyle = (style) => {
-  let listType = "ul";
-  let listStyleType = "disc";
+    console.log(style,"Style Heree")
+    let listType = "ul";
+    let listStyleType = "disc";
 
-  switch (style) {
-    case "• Disc": listType = "ul"; listStyleType = "disc"; break;
-    case "◦ Circle": listType = "ul"; listStyleType = "circle"; break;
-    case "▪ Square": listType = "ul"; listStyleType = "square"; break;
-    case "1. Numbered": listType = "ol"; listStyleType = "decimal"; break;
-    case "a. Lower Alpha": listType = "ol"; listStyleType = "lower-alpha"; break;
-    case "A. Upper Alpha": listType = "ol"; listStyleType = "upper-alpha"; break;
-    case "i. Lower Roman": listType = "ol"; listStyleType = "lower-roman"; break;
-    case "I. Upper Roman": listType = "ol"; listStyleType = "upper-roman"; break;
-    default: break;
-  }
-
-  const html = `<${listType} style="list-style-type: ${listStyleType};"><li></li></${listType}>`;
-  exec("insertHTML", html);
-
-  // Move cursor inside the new list item
-  setTimeout(() => {
-    const li = editorRef.current.querySelector("li:last-child");
-    if (li) {
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.selectNodeContents(li);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
+    switch (style) {
+      case "• Disc": listType = "ul"; listStyleType = "disc"; break;
+      case "◦ Circle": listType = "ul"; listStyleType = "circle"; break;
+      case "▪ Square": listType = "ul"; listStyleType = "square"; break;
+      case "1. Numbered": listType = "ol"; listStyleType = "decimal"; break;
+      case "a. Lower Alpha": listType = "ol"; listStyleType = "lower-alpha"; break;
+      case "A. Upper Alpha": listType = "ol"; listStyleType = "upper-alpha"; break;
+      case "i. Lower Roman": listType = "ol"; listStyleType = "lower-roman"; break;
+      case "I. Upper Roman": listType = "ol"; listStyleType = "upper-roman"; break;
+      default: break;
     }
-  }, 0);
-};
-const handleKeyDown = (e) => {
+
+    // Insert the list with a placeholder so the bullet shows up
+    const html = `<${listType} style="list-style-type: ${listStyleType};"><li>&nbsp;</li></${listType}>`;
+    exec("insertHTML", html);
+
+    // Move cursor inside the new list item
+    setTimeout(() => {
+      const li = editorRef.current.querySelector("li:last-child");
+      if (li) {
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(li);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }, 0);
+  };
+
+  const handleKeyDown = (e) => {
   const sel = window.getSelection();
   const li = sel?.anchorNode?.closest("li");
 
-  // Handle Enter: create new bullet
   if (e.key === "Enter" && li) {
     e.preventDefault();
+
+    if (li.textContent.trim() === "") {
+      const list = li.parentNode;
+      const p = document.createElement("p");
+      p.innerHTML = "<br>"; // placeholder line
+
+      list.parentNode.insertBefore(p, list.nextSibling);
+      list.removeChild(li);
+
+      if (list.childNodes.length === 0) list.remove();
+
+      const range = document.createRange();
+      range.selectNodeContents(p);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      return;
+    }
+
+    // Else create new <li>
     const newLi = document.createElement("li");
-    newLi.innerHTML = "";
+    newLi.innerHTML = "<br>";
     li.parentNode.insertBefore(newLi, li.nextSibling);
 
+    // Move cursor to new list item
     const range = document.createRange();
     range.selectNodeContents(newLi);
     range.collapse(true);
@@ -307,15 +359,21 @@ const handleKeyDown = (e) => {
     sel.addRange(range);
   }
 
-  // Handle Backspace: stop bullets if empty
-  if (e.key === "Backspace" && li && li.textContent === "") {
+  // ✅ Handle Backspace — exit list if empty
+  if (e.key === "Backspace" && li && li.textContent.trim() === "") {
     e.preventDefault();
+
     const list = li.parentNode;
     const p = document.createElement("p");
+    p.innerHTML = "<br>";
+
+    // Insert paragraph after list
     list.parentNode.insertBefore(p, list.nextSibling);
     list.removeChild(li);
+
     if (list.childNodes.length === 0) list.remove();
 
+    // Move cursor into the paragraph
     const range = document.createRange();
     range.selectNodeContents(p);
     range.collapse(true);
@@ -323,7 +381,6 @@ const handleKeyDown = (e) => {
     sel.addRange(range);
   }
 };
-
 
 
   return (
