@@ -279,7 +279,8 @@ const router = createBrowserRouter([
     path: "/become-a-partner",
     element: <BecomePartner />,
   },
-  {path:'/testing',
+  {
+    path:'/testing',
    element:<EditorRichUI />
           },
 

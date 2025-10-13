@@ -6,15 +6,18 @@ import { useLocation } from "react-router-dom";
 import AddButtonEventModal from "../Design/components/formDesigner/AddButtonEventModal";
 import { TabsContainer, TabItem } from "../MyTickets/pages/StyledComponents";
 
-export default function FormDesignerPage({recordId}) {
-  console.log(recordId,"RecordId Heree")
+export default function FormDesignerPage({recordId:propRecordId}) {
+
   const { state } = useLocation();
+  console.log(state,"Here state")
+    const recordId = propRecordId || state?.recordId;
   const [module, setModule] = React.useState("");
   const [formFields, setFormFields] = React.useState([]);
   const [formButtons, setFormButtons] = React.useState([]);
   const [showPreview, setShowPreview] = React.useState(false);
   const [showTabs, setShowTabs] = React.useState(false);
   const [tabs, setTabs] = React.useState([]);
+  // const [recordId,setRecordId]=useState(recordId)
 
   const titleOptions = ["Users", "Admin", "Tickets", "My Items"];
   const [addingButton, setAddingButton] = useState({
@@ -92,6 +95,7 @@ export default function FormDesignerPage({recordId}) {
 
  
   const getRecordDetails=async()=>{
+    if(!recordId) return;
     const url=`${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`
     const response=await fetch(url)
     // console.log(response,"Record Response");
