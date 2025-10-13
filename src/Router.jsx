@@ -167,7 +167,8 @@ import AlertTemplateView from "./modules/Admin-Portal/Alerts/pages/AlertsTemplat
 import PreviewAlerts from "./modules/Admin-Portal/Alerts/pages/AlertsPreview.jsx";
 import TemplateSelectionForTemplate from "./modules/Admin-Portal/Templates/pages/TemplateSelectionForTemplates.jsx";
 import CreateEditor from "./shared/CreationEditor/CreateEditor.jsx";
-
+import SlateEditor from "./shared/CreationEditor/CreateEditor.jsx";
+import EditorRichUI from "./shared/CreationEditor/WorkingEditor.jsx";
 
 const router = createBrowserRouter([
   // Public routes (no authentication required)
@@ -278,6 +279,11 @@ const router = createBrowserRouter([
     path: "/become-a-partner",
     element: <BecomePartner />,
   },
+  {path:'/testing',
+   element:<EditorRichUI />
+          },
+
+           
   // MFA authentication routes
   {
     path: "/email-MFA",
@@ -316,7 +322,7 @@ const router = createBrowserRouter([
   // Protected routes (require authentication)
   {
     element: <ProtectedRoute />,
-    children: [
+   children: [
       // Admin layout routes
       {
         element: <Layout />,
@@ -717,9 +723,7 @@ const router = createBrowserRouter([
             path: "/apps",
             element: <Apps />,
           },
-          {path:'/testing',
-            element:<CreateEditor />
-          }
+          
         ],
       },
       // User portal layout routes

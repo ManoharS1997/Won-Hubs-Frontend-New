@@ -10,6 +10,7 @@ export default function PreviewModal({
   formButtons,
   tabs,
   state,
+  recordId
 }) {
   const navigation = useNavigate();
   const [values, setValues] = useState({});
@@ -174,6 +175,7 @@ export default function PreviewModal({
   };
 
   const handleSave = async () => {
+    let Method=recordId ?"PUT":"POST"
     try {
       setSaving(true);
       const payload = {
@@ -188,22 +190,20 @@ export default function PreviewModal({
         selectedDepartments: state?.selectedDepartments,
       };
 
-      console.log(payload);
-
-      const res = await fetch(
-        `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const url=recordId?`${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`:`${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer`
+    
+      const res = await fetch(url, {
+        method: Method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
       if (!res.ok) throw new Error("Failed to save form");
       await res.json();
       alert("Form saved successfully!");
       navigation("/create/new/design");
     } catch (err) {
+      console.log(err,"Error Heree")
       alert("Error saving form");
     } finally {
       setSaving(false);
@@ -288,7 +288,7 @@ export default function PreviewModal({
                       <button
                         key={i}
                         type={btn.type}
-                        className="px-5 py-2 bg-indigo-600 text-white !rounded shadow hover:bg-indigo-700 transition"
+                        className="px-5 py-2 !bg-indigo-600 text-white !rounded shadow hover:bg-indigo-700 transition"
                       >
                         {btn.label}
                       </button>
@@ -338,11 +338,17 @@ export default function PreviewModal({
           disabled={saving}
           className={`px-6 py-2 !rounded-lg shadow text-white transition ${
             saving
-              ? "bg-gray-400 cursor-not-allowed"
+              ? "!bg-gray-400 cursor-not-allowed"
               : "!bg-green-600 hover:bg-green-700"
           }`}
         >
-          {saving ? "Saving..." : "Save"}
+          {saving
+          ? recordId
+            ? "Updating..."
+            : "Saving..."
+          : recordId
+          ? "Update"
+          : "Save"}
         </button>
       </div>
     </div>

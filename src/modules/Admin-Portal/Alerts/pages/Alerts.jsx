@@ -27,6 +27,7 @@ const Alerts = () => {
       if (data?.alerts?.length === 0) {
         // setUsersData(ApprovalsDummyData)
       } else {
+        console.log(data.alerts,"Alerts Hereeee")
         setAlertsData(data.alerts)
       }
       setTableColumnNames(newColumnNames.columns)

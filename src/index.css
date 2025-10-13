@@ -557,6 +557,55 @@ button:focus-visible {
   overflow: visible !important;
   position: relative;
 }
+/* Add this CSS to your styles (ideally globally) */
+.wrapperClassName {
+  min-height: 300px;
+  border: 1px solid #ccc;
+}
+
+.editorClassName {
+  min-height: 200px;
+  padding: 10px;
+}
+
+/* 🔧 React Draft WYSIWYG Fixes */
+
+/* Toolbar must stay visible */
+.rdw-editor-toolbar {
+  z-index: 2000 !important;
+  position: relative !important;
+  background: #fff !important;
+}
+
+/* Dropdown option lists */
+.rdw-dropdown-optionwrapper {
+  position: absolute !important;
+  background: #fff !important;
+  border: 1px solid #ccc !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+  z-index: 99999 !important;
+}
+
+/* Emoji / color / link / image modals */
+.rdw-emoji-modal,
+.rdw-colorpicker-modal,
+.rdw-link-modal,
+.rdw-image-modal,
+.rdw-embedded-modal {
+  position: fixed !important;
+  background: #fff !important;
+  border: 1px solid #ccc !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+  z-index: 100000 !important;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* Prevent clipping from parent containers */
+body, html, #root, .App {
+  overflow: visible !important;
+}
+
 
 
 /* body {

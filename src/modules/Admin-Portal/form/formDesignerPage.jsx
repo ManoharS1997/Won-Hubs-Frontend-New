@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import FormBuilder from "../Design/components/formDesigner/formBuilder";
 import PreviewModal from "../Design/components/formDesigner/PreviewModal";
 import TabDesigner from "../Design/components/formDesigner/TabDesigner";
@@ -6,7 +6,8 @@ import { useLocation } from "react-router-dom";
 import AddButtonEventModal from "../Design/components/formDesigner/AddButtonEventModal";
 import { TabsContainer, TabItem } from "../MyTickets/pages/StyledComponents";
 
-export default function FormDesignerPage() {
+export default function FormDesignerPage({recordId}) {
+  console.log(recordId,"RecordId Heree")
   const { state } = useLocation();
   const [module, setModule] = React.useState("");
   const [formFields, setFormFields] = React.useState([]);
@@ -88,128 +89,30 @@ export default function FormDesignerPage() {
   const removeButton = (i) =>
     setFormButtons((prev) => prev.filter((_, idx) => idx !== i));
 
-  // return (
-  //   <>
-  //     <div className="h-[92vh] overflow-y-auto p-8 no-scrollbar">
-  //       <div className="max-w-7xl mx-auto">
-  //         {/* Header */}
-  //         {/* <header className="flex justify-between items-center w-full mb-10">
-  //           <h1
-  //             style={{ color: "#022052", fontSize: 30, fontWeight: "bolder" }}
-  //           >
-  //             Form Designer
-  //           </h1>
-  //           <div className="flex items-center gap-3">
-  //             <input
-  //               type="text"
-  //               placeholder="Title"
-  //               className="border-b-2 border-black outline-none"
-  //               onChange={(e) => setModule(e.target.value)}
-  //             />
-  //             <PreviewBtn
-  //               // style={{ borderRadius: 8 }}
-  //               // className="px-6 py-2 !bg-green-600 text-white rounded-lg"
-  //               onClick={() => setShowTabs((v) => !v)}
-  //               type="button"
-  //               className="flex gap-2"
-  //             >
-  //               {showTabs ? "Hide Tabs" : "Configure Tabs"}
-  //               {renderIcons("TiTabsOutline", 25, "inherit")}
-  //             </PreviewBtn>
 
-  //             <PreviewBtn
-  //               // style={{ borderRadius: 8 }}
-  //               type="button"
-  //               // className="px-6 py-2 !bg-indigo-600 !text-white rounded-lg"
-  //               onClick={() => {
-  //                 if (module.length > 0) setShowPreview((v) => !v);
-  //                 else alert("Please enter a title for the form");
-  //               }}
-  //             >
-  //               {showPreview ? "Hide Preview" : "Show Preview"}
-  //               {renderIcons("MdDoubleArrow", 25, "inherit")}
-  //             </PreviewBtn>
-  //           </div>
-  //         </header> */}
-  //         <header className="flex justify-center items-center w-full mb-10 gap-4">
-  //         <TabsContainer style={{marginBottom:20}}>
-  //           <TabItem type="button" active={true} >Form Designer</TabItem>
-  //           <TabItem type="button" active={showTabs} onClick={() => {setShowTabs(true),setShowPreview(false)}}>Tab Designer</TabItem>
-  //           <TabItem type="button" active={showPreview} onClick={() => {setShowPreview(true),setShowTabs(false)}}>Preview</TabItem>
-  //         </TabsContainer>
-  //         </header>
-
-  //         <div className="grid grid-cols-1 gap-8">
-  //           <FormBuilder
-  //             formFields={formFields}
-  //             formButtons={formButtons}
-  //             addCustomButton={addCustomButton}
-  //             onDragStart={onDragStart}
-  //             onDropField={onDropField}
-  //             onDropButton={onDropButton}
-  //             allowDrop={allowDrop}
-  //             removeField={removeField}
-  //             removeButton={removeButton}
-  //             setFormFields={setFormFields}
-  //           />
-  //         </div>
-  //       </div>
-  //     </div>
-
-  //     {showPreview && (
-  //       <PreviewModal
-  //         show={showPreview}
-  //         onClose={() => setShowPreview(false)}
-  //         module={module}
-  //         formFields={formFields}
-  //         formButtons={formButtons}
-  //         tabs={tabs}
-  //         state={state}
-  //       />
-  //     )}
-
-  //     {showTabs && (
-  //       <div className="fixed inset-0 z-40" onClick={() => setShowTabs(false)}>
-  //         {/* Backdrop */}
-  //         <div className="absolute inset-0 bg-black/30"></div>
-  //         {/* Panel */}
-  //         <div
-  //           className={`absolute top-0 right-0 h-full w-1/2 bg-white shadow-2xl transform transition-transform duration-300 ${
-  //             showTabs ? "translate-x-0" : "translate-x-full"
-  //           }`}
-  //           onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
-  //         >
-  //           <div className="flex justify-between items-center p-4 border-b">
-  //             <h1
-  //               style={{ color: "#022052", fontSize: 30, fontWeight: "bolder" }}
-  //             >
-  //               Tab Designer
-  //             </h1>
-
-  //             <button
-  //               className="text-red-500 font-semibold bg-transparent"
-  //               onClick={() => setShowTabs(false)}
-  //             >
-  //               ✕
-  //             </button>
-  //           </div>
-  //           <div className="px-2.5 overflow-y-auto h-[90%] no-scrollbar">
-  //             <TabDesigner setTabs={setTabs} tabs={tabs} />
-  //           </div>
-  //         </div>
-  //       </div>
-  //     )}
-
-  //     <AddButtonEventModal
-  //       open={addingButton.open}
-  //       onClose={() =>
-  //         setAddingButton({ open: false, tabIndex: null, buttonData: null })
-  //       }
-  //       onSubmit={handleAddButtonModalSubmit}
-  //       initialLabel={addingButton.buttonData?.label}
-  //     />
-  //   </>
-  // );
+ 
+  const getRecordDetails=async()=>{
+    const url=`${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`
+    const response=await fetch(url)
+    // console.log(response,"Record Response");
+    const dbResponse=await response.json()
+    console.log(dbResponse,"DbResponse Hereee")
+    if(dbResponse.data){
+    const {formFields,formButtons,tabs,module}=dbResponse.data
+    setFormFields(formFields)
+    setFormButtons(formButtons)
+    setTabs(tabs)
+    setModule(module)
+    }
+  }
+  
+  useEffect(()=>{
+    if(recordId){
+      getRecordDetails()
+    }
+  },[])
+  
+  
   return (
     <>
       <div className="h-[92vh] overflow-y-auto p-8 no-scrollbar">
@@ -322,6 +225,7 @@ export default function FormDesignerPage() {
                   formButtons={formButtons}
                   tabs={tabs}
                   state={state}
+                  recordId={recordId}
                 />
               </section>
             )}

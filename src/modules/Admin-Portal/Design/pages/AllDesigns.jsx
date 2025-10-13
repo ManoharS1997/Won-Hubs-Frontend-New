@@ -21,24 +21,36 @@ const AllDesigns = () => {
 
   const fetchConnectionsData = async () => {
     try {
-      const data = await getTableData('designs')
+      const url=`${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer`
+      const data=await fetch(url)
+      // console.log(data,"It is response")
+      const data2=await data.json()
+      // console.log(data2,"Respon.json")
       const newColumnNames = await getTableColumnNames('designs')
-      if (data?.designs?.length === 0) {
+      if (!(data2?.data.length>0)) {
         // setUsersData(ApprovalsDummyData)
       } else {
-        setDesignsData(data.designs)
+        const tableData=data2.data.map(Item=>{
+          return {
+            ...Item,
+            ...Item.selectedDepartments,
+            title:Item?.module,
+            id:Item?._id
+          }
+        })
+        console.log(tableData,"tableData")
+        setDesignsData(tableData)
       }
       setTableColumnNames(newColumnNames.columns)
     } catch {
       console.log('Error fetching Design Data')
     }
   }
-
+// console.log(TableColumnNames)
   return (
     <WonContext.Consumer>
       {value => {
         const { recordsPerPage } = value
-
         return (
           <CustomViewContainer>
             <SideNavNContentContainer>
