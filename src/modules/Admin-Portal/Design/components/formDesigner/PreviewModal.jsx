@@ -1,16 +1,10 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 import { AiOutlineSwap } from "react-icons/ai"; // or MdSwapHoriz / HiOutlineSwitchHorizontal
-
-const fieldTypesWithOptions = ["dropdown", "radio", "checkbox"];
-function fieldSupportsOptions(type) {
-  return fieldTypesWithOptions.includes(type);
-}
-
+import { useNavigate } from "react-router-dom";
 
 export default function PreviewModal({
   show,
-  onClose,
   module,
   formFields,
   formButtons,
@@ -18,6 +12,7 @@ export default function PreviewModal({
   state,
   recordId
 }) {
+  const navigation = useNavigate();
   const [values, setValues] = useState({});
   const [saving, setSaving] = useState(false);
   const [twoColumn, setTwoColumn] = useState(true);
@@ -121,7 +116,10 @@ export default function PreviewModal({
             </div>
             <div className="flex flex-wrap gap-4">
               {(field.options || []).map((opt) => (
-                <label key={opt} className="flex gap-2 items-center text-gray-600">
+                <label
+                  key={opt}
+                  className="flex gap-2 items-center text-gray-600"
+                >
                   <input
                     type="radio"
                     name={field.name}
@@ -192,8 +190,6 @@ export default function PreviewModal({
         selectedDepartments: state?.selectedDepartments,
       };
 
-      // console.log(payload);
-
       const url=recordId?`${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`:`${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer`
     
       const res = await fetch(url, {
@@ -205,6 +201,7 @@ export default function PreviewModal({
       if (!res.ok) throw new Error("Failed to save form");
       await res.json();
       alert("Form saved successfully!");
+      navigation("/create/new/design");
     } catch (err) {
       console.log(err,"Error Heree")
       alert("Error saving form");
@@ -357,7 +354,6 @@ export default function PreviewModal({
     </div>
   );
 }
-
 
 // Helper needed for table rendering (assumed external or define if needed)
 // function fieldSupportsOptions(type) {
