@@ -49,15 +49,23 @@ export default function FormDesignerPage({recordId:propRecordId}) {
   // IMPORTANT: open modal on button drop
   const onDropButton = (e) => {
     e.preventDefault();
-    const data = JSON.parse(e.dataTransfer.getData("application/json"));
-    if (data.category === "button") {
-      setAddingButton({ open: true, tabIndex: null, buttonData: data.item });
+    if (module?.length > 0) {
+      const data = JSON.parse(e.dataTransfer.getData("application/json"));
+      if (data.category === "button") {
+        setAddingButton({ open: true, tabIndex: null, buttonData: data.item });
+      }
+    } else {
+      alert("Select module");
     }
   };
 
   // Open modal on custom button add
   const addCustomButton = () => {
-    setAddingButton({ open: true, tabIndex: null, buttonData: null });
+    if (module?.length > 0) {
+      setAddingButton({ open: true, tabIndex: null, buttonData: null });
+    } else {
+      alert("Select module");
+    }
   };
 
   // Submit modal data: add button to formButtons
@@ -136,8 +144,12 @@ export default function FormDesignerPage({recordId:propRecordId}) {
                     type="button"
                     active={showTabs}
                     onClick={() => {
-                      setShowTabs(true);
-                      setShowPreview(false);
+                      if (module?.length > 0) {
+                        setShowTabs(true);
+                        setShowPreview(false);
+                      } else {
+                        alert("Select module");
+                      }
                     }}
                   >
                     Tab Designer
@@ -146,8 +158,12 @@ export default function FormDesignerPage({recordId:propRecordId}) {
                     type="button"
                     active={showPreview}
                     onClick={() => {
-                      setShowPreview(true);
-                      setShowTabs(false);
+                      if (module?.length > 0) {
+                        setShowPreview(true);
+                        setShowTabs(false);
+                      } else {
+                        alert("Select module");
+                      }
                     }}
                   >
                     Preview
@@ -157,11 +173,12 @@ export default function FormDesignerPage({recordId:propRecordId}) {
               <div className="relative">
                 <select
                   value={module}
+                  style={{ height: 40, width: 200 }}
                   onChange={(e) => setModule(e.target.value)}
-                  className="w-48 p-2 border rounded"
-                  placeholder="Select Title"
+                  className="w-48 h-20 p-2 border rounded"
+                  placeholder="Select Module"
                 >
-                  <option value="">Select Title</option>
+                  <option value="">Select Module</option>
                   {titleOptions.map((option) => (
                     <option key={option} value={option}>
                       {option}
