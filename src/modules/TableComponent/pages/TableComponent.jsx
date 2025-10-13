@@ -40,6 +40,7 @@ import {
 import CreateAlerts from '../../Admin-Portal/Alerts/pages/CreateAlerts';
 import CreateFeedback from '../../Admin-Portal/Feedback/pages/CreateFeedback';
 import { selectedGridRowsCountSelector } from '@mui/x-data-grid';
+import FormDesignerPage from '../../Admin-Portal/form/formDesignerPage';
 
 const conditions = ['Like', 'Not Like', 'Equals To', 'Not Equals To']
 
@@ -519,6 +520,8 @@ export default function TableComponent({
       
       case 'templates':
         return <CreateTemplate recordId={selectedTab} />
+      case 'designs':
+        return <FormDesignerPage recordId={selectedTab} />
       default:
         return <DetailedView recordId={selectedTab} tableName={tableName} />
 

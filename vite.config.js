@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [
     tailwindcss(),
-    react()
+    react(),
   ],
   // build: {
   //   rollupOptions: {
@@ -19,6 +19,9 @@ export default defineConfig({
   //     },
   //   },
   // },
+  define: {
+    global: {}, // ✅ Fix for "global is not defined"
+  },
 
   server: {
     allowedHosts: ['wonhubs.com'],
