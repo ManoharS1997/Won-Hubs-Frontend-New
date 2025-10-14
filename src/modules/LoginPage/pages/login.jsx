@@ -25,7 +25,7 @@ import {
 } from './StyledComponents'
 
 const hostedUrl = import.meta.env.VITE_HOSTED_API_URL
-console.log(hostedUrl,"url")
+console.log(hostedUrl, "url")
 
 // other service products logos default images data
 const appsLogos = [
@@ -155,7 +155,7 @@ export default function LoginPage() {
             {/* console.log(userName) */ }
             const response = await fetch(url, options)
             const resdata = await response.json()
-            console.log(response)
+            console.log(response, "user Response Here")
             if (!response.ok) {
               if (userName === 'Super_Admin_2') {
                 return setUsernameSubmit(true)
@@ -207,7 +207,14 @@ export default function LoginPage() {
 
             const response = await fetch(url, options)
             const data = await response.json()
-
+            console.log(data, "data here for user Response")
+            const user_obj = {
+              category: data?.user?.category,
+              subcategory: data?.user.subcategory,
+              view: data?.user.view,
+              department:data?.user.department
+            }
+            localStorage.setItem("userObj",JSON.stringify(user_obj))
             if (!response.ok) {
               return addAlert("Password Doesn't Match", 'failure')
             } else {
