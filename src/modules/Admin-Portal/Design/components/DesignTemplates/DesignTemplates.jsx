@@ -148,7 +148,7 @@ export default function DesignTemplates() {
   const CatalogDepartment = location.state ? location.state.department : "";
   const CatalogCategory = location.state ? location.state.category : "";
   const CatalogSubcategory = location.state ? location.state.subCategory : "";
-  const [templatesData, setTemplatesData] = useState(dummyData)
+  const [templatesData, setTemplatesData] = useState(dummyData);
   const [selectedTab, setSelectedtab] = useState("Desktop");
   const [category, setCategory] = useState("IT");
   const [openConfigure, setOpenConfigure] = useState(false);
@@ -168,30 +168,29 @@ export default function DesignTemplates() {
   ]);
   const [selectedViews, setSelectedViews] = useState([]);
   const [departmentName, setDepartmentName] = useState("");
-  const { setSelectedDesign } = useContext(WonContext);
-  const [DesignName, setDesignName] = useState(""); // by sandhya
+  // const { setSelectedDesign } = useContext(WonContext);
+  // const [DesignName, setDesignName] = useState(""); // by sandhya
   const [departmentData, setDepartmentData] = useState(departmentDummyData);
-  const [openExistRecord, setOpenExistRecord] = useState(false)
-  const [recordId, setRecordId] = useState("")
+  // const [openExistRecord, setOpenExistRecord] = useState(false);
+  // const [recordId, setRecordId] = useState("");
   useEffect(() => {
-    fetchConnectionsData()
-  }, [])
+    fetchConnectionsData();
+  }, []);
 
   const fetchConnectionsData = async () => {
     try {
-      const url = `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer`
-      const data = await fetch(url)
+      const url = `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer`;
+      const data = await fetch(url);
       // console.log(data,"It is response")
-      const data2 = await data.json()
+      const data2 = await data.json();
       // console.log(data2,"Respon.json")
-      if ((data2?.data.length > 0)) {
-        setTemplatesData(data2.data)
+      if (data2?.data.length > 0) {
+        setTemplatesData(data2.data);
       }
-
     } catch {
-      console.log('Error fetching Design Data')
+      console.log("Error fetching Design Data");
     }
-  }
+  };
   const Navigate = useNavigate();
 
   console.log(selectedDepartments, selectedViews, departmentName, category);
@@ -210,23 +209,23 @@ export default function DesignTemplates() {
         return selectedDepartments.department &&
           departmentData[selectedDepartments.department]
           ? Object.keys(departmentData[selectedDepartments.department]).map(
-            (cat) => ({
-              label: cat,
-              value: cat,
-            })
-          )
+              (cat) => ({
+                label: cat,
+                value: cat,
+              })
+            )
           : [];
       case "sub_category":
         return selectedDepartments.category &&
           departmentData[selectedDepartments.department]?.[
-          selectedDepartments.category
+            selectedDepartments.category
           ]
           ? departmentData[selectedDepartments.department][
-            selectedDepartments.category
-          ].map((subCat) => ({
-            label: subCat,
-            value: subCat,
-          }))
+              selectedDepartments.category
+            ].map((subCat) => ({
+              label: subCat,
+              value: subCat,
+            }))
           : [];
       default:
         return [];
@@ -259,7 +258,7 @@ export default function DesignTemplates() {
         sub_category: N.value,
       }));
 
-      const { department, category } = selectedDepartments;
+      // const { department, category } = selectedDepartments;
     } catch (error) {
       console.error("Error updating subcategory:", error);
       // Optionally, you can set an error state here to inform the user.
@@ -273,9 +272,9 @@ export default function DesignTemplates() {
   const onChangeInputField = (e) => {
     console.log(e.target.value, "tRGET FORM NAME");
     setDepartmentName(e.target.value);
-    setDesignName(e.target.value); // by sandhya
+    // setDesignName(e.target.value); // by sandhya
   };
-  console.log(templatesData, "Here")
+  console.log(templatesData, "Here");
 
   return (
     <div className="w-full h-full flex flex-col overflow-auto">
@@ -287,10 +286,11 @@ export default function DesignTemplates() {
               <button
                 key={index}
                 className={`h-fit w-[100px] !border-b-2 transition-all duration-500 py-2 font-semibold
-                 ${selectedTab === item
-                    ? "!border-black"
-                    : "!border-transparent"
-                  }`}
+                 ${
+                   selectedTab === item
+                     ? "!border-black"
+                     : "!border-transparent"
+                 }`}
                 onClick={() => setSelectedtab(item)}
               >
                 {item}
@@ -314,41 +314,10 @@ export default function DesignTemplates() {
             className="grid md:grid-cols-4 gap-4 bg-[var(--background-color)] rounded-lg p-4 list-none 
                   w-full h-fit m-0 overflow-auto"
           >
-            {templatesData.filter(
+            {/* {templatesData.filter(
               (template) =>
-                template.category === category || template.widgetname === selectedTab
-              // template.category === category && template.mode === selectedTab by kartheek
-            ).length > 0 ? (
-              templatesData
-                .filter(
-                  (template) =>
-                    // template.category === category &&
-                    // template.mode === selectedTab by kartheek
-                    template.widgetname === selectedTab
-                )
-                .map((item, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      Navigate("/form-designer", {
-                        state: { recordId: item._id, widgetname: selectedTab },
-                      })}}
-                      className = "w-full h-[200px] bg-gray-100 -2 rounded flex items-center justify-center hover:shadow-lg " >
-
-
-                        <p className="m-0 !text-blue">{item?.module}</p>
-
-                  </div>
-        ))
-        ) : (
-        <p className="text-center text-gray-500">
-          No templates available for this selection
-        </p>
-            )}
-        {templatesData.filter(
-          (template) =>
-            template.category === category && template.mode === selectedTab
-        ).length > 0 && (
+                template.category === category && template.mode === selectedTab
+            ).length > 0 && ( */}
             <li
               onClick={() => {
                 setOpenConfigure(true);
@@ -367,98 +336,127 @@ export default function DesignTemplates() {
             >
               <p style={{ fontSize: "55px" }}>+</p>
             </li>
-          )}
-      </ul>
-    </div>
-      </div >
-
-    { openConfigure && (
-      <div className="fixed w-screen min-h-screen bg-black/50 top-0 left-0 flex items-center justify-center">
-        <div className="flex flex-col justify-between items-center w-fit bg-white py-4 px-8 rounded-lg gap-4">
-          <button
-            type="button"
-            onClick={() => setOpenConfigure(false)}
-            className="self-end border !rounded-full hover:!bg-red-500 hover:text-white transition-all duration-500"
-          >
-            {renderIcons("IoIosClose", 20, "inherit")}
-          </button>
-
-          <div className="w-full">
-            <FormInput
-              inputType={"text"}
-              name={"name"}
-              label={"Name"}
-              value={departmentName}
-              placeholder={"Enter Design Name"}
-              isMandatory={true}
-              onChangeHandler={onChangeInputField}
-              iconName={"MdPassword"}
-            />
-          </div>
-
-          <div className="w-[280px] mx-1 border rounded">
-            <ReactSelect
-              options={getDropdownOptions("department")}
-              value={selectedDepartments.department}
-              onChange={(value) => updateDepartments(value)}
-              placeholder="Select Department"
-            />
-          </div>
-
-          <div className="w-[280px] mx-1 border rounded">
-            <ReactSelect
-              options={getDropdownOptions("category")}
-              value={selectedDepartments.category}
-              onChange={(value) => updateCategory(value)}
-              placeholder="Select Category"
-              isDisabled={!selectedDepartments.department}
-            />
-          </div>
-
-          <div className="w-[280px] mx-1 border rounded">
-            <ReactSelect
-              options={getDropdownOptions("sub_category")}
-              value={selectedDepartments.sub_category}
-              onChange={(value) => updateSubcategory(value)}
-              placeholder="Select Sub-Category"
-              isDisabled={!selectedDepartments.category}
-            />
-          </div>
-
-          <div className="w-[280px] mx-1 border rounded">
-            <ReactSelect
-              options={views.map((view) => ({ label: view, value: view }))}
-              values={views
-                .filter((view) => selectedViews.includes(view))
-                .map((view) => ({ label: view, value: view }))}
-              onChange={onClickView}
-              multi
-              placeholder="Select Views"
-            />
-          </div>
-
-          <button
-            type="submit"
-            onClick={() =>
-              Navigate("/form-designer", {
-                state: {
-                  widgetname: selectedTab,
-                  selectedDepartments,
-                  selectedViews,
-                  departmentName,
-                  category,
-                },
-              })
-            }
-            className="border w-full px-4 py-2 rounded !bg-[var(--primary-color)]/20 hover:!bg-[var(--primary-color)] hover:text-[var(--background-color)] transition-all duration-500 "
-          >
-            Start Design
-          </button>
+            {/* // )} */}
+            {templatesData.filter(
+              (template) =>
+                template.category === category ||
+                template.widgetname === selectedTab
+              // template.category === category && template.mode === selectedTab by kartheek
+            ).length > 0 ? (
+              templatesData
+                .filter(
+                  (template) =>
+                    // template.category === category &&
+                    // template.mode === selectedTab by kartheek
+                    template.widgetname === selectedTab
+                )
+                .map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      Navigate("/form-designer", {
+                        state: { recordId: item._id, widgetname: selectedTab },
+                      });
+                    }}
+                    className="w-full h-[200px] bg-gray-100 -2 rounded flex items-center justify-center hover:shadow-lg "
+                  >
+                    <p className="m-0 !text-blue">{item?.module}</p>
+                  </div>
+                ))
+            ) : (
+              <p className="text-center text-gray-500">
+                No templates available for this selection
+              </p>
+            )}
+          </ul>
         </div>
       </div>
-    )
-}
- 
-    </div >
+
+      {openConfigure && (
+        <div className="fixed w-screen min-h-screen bg-black/50 top-0 left-0 flex items-center justify-center">
+          <div className="flex flex-col justify-between items-center w-fit bg-white py-4 px-8 rounded-lg gap-4">
+            <button
+              type="button"
+              onClick={() => setOpenConfigure(false)}
+              className="self-end border !rounded-full hover:!bg-red-500 hover:text-white transition-all duration-500"
+            >
+              {renderIcons("IoIosClose", 20, "inherit")}
+            </button>
+
+            <div className="w-full">
+              <FormInput
+                inputType={"text"}
+                name={"name"}
+                label={"Name"}
+                value={departmentName}
+                placeholder={"Enter Design Name"}
+                isMandatory={true}
+                onChangeHandler={onChangeInputField}
+                iconName={"MdPassword"}
+              />
+            </div>
+
+            <div className="w-[280px] mx-1 border rounded">
+              <ReactSelect
+                options={getDropdownOptions("department")}
+                value={selectedDepartments.department}
+                onChange={(value) => updateDepartments(value)}
+                placeholder="Select Department"
+              />
+            </div>
+
+            <div className="w-[280px] mx-1 border rounded">
+              <ReactSelect
+                options={getDropdownOptions("category")}
+                value={selectedDepartments.category}
+                onChange={(value) => updateCategory(value)}
+                placeholder="Select Category"
+                isDisabled={!selectedDepartments.department}
+              />
+            </div>
+
+            <div className="w-[280px] mx-1 border rounded">
+              <ReactSelect
+                options={getDropdownOptions("sub_category")}
+                value={selectedDepartments.sub_category}
+                onChange={(value) => updateSubcategory(value)}
+                placeholder="Select Sub-Category"
+                isDisabled={!selectedDepartments.category}
+              />
+            </div>
+
+            <div className="w-[280px] mx-1 border rounded">
+              <ReactSelect
+                options={views.map((view) => ({ label: view, value: view }))}
+                values={views
+                  .filter((view) => selectedViews.includes(view))
+                  .map((view) => ({ label: view, value: view }))}
+                onChange={onClickView}
+                multi
+                placeholder="Select Views"
+              />
+            </div>
+
+            <button
+              type="submit"
+              onClick={() =>
+                Navigate("/form-designer", {
+                  state: {
+                    widgetname: selectedTab,
+                    selectedDepartments,
+                    selectedViews,
+                    departmentName,
+                    category,
+                  },
+                })
+              }
+              className="border w-full px-4 py-2 rounded !bg-[var(--primary-color)]/20 hover:!bg-[var(--primary-color)] hover:text-[var(--background-color)] transition-all duration-500 "
+            >
+              Start Design
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
