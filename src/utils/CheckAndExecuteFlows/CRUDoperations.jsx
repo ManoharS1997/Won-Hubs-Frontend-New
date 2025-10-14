@@ -1306,7 +1306,7 @@ export const deleteUser = async (recordId) => {
 }
 
 //get addUserForm fields
-export const GetAddUserFormFields = async (param) => {
+export const  GetAddUserFormFields = async (param) => {
   try {
     const url = `${apiUrl}/api/add/fields/${param}`
     const options = {

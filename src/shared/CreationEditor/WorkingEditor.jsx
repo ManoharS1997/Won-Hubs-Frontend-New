@@ -21,6 +21,9 @@ import {
   FaOutdent,
   FaEraser,
 } from 'react-icons/fa';
+import { VscTextSize } from "react-icons/vsc";
+import { IoColorPalette } from "react-icons/io5";
+
 
 const FONT_SIZE_MAP = {
   '12px': 2,
@@ -218,7 +221,7 @@ const EditorRichUI = () => {
       }}
     >
       {Icon && <Icon />}
-      <span style={{ fontSize: 14 }}>{labelRender ? labelRender() : title}</span>
+      {/* <span style={{ fontSize: 14 }}>{labelRender ? labelRender() : title}</span> */}
     </button>
 
     {openDropdown === keyName && (
@@ -406,7 +409,7 @@ const EditorRichUI = () => {
 
         {/* Lists */}
         <Dropdown
-          icon={FaListUl}
+          Icon={FaListUl}
           title="List Style"
           options={["• Disc", "◦ Circle", "▪ Square", "1. Numbered", "a. Lower Alpha", "A. Upper Alpha", "i. Lower Roman", "I. Upper Roman"]}
           openDropdown={openDropdown}
@@ -432,8 +435,8 @@ const EditorRichUI = () => {
 
         {/* Dropdowns */}
         <Dropdown keyName="font-family" Icon={FaFont} title="Font" options={fontFamilies} labelRender={() => fontFamily} />
-        <Dropdown keyName="font-size" title="Size" options={fontSizes} labelRender={() => fontSize} />
-        <Dropdown keyName="color" title="Color" options={colorPalette} />
+        <Dropdown keyName="font-size" title="Size" options={fontSizes} labelRender={() => fontSize} Icon={VscTextSize} />
+        <Dropdown keyName="color" title="Color" options={colorPalette} Icon={IoColorPalette}/>
         <Dropdown keyName="emoji" Icon={FaSmile} title="Emoji" options={emojis} labelRender={() => '😊'} />
 
         {/* Link & Image */}
