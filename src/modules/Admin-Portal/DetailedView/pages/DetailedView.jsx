@@ -4,6 +4,7 @@ import convertName from "../../../../utils/conevrtName";
 import FormInput from "../../../../shared/UIElements/FormInput";
 import PropTypes from "prop-types";
 import axios from "axios";
+import SourceForm from "../../Design/components/formDesigner/SourceForm";
 
 const RECORD_TABS = [{ id: 1, name: "Details" }];
 
@@ -77,19 +78,21 @@ export default function DetailedView({ recordId, tableName, formData }) {
   // 🔹 Render Tab Content (form/table)
   const renderTabContent = (tab) => {
     if (tab.type === "form") {
+      console.log(tab, "ppppp");
       return (
         <div className="p-4 grid md:grid-cols-2 gap-4">
           {tab.fields?.length > 0 ? (
-            tab.fields.map((field) => (
-              <FormInput
-                key={field._id}
-                inputType={field.type}
-                name={field.name}
-                label={field.label}
-                value={recordData?.[field.name] ?? ""}
-                placeholder={`Enter ${field.label}`}
-              />
-            ))
+            // tab.fields.map((field) => (
+            //   <FormInput
+            //     key={field._id}
+            //     inputType={field.type}
+            //     name={field.name}
+            //     label={field.label}
+            //     value={recordData?.[field.name] ?? ""}
+            //     placeholder={`Enter ${field.label}`}
+            //   />
+            // ))
+            <SourceForm formFields={tab.fields} formButtons={tab.buttons} />
           ) : (
             <div className="text-gray-400 col-span-2 text-center">
               No form fields
@@ -143,14 +146,6 @@ export default function DetailedView({ recordId, tableName, formData }) {
     );
   };
 
-  const handleSave = () => {
-    console.log("Save clicked");
-  };
-
-  const handleUpdate = () => {
-    console.log("Update clicked");
-  };
-
   if (loading)
     return (
       <div className="flex justify-center items-center h-[80vh] text-gray-500">
@@ -200,7 +195,7 @@ export default function DetailedView({ recordId, tableName, formData }) {
       </div>
 
       {/* 🔹 Top-Level Buttons */}
-      <div className="w-full flex items-center justify-end gap-4 px-4">
+      {/* <div className="w-full flex items-center justify-end gap-4 px-4">
         {formData?.formButtons?.map((btn) => (
           <button
             key={btn._id}
@@ -225,7 +220,7 @@ export default function DetailedView({ recordId, tableName, formData }) {
         >
           Update
         </button>
-      </div>
+      </div> */}
 
       {/* 🔹 Tab Content */}
       <div className="grow overflow-auto rounded-b-[1rem]">
@@ -250,8 +245,9 @@ export default function DetailedView({ recordId, tableName, formData }) {
             .map((tab) => (
               <div key={tab.id}>
                 {renderTabContent(tab)}
-                {/* Render tab-specific buttons */}
-                {tab.buttons?.length > 0 && (
+
+                {/* ✅ Only show buttons if NOT a form tab */}
+                {tab.type !== "form" && tab.buttons?.length > 0 && (
                   <div className="flex justify-end gap-3 p-4">
                     {tab.buttons.map((btn) => (
                       <button
