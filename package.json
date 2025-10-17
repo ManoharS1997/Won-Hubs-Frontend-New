@@ -50,6 +50,7 @@
     "jwt-decode": "^4.0.0",
     "libphonenumber-js": "^1.11.11",
     "lucide-react": "^0.475.0",
+    "mammoth": "^1.11.0",
     "openai": "^5.22.1",
     "quill": "^2.0.3",
     "quill-emoji": "^0.2.0",

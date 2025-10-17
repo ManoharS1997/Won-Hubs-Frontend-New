@@ -1,6 +1,5 @@
 // Import the createBrowserRouter function from react-router-dom
 import { createBrowserRouter } from "react-router-dom";
-
 // Import all page and component modules used in the routes
 import LoginPage from "./modules/LoginPage/pages/login.jsx";
 import ProtectedRoute from "./modules/ProtectedRoute/ProtectedRoute.jsx";
@@ -668,9 +667,13 @@ const router = createBrowserRouter([
             path: "/create/notification",
             element: <NotificationTemplates />,
           },
+          // {
+          //   path: "/notifications/:id",
+          //   element: <CreateNotification />,
+          // },
           {
             path: "/notifications/:id",
-            element: <CreateNotification />,
+            element:<EditorRichUI />
           },
           {
             path: "/notification-preview",
