@@ -1,4 +1,4 @@
-import React, { useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import FormBuilder from "../Design/components/formDesigner/formBuilder";
 import PreviewModal from "../Design/components/formDesigner/PreviewModal";
 import TabDesigner from "../Design/components/formDesigner/TabDesigner";
@@ -6,20 +6,39 @@ import { useLocation } from "react-router-dom";
 import AddButtonEventModal from "../Design/components/formDesigner/AddButtonEventModal";
 import { TabsContainer, TabItem } from "../MyTickets/pages/StyledComponents";
 
-export default function FormDesignerPage({recordId:propRecordId}) {
+export default function FormDesignerPage({ recordId: propRecordId }) {
 
   const { state } = useLocation();
-  console.log(state,"Here state")
-    const recordId = propRecordId || state?.recordId;
+  console.log(state, "Here state")
+  const recordId = propRecordId || state?.recordId;
   const [module, setModule] = React.useState("");
   const [formFields, setFormFields] = React.useState([]);
   const [formButtons, setFormButtons] = React.useState([]);
   const [showPreview, setShowPreview] = React.useState(false);
   const [showTabs, setShowTabs] = React.useState(false);
   const [tabs, setTabs] = React.useState([]);
+  const [titleObj, setTitleObj] = useState({
+    title: "",   // selected module/submodule
+    hovered: "", // option being hovered
+    open: false, // dropdown open/close
+  });
+
   // const [recordId,setRecordId]=useState(recordId)
 
-  const titleOptions = ["Users", "Admin", "Tickets", "My Items"];
+  // const titleOptions = ["Users", "Admin", "Tickets", "My Items"];
+  const titleOptions = [{
+    name: 'Users',
+    subModules: []
+  },
+  {
+    name: 'Groups',
+    subModules: []
+  },
+  {
+    name: 'My Items',
+    subModules: ['Tickets', 'Tasks', 'Approvals']
+  },
+  ]
   const [addingButton, setAddingButton] = useState({
     open: false,
     tabIndex: null,
@@ -93,30 +112,31 @@ export default function FormDesignerPage({recordId:propRecordId}) {
     setFormButtons((prev) => prev.filter((_, idx) => idx !== i));
 
 
- 
-  const getRecordDetails=async()=>{
-    if(!recordId) return;
-    const url=`${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`
-    const response=await fetch(url)
+
+  const getRecordDetails = async () => {
+    if (!recordId) return;
+    const url = `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`
+    const response = await fetch(url)
     // console.log(response,"Record Response");
-    const dbResponse=await response.json()
-    console.log(dbResponse,"DbResponse Hereee")
-    if(dbResponse.data){
-    const {formFields,formButtons,tabs,module}=dbResponse.data
-    setFormFields(formFields)
-    setFormButtons(formButtons)
-    setTabs(tabs)
-    setModule(module)
+    const dbResponse = await response.json()
+    console.log(dbResponse, "DbResponse Hereee")
+    if (dbResponse.data) {
+      const { formFields, formButtons, tabs, module } = dbResponse.data
+      setFormFields(formFields)
+      setFormButtons(formButtons)
+      setTabs(tabs)
+      setModule(module)
     }
   }
-  
-  useEffect(()=>{
-    if(recordId){
+
+  useEffect(() => {
+    if (recordId) {
       getRecordDetails()
     }
-  },[])
-  
-  
+  }, [])
+  console.log(titleObj,"title Obj Hereee")
+
+
   return (
     <>
       <div className="h-[92vh] overflow-y-auto p-8 no-scrollbar">
@@ -170,22 +190,71 @@ export default function FormDesignerPage({recordId:propRecordId}) {
                   </TabItem>
                 </TabsContainer>
               </div>
-              <div className="relative">
-                <select
-                  value={module}
-                  style={{ height: 40, width: 200 }}
-                  onChange={(e) => setModule(e.target.value)}
-                  className="w-48 h-20 p-2 border rounded"
-                  placeholder="Select Module"
+              {/* <div className="relative">
+  <select
+    value={module}
+    onChange={(e) => setModule(e.target.value)}
+    className="w-48 h-10 p-2 border rounded"
+  >
+    <option value="">Select Module</option>
+    {titleOptions.map((option) => (
+      <option key={option.name} value={option.name}>
+        {option.name}
+      </option>
+    ))}
+  </select>
+            </div> */}
+              <div className="relative inline-block w-48">
+                <button
+                  onClick={() => setTitleObj(prev => ({ ...prev, open: !prev.open }))}
+                  className="w-full h-10 border rounded px-3 text-left bg-white flex items-center justify-between"
                 >
-                  <option value="">Select Module</option>
-                  {titleOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+                  {titleObj.title || "Select Module"}
+                  <span className="text-gray-500">▾</span>
+                </button>
+
+                {titleObj.open && (
+                  <div className="absolute left-0 mt-1 w-full bg-white border rounded shadow-md z-10">
+                    {titleOptions.map((option) => (
+                      <div
+                        key={option.name}
+                        className="relative group px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                        onMouseEnter={() => setTitleObj(prev => ({ ...prev, hovered: option.name }))}
+                        onMouseLeave={() => setTitleObj(prev => ({ ...prev, hovered: "" }))}
+                      >
+                        <div
+                          className="flex justify-between items-center"
+                          onClick={() => {
+                            if (!option.subModules.length) {
+                              setTitleObj(prev => ({ ...prev, title: option.name, open: false }));
+                            }
+                          }}
+                        >
+                          <span>{option.name}</span>
+                          {option.subModules.length > 0 && <span className="text-gray-400">›</span>}
+                        </div>
+
+                        {/* Submodules */}
+                        {option.subModules.length > 0 && titleObj.hovered === option.name && (
+                          <div className="absolute left-full top-0 ml-1 w-40 bg-white border rounded shadow-md z-20">
+                            {option.subModules.map((sub) => (
+                              <div
+                                key={sub}
+                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => setTitleObj(prev => ({ ...prev, title: sub, open: false }))}
+                              >
+                                {sub}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
+
+
             </div>
           </div>
 

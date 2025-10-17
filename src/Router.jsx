@@ -54,38 +54,28 @@ import DemoForm from "./modules/GreetingPage/pages/DemoForm.jsx";
 import GroupTableCreateView from "./modules/Admin-Portal/Tables/GroupTable/GroupTableCreateView/GroupTableCreateView.jsx";
 import GroupTableDetailView from "./modules/Admin-Portal/Tables/GroupTable/GroupTableDetailView/GroupTableDetailView.jsx";
 import GroupTableListView from "./modules/Admin-Portal/Tables/GroupTable/GroupTableListView.jsx";
-
 import Help from "./modules/Admin-Portal/Help/pages/Help.jsx";
-
 import LocationDetailView from "./modules/Admin-Portal/Tables/LocationsTable/LocationDetailView/LocationDetailView";
 import LocationsTableListView from "./modules/Admin-Portal/Tables/LocationsTable/LocationsTableListView";
 import LinkedInSignInButton from "./modules/Admin-Portal/Apps/components/LinkedIn/LinkedIn.jsx";
-
 import MyGroupTickets from "./modules/Admin-Portal/MyGroupsTickets/pages/MyGroupTickets.jsx";
 import MyTickets from "./modules/Admin-Portal/MyTickets/pages/MyTickets.jsx";
 import MyCalendar from "./modules/Admin-Portal/Calender/pages/Calender";
-
 import NotificationTemplates from "./modules/Admin-Portal/Notifications/pages/NotificationTemplates";
-
 import PreviewNotification from "./modules/Admin-Portal/Notifications/pages/PreviewNotification.jsx";
 import PreviewTemplate from "./modules/Admin-Portal/Templates/pages/TemplatePreview";
 import PreviewFeedback from "./modules/Admin-Portal/Feedback/pages/PreviewFeedback.jsx";
-
 import Recieved from "./modules/Admin-Portal/Inbox/Recieved/Recieved";
 import Register from "./modules/SignupPage/pages/Register.jsx";
 import RoleDetailedView from "./modules/Admin-Portal/Tables/RolesTable/pages/RoleDetailedView.jsx";
 import RolesTable from "./modules/Admin-Portal/Tables/RolesTable/pages/Rolestable.jsx";
 import CreateRole from "./modules/Admin-Portal/Tables/RolesTable/pages/CreateRole.jsx";
-
 import Scheduled from "./modules/Admin-Portal/Inbox/Scheduled/Scheduled";
 import Send from "./modules/Admin-Portal/Inbox/Send/Send";
-import TemplateCards from "./modules/Admin-Portal/Templates/pages/TemplateCards";
 import TicketDetailsView from "./modules/Admin-Portal/TicketDetailsView/TicketDetailsView";
 import Trash from "./modules/Admin-Portal/Inbox/Trash/Trash";
-
 import UserDetailedView from "./modules/Admin-Portal/Tables/UsersTable/UserDetailedView/UserDetailedView.jsx";
 import UsersTable from "./modules/Admin-Portal/Tables/UsersTable/UsersTable.jsx";
-
 import WorkflowComponent from "./modules/Admin-Portal/WorkflowAutomator/pages/WorkflowV2/WorkflowV2";
 import WorkflowTemplateCards from "./modules/Admin-Portal/WorkflowAutomator/pages/WorkflowTemplateCards/WorkflowTemplateCards";
 import WhatsApp from "./modules/Admin-Portal/Apps/components/WhatsApp/WhatsApp.jsx";

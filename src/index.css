@@ -605,6 +605,33 @@ button:focus-visible {
 body, html, #root, .App {
   overflow: visible !important;
 }
+/* For Chrome, Edge, Safari */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;      /* scrollbar width */
+  height: 4px;     /* scrollbar height for horizontal scrolling */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* track background */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.4); /* scrollbar color */
+  border-radius: 9999px; /* rounded thumb */
+  border: none;   
+      /* removes default border */
+}
+
+/* Remove arrows (stepper buttons) in Webkit */
+.custom-scrollbar::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* For Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;          /* makes scrollbar thin */
+  scrollbar-color: rgba(0,0,0,0.4) transparent; /* thumb and track */
+}
 
 
 
