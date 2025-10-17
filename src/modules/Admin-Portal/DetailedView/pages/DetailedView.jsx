@@ -206,7 +206,7 @@ export default function DetailedView({ recordId, tableName, formData }) {
             key={btn._id}
             type="button"
             onClick={() => handleButtonClick(btn)}
-            className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className="py-2 px-4 !bg-blue-500 text-white !rounded-md hover:bg-blue-600"
           >
             {btn.label}
           </button>
@@ -214,14 +214,14 @@ export default function DetailedView({ recordId, tableName, formData }) {
         <button
           type="button"
           onClick={handleSave}
-          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          className="py-2 px-4 !bg-blue-500 text-white !rounded-md hover:bg-blue-600"
         >
           Save
         </button>
         <button
           type="button"
           onClick={handleUpdate}
-          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          className="py-2 px-4 !bg-blue-500 text-white !rounded-md hover:bg-blue-600"
         >
           Update
         </button>
@@ -258,7 +258,7 @@ export default function DetailedView({ recordId, tableName, formData }) {
                         key={btn._id}
                         type="button"
                         onClick={() => handleButtonClick(btn)}
-                        className="py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600"
+                        className="py-2 px-4 !bg-green-500 text-white rounded-md hover:bg-green-600"
                       >
                         {btn.label}
                       </button>

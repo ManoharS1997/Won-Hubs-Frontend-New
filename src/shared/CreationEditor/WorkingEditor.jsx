@@ -26,10 +26,9 @@ import {
 import { VscTextSize } from "react-icons/vsc";
 import { IoColorPalette } from "react-icons/io5";
 import { IoMdAdd } from "react-icons/io";
-import { FinishBtn } from '../../modules/Admin-Portal/Notifications/pages/StyledNotificationTemlates';
-import renderIcons from '../functions/renderIcons';
 import { useNavigate } from 'react-router-dom';
 import mammoth from 'mammoth';
+import EditableFields from './EditableFields';
 
 const fieldsList = [
   { fieldName: 'Address', isAdded: false, value: 'India  -6-284-1, Uma Shankar Nagar, Revenue Ward -17 , YSR Tadigadapa, 520007.' },
@@ -600,10 +599,10 @@ const EditorRichUI = ({ path }) => {
       editorRef.current.innerHTML = savedContent;
     }
   }, []);
-  // console.log(detailsObject, "@@@")
+
   return (
-    <div className='flex h-full w-[100%] '>
-      <div className="hidden w-[17vw] h-full md:flex flex-col p-4 bg-[#353535] text-white overflow-y-auto">
+    <div className='flex h-[100%] w-[100%]'>
+      <div className="hidden w-[17vw] h-full md:flex flex-col p-4 bg-[#353535] text-white overflow-y-auto custom-scrollbar">
         <h2 className="text-center">Additional Fields</h2>
         <ul className="flex flex-col gap-[10px] pl-0">
           {fieldsListData.map((item) =>
@@ -620,51 +619,48 @@ const EditorRichUI = ({ path }) => {
           )}
         </ul>
       </div>
-      <div className='border-2 overflow-y-auto'>
-        <div className='w-full flex items-end justify-end p-2'>
-          <button
-            className="
-    bg-black text-white 
-    flex items-center justify-between 
-    px-4 py-1 
-    font-bold 
-    outline-none 
-    cursor-pointer 
-    border-none 
-    h-full 
-    transition-transform duration-500 ease-in-out 
-    ml-auto 
-    !rounded-full
-    group
-    border-1
-  "
-            type="button"
-            onClick={saveContentToLocalStorage}
-          >
-            <span>Finish</span>
-            <svg
-              className="transition-transform duration-500 ease-in-out transform group-hover:translate-x-[10px]"
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="40"
-              fill="currentColor"
-              viewBox="0 0 16 16"
+      <div className='overflow-y-auto custom-scrollbar p-0 m-0 w-full'>
+        <div className="flex items-start gap-4 w-full mt-2">
+          {/* Editable Fields */}
+          <div className="flex-1">
+            <EditableFields />
+          </div>
+          {/* Finish Button */}
+          <div className="flex items-end mt-2">
+            <button
+              className="
+        bg-black text-white 
+        flex items-center justify-between 
+        px-4 py-1 
+        font-bold 
+        outline-none 
+        cursor-pointer 
+        h-full 
+        transition-transform duration-500 ease-in-out 
+        !rounded-full
+        group
+      "
+              type="button"
+              onClick={saveContentToLocalStorage}
             >
-              <path d="M1 8h14M9 3l6 5-6 5" />
-            </svg>
-          </button>
+              <span>Finish</span>
+              <svg
+                className="transition-transform duration-500 ease-in-out transform group-hover:translate-x-[10px]"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="40"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path d="M1 8h14M9 3l6 5-6 5" />
+              </svg>
+            </button>
+          </div>
         </div>
-        <div>
-          <p>Fields:</p>
-          {Object.entries(detailsObject).map(([key, value]) => (
-            <div key={key} className='flex gap-2 border-2'>
-              <p className='mt-2'>{key} :</p>
-              <input id={key} value={value?.value} />
-            </div>
-          ))}
-        </div>
-        <div className="w-[83vw] min-h-[90%] mt-10">
-          <div style={{ maxWidth: 980, margin: '20px auto', border: '2px solid #dcdcdc', borderRadius: 8 }}>
+
+        <div className="w-[79vw] min-h-[95%] mt-10 mx-auto  p-0">
+          <div style={{ maxWidth:"97%" ,margin: '20px auto', border: '2px solid #dcdcdc', borderRadius: 8, minHeight: "95%", maxHeight:"98%" }} 
+          className='!mr-2 flex-1'>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '1rem', borderBottom: '1px solid #eee', background: '#fafafa', alignItems: 'center' }}>
               {/* Formatting */}
               <ToolButton id="bold" Icon={FaBold} title="Bold" activeState={active.bold} />
