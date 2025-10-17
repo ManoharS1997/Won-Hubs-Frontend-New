@@ -95,7 +95,7 @@ export default function TableComponent({
   recordsPerPage, allowDeleting, createNewPath,
   id, tableData, TableColumnNames, setTableColumnNames,
   showConfigurefieldsBtn, selectedRows, tableName, title,
-  fetchTableData, rdtColValue, redirectionPath,
+  fetchTableData, rdtColValue, redirectionPath,formData
 }) {
 
   const [recievedTableData, setTableData] = useState(tableData)
@@ -138,6 +138,8 @@ export default function TableComponent({
   useEffect(() => {
     updateSelectedColumns()
   }, [selectedColumns])
+
+  console.log(formData, "====")
 
   const SelectedRowActionsList = ['Delete', 'Mark As Favorite', 'Move', 'Copy']
 
@@ -523,7 +525,7 @@ export default function TableComponent({
       case 'designs':
         return <FormDesignerPage recordId={selectedTab} />
       default:
-        return <DetailedView recordId={selectedTab} tableName={tableName} />
+        return <DetailedView recordId={selectedTab} tableName={tableName} formData={formData}/>
 
     }
   };

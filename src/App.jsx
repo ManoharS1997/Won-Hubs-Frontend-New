@@ -158,7 +158,7 @@ export default function App() {
     const id = setInterval(() => {
       // Periodic tasks (e.g., check emails, run flows)
       // checkEmails()
-      CheckAllChannels()
+      // CheckAllChannels()
     }, 10 * 1000)
 
     return () => clearInterval(id)
