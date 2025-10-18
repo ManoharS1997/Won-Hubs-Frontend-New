@@ -158,6 +158,7 @@ import TemplateSelectionForTemplate from "./modules/Admin-Portal/Templates/pages
 import CreateEditor from "./shared/CreationEditor/CreateEditor.jsx";
 import SlateEditor from "./shared/CreationEditor/CreateEditor.jsx";
 import EditorRichUI from "./shared/CreationEditor/WorkingEditor.jsx";
+import PreviewEditor from "./shared/CreationEditor/PreviewEditor.jsx";
 
 const router = createBrowserRouter([
   // Public routes (no authentication required)
@@ -784,6 +785,10 @@ const router = createBrowserRouter([
           {
             path: "/user/ticket/:id",
             element: <UserTicketDetailedView />,
+          },
+           {
+            path: "/:path/preview",
+            element: <PreviewEditor />,
           },
         ],
       },
