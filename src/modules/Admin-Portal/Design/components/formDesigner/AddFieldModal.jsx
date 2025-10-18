@@ -9,18 +9,15 @@ const FIELD_TYPES = [
   { value: "number", label: "Number" },
   { value: "tel", label: "Phone" },
   { value: "url", label: "URL" },
-
   { value: "date", label: "Date" },
   { value: "time", label: "Time" },
   { value: "month", label: "Month" },
   { value: "week", label: "Week" },
-
   { value: "dropdown", label: "Dropdown (Select)" },
   { value: "radio", label: "Radio Buttons" },
   { value: "checkbox", label: "Checkbox" },
   { value: "switch", label: "Toggle Switch" },
   { value: "multi-select", label: "Multi-Select" },
-
   { value: "file", label: "File Upload" },
   { value: "image", label: "Image Upload" },
   { value: "signature", label: "Signature Pad" },
@@ -32,9 +29,10 @@ export default function AddFieldModal({ open, onClose, onSubmit }) {
   const [type, setType] = useState("text");
   const [options, setOptions] = useState([""]);
   const [maxRating, setMaxRating] = useState(5);
+  const [required, setRequired] = useState(false); // ✅ new state
 
   const handleSubmit = () => {
-    let fieldData = { label, type };
+    let fieldData = { label, type, required };
 
     if (
       ["dropdown", "radio", "multi-select", "switch", "checkbox"].includes(type)
@@ -43,10 +41,13 @@ export default function AddFieldModal({ open, onClose, onSubmit }) {
     }
 
     onSubmit(fieldData);
+
+    // reset form
     setLabel("");
     setType("text");
     setOptions([""]);
     setMaxRating(5);
+    setRequired(false);
   };
 
   const handleOptionChange = (index, value) => {
@@ -102,6 +103,7 @@ export default function AddFieldModal({ open, onClose, onSubmit }) {
           ))}
         </select>
 
+        {/* Options Field (for dropdown, radio, etc.) */}
         {["dropdown", "radio", "multi-select", "switch", "checkbox"].includes(
           type
         ) && (
@@ -141,6 +143,7 @@ export default function AddFieldModal({ open, onClose, onSubmit }) {
           </div>
         )}
 
+        {/* Rating Field */}
         {type === "rating" && (
           <div className="mb-4">
             <label className="block mb-2 text-sm font-medium text-gray-700">
@@ -156,6 +159,23 @@ export default function AddFieldModal({ open, onClose, onSubmit }) {
             />
           </div>
         )}
+
+        {/* ✅ Required Checkbox */}
+        <div className="flex items-center mb-5 mt-3 gap-2">
+          <input
+            id="required"
+            type="checkbox"
+            checked={required}
+            onChange={(e) => setRequired(e.target.checked)}
+            className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+          />
+          <label
+            htmlFor="required"
+            className="text-sm font-medium text-gray-700"
+          >
+            Mark as required
+          </label>
+        </div>
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-3">

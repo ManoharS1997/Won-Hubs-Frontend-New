@@ -7,23 +7,21 @@ import AddButtonEventModal from "./AddButtonEventModal";
 const PREDEFINED_TABS = ["History", "Settings"];
 
 const PREDEFINED_FIELDS = [
-  { type: "text", label: "Text" },
-  { type: "email", label: "Email" },
-  { type: "number", label: "Number" },
-  { type: "date", label: "Date" },
-  { type: "time", label: "Time" },
-  {
-    type: "dropdown",
-    label: "Dropdown",
-    options: ["Option 1", "Option 2", "Option 3"],
-  },
-  { type: "radio", label: "Radio", options: ["Option A", "Option B"] },
-  { type: "checkbox", label: "Checkbox", options: ["Check 1", "Check 2"] },
+  { type: "text", label: "Id" },
+  { type: "text", label: "Name" },
+  { type: "text", label: "Channel" },
+  { type: "text", label: "Org Id" },
+  { type: "text", label: "Action Plan" },
+  { type: "text", label: "External Notes" },
+  { type: "text", label: "Internal Notes" },
+  { type: "text", label: "Label" },
+  { type: "text", label: "On Behalf Of" },
 ];
 
 const PREDEFINED_BUTTONS = [
   { type: "submit", label: "Submit" },
-  { type: "reset", label: "Reset" },
+  { type: "update", label: "Update" },
+  { type: "delete", label: "Delete" },
 ];
 
 const TABLE_ACTIONS = [
@@ -142,6 +140,7 @@ function Tab({
   addTabColumn,
   removeTab,
   addCustomButton,
+  toggleRequired,
 }) {
   return (
     <section className="bg-indigo-50 rounded-lg p-6 shadow-md w-full mb-2.5">
@@ -221,23 +220,39 @@ function Tab({
 
             {/* Responsive grid layout for dropped fields */}
             {tab.fields.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 {tab.fields.map((field, idx) => (
                   <div
                     key={field.name}
                     className="flex justify-between items-center bg-white rounded px-4 py-2 shadow-sm hover:shadow-md transition"
                   >
-                    <span>
-                      {field.label}{" "}
+                    <div>
+                      <span className="font-medium">{field.label}</span>{" "}
                       <small className="text-indigo-500">({field.type})</small>
-                    </span>
-                    <button
-                      onClick={() => removeField(tabIdx, idx)}
-                      className="text-red-600 hover:text-red-800 rounded focus:outline-none"
-                      aria-label="Remove field"
-                    >
-                      &times;
-                    </button>
+                      {field.required && (
+                        <span className="text-red-500 text-sm ml-1">*</span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => toggleRequired(tabIdx, idx)}
+                        className={`text-sm font-semibold ${
+                          field.required ? "text-red-500" : "text-gray-400"
+                        } hover:text-red-600 transition`}
+                        title="Toggle required"
+                      >
+                        {field.required ? "Req" : "Opt"}
+                      </button>
+
+                      <button
+                        onClick={() => removeField(tabIdx, idx)}
+                        className="text-red-600 hover:text-red-800 rounded focus:outline-none"
+                        aria-label="Remove field"
+                      >
+                        &times;
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -278,7 +293,7 @@ function Tab({
 
             {/* Responsive grid layout for dropped buttons */}
             {tab.buttons.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 {tab.buttons.map((button, idx) => (
                   <div
                     key={idx}
@@ -450,6 +465,7 @@ Tab.propTypes = {
   addTabButton: PropTypes.func.isRequired,
   removeTab: PropTypes.func.isRequired,
   addCustomButton: PropTypes.func.isRequired,
+  toggleRequired: PropTypes.func.isRequired,
 };
 
 function TabsDesigner({
@@ -471,6 +487,7 @@ function TabsDesigner({
   removeTab,
   updateTabFilters,
   addCustomButton,
+  toggleRequired,
 }) {
   return (
     <section className="bg-white rounded-lg  mx-auto mt-2 min-h-full">
@@ -576,6 +593,7 @@ function TabsDesigner({
                 openAddFieldModal={addCustomField}
                 removeTab={removeTab}
                 addCustomButton={addCustomButton}
+                toggleRequired={toggleRequired}
               />
             ))}
           </div>
@@ -604,6 +622,7 @@ TabsDesigner.propTypes = {
   updateTabFilters: PropTypes.func.isRequired,
   tabsList: PropTypes.func.isRequired,
   addCustomButton: PropTypes.func.isRequired,
+  toggleRequired: PropTypes.func.isRequired,
 };
 
 TabDesigner.propTypes = {
@@ -712,8 +731,27 @@ export default function TabDesigner({ tabs, setTabs, module }) {
               ...tab,
               fields: [
                 ...tab.fields,
-                { ...field, name: `${field.label}-${tab.fields.length}` },
+                {
+                  ...field,
+                  required: !!field.required,
+                  name: `${field.label}-${tab.fields.length}`,
+                },
               ],
+            }
+          : tab
+      )
+    );
+  };
+
+  const toggleRequired = (tabIdx, fieldIdx) => {
+    setTabs((prev) =>
+      prev.map((tab, i) =>
+        i === tabIdx
+          ? {
+              ...tab,
+              fields: tab.fields.map((field, j) =>
+                j === fieldIdx ? { ...field, required: !field.required } : field
+              ),
             }
           : tab
       )
@@ -854,6 +892,7 @@ export default function TabDesigner({ tabs, setTabs, module }) {
         removeTab={removeTab}
         updateTabFilters={updateTabFilters}
         addCustomButton={addCustomButton}
+        toggleRequired={toggleRequired}
       />
       <AddFieldModal
         open={showAddFieldModal}
