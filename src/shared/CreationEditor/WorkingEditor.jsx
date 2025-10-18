@@ -55,7 +55,8 @@ const FONT_SIZE_MAP = {
   '20px': 6,
   '24px': 7,
 };
-const EditorRichUI = ({ path }) => {
+const EditorRichUI = (props) => {
+  console.log(props,"Path here jhvbdsfjbfdhgb")
   const editorRef = useRef(null);
   const fileInputRef = useRef(null);
   const savedCollection = useRef(null);
@@ -590,8 +591,9 @@ const EditorRichUI = ({ path }) => {
     const content = editorRef.current?.innerHTML || "";
     console.log(content, "Content Here")
     localStorage.setItem("editorContent", content);
-    Navigate(`/${path}/preview`);
+    Navigate(`/notifications/preview/testing`);
   };
+
   useEffect(() => {
     const savedContent = localStorage.getItem("editorContent");
     if (savedContent && editorRef.current) {

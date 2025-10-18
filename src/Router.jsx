@@ -270,11 +270,11 @@ const router = createBrowserRouter([
     element: <BecomePartner />,
   },
   {
-    path:'/testing',
-   element:<EditorRichUI />
-          },
+    path: '/testing',
+    element: <EditorRichUI />
+  },
 
-           
+
   // MFA authentication routes
   {
     path: "/email-MFA",
@@ -313,7 +313,7 @@ const router = createBrowserRouter([
   // Protected routes (require authentication)
   {
     element: <ProtectedRoute />,
-   children: [
+    children: [
       // Admin layout routes
       {
         element: <Layout />,
@@ -649,7 +649,7 @@ const router = createBrowserRouter([
             path: "/template/new",
             element: <CreateTemplate />,
           },
-          
+
           {
             path: "/template-preview",
             element: <PreviewTemplate />,
@@ -664,7 +664,7 @@ const router = createBrowserRouter([
           // },
           {
             path: "/notifications/:id",
-            element:<EditorRichUI />
+            element: <EditorRichUI />
           },
           {
             path: "/notification-preview",
@@ -674,7 +674,7 @@ const router = createBrowserRouter([
             path: "/PreviewFeedback",
             element: <PreviewFeedback />,
           },
-             {
+          {
             path: "/PreviewAlert",
             element: <PreviewAlerts />,
           },
@@ -718,7 +718,11 @@ const router = createBrowserRouter([
             path: "/apps",
             element: <Apps />,
           },
-          
+          {
+            path: "/notifications/preview/testing",
+            element: <PreviewEditor />,
+          },
+
         ],
       },
       // User portal layout routes
@@ -786,10 +790,7 @@ const router = createBrowserRouter([
             path: "/user/ticket/:id",
             element: <UserTicketDetailedView />,
           },
-           {
-            path: "/:path/preview",
-            element: <PreviewEditor />,
-          },
+
         ],
       },
     ],

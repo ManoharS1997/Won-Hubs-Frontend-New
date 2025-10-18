@@ -80,7 +80,7 @@ export default function DetailedView({ recordId, tableName, formData }) {
     if (tab.type === "form") {
       console.log(tab, "ppppp");
       return (
-        <div className="p-4 grid md:grid-cols-2 gap-4">
+        <div >
           {tab.fields?.length > 0 ? (
             // tab.fields.map((field) => (
             //   <FormInput
