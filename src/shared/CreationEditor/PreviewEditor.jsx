@@ -77,39 +77,42 @@ const PreviewEditor = ({ formData, onFinish }) => {
         //     ></div>
         //   </div>
         // </div>
-        <div>
-            <div className="h-[100%] w-100%">
-                <div className="flex justify-between p-2">
-                    <div className="mt-10 flex">
-                        <button>{renderIcons("IoIosArrowBack")}</button>
-                        <h4>Title Displays Here</h4>
-                    </div>
-                    <div className="mt-10 ">
-                        <span className=" text-gray-400">{data.timestamp}</span>
-                    </div>
+        <div className="overflow-hidden">
+            <div className="h-[100%] w-[100%] ">
+                <div className="mt-3 mb-2  min-h-[5vh]  px-3">
+                    <button className="mt-10">{renderIcons("IoIosArrowBack", 25)}</button>
+                    <button onClick={onFinish} className="float-right px-4 py-2 !bg-[#150363] hover:bg-blue-700 text-white !rounded-lg ml-8">Finish</button>
+                </div>
+
+                
+                <div className="flex justify-between px-4 mb-1">
+                    <h4 className='mb-1'>Title Displays Here</h4>
+                    <span className=" text-gray-400 text-[15px]">{data.timestamp}</span>
                 </div>
                 <div className="flex justify-between w-[98%]">
                     {/* subject Container */}
-                <div className="ml-5 px-3">
-                    <div className="flex gap-2">
-                    <span>From Email Displays here</span>
-                  <button onClick={() => setShowCC(!showCC)}> <span>{renderIcons("GoTriangleDown",22,"grey")}</span></button>
-                  </div>
-                {showCC && <p className="text-gray-500">cc1@example.com, cc2@example.com,cc3@example.com</p>}
-                </div>
-                <div>
-                    <span className="text-blue-700">toemail@gmail.com</span>
-                </div>
+                    <div className="ml-5 px-3">
+                        <div className="flex gap-2">
+                            <span className="text-[15px] font-bold mb-1">from@gmail.com</span>
+                            <button onClick={() => setShowCC(!showCC)}> <span>{renderIcons("GoTriangleDown", 22, "grey")}</span></button>
+                        </div>
+                        {showCC && <p className="text-gray-500 mb-0 p-0 m-0">cc1@example.com, cc2@example.com,cc3@example.com</p>}
+                    </div>
+                    <div>
+                        <span className="text-blue-700 text-[15px] font-bold">toemail@gmail.com</span>
+                    </div>
                 </div>
                 <div className="p-2 ml-6">
-                <h4 className='m-0 p-0 mb-1'>Subject Displays Here : Diwali Wishes</h4>
-                <p className='m-0 p-0 text-gray-800 ml-3'>Subject Description Displays Here if it extends line 1 line 333ghgrfhgb</p>
+                    <p className="text-[17px] font-bold mb-1">Subject  :   Diwali Wishes</p>
+                    <div className="ml-20 mt-2">
+                        <p className='m-0 p-0 text-gray-600'>Subject Description Displays Here Subject Description Displays Here Subject Description Displays Here Subject Description Displays Here </p>
+                    </div>
                 </div>
                 {/* Content Container */}
-                <div className="flex min-h-[70vh]">
-                <div className="border border-gray-300 rounded-md m-5 p-5 min-h-full w-[80%]">
-                    <p>Content Displays Here</p>
-                </div>
+                <div className="flex min-h-[66vh] mt-0">
+                    <div className="border border-gray-300 rounded-md m-5 p-5 min-h-[90%] w-[96%]">
+                        <p>Content Displays Here</p>
+                    </div>
                 </div>
             </div>
         </div>
