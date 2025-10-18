@@ -593,7 +593,7 @@ import EditorRichUI from '../../../../shared/CreationEditor/WorkingEditor'
 // }
 // export default CreateNotification
 
-const createNotification=()=>{
+const CreateNotification=()=>{
   const [notificationData,setNotificationData]=useState({})
   return (
     <div className='h-[100%] w-[100%] hidden'>
@@ -601,4 +601,4 @@ const createNotification=()=>{
     </div>
   )
 }
-export default createNotification
+export default CreateNotification

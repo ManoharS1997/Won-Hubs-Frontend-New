@@ -220,9 +220,9 @@ export default function SourceForm({ formFields = [], formButtons = [] }) {
   };
 
   return (
-    <div className="w-full h-fit bg-white p-6 overflow-y-auto rounded-b-[0.5rem]">
+    <div className="w-[100%] h-fit bg-white p-6 overflow-y-auto rounded-b-[0.5rem]">
       {/* Form Fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full !min-w-[100%]">
         {formFields.map((field, idx) => (
           <div key={field?.name || idx}>
             <ItemCheck field={field} formValues={formValues} handleChange={handleChange} />
@@ -241,8 +241,8 @@ export default function SourceForm({ formFields = [], formButtons = [] }) {
               disabled={loadingBtn === btn._id}
               className={`px-6 py-2 text-white rounded transition-all ${
                 loadingBtn === btn._id
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+                  ? "!bg-gray-400 cursor-not-allowed"
+                  : "!bg-blue-600 hover:bg-blue-700"
               }`}
             >
               {loadingBtn === btn._id ? "Processing..." : btn.label}

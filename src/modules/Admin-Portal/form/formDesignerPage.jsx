@@ -5,6 +5,7 @@ import TabDesigner from "../Design/components/formDesigner/TabDesigner";
 import { useLocation } from "react-router-dom";
 import AddButtonEventModal from "../Design/components/formDesigner/AddButtonEventModal";
 import { TabsContainer, TabItem } from "../MyTickets/pages/StyledComponents";
+import { set } from "date-fns";
 
 export default function FormDesignerPage({ recordId: propRecordId }) {
 
@@ -206,7 +207,10 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
             </div> */}
               <div className="relative inline-block w-48">
                 <button
-                  onClick={() => setTitleObj(prev => ({ ...prev, open: !prev.open }))}
+                  onClick={() => {
+                    setTitleObj(prev => ({ ...prev, open: !prev.open }));
+                  
+                  }}
                   className="w-full h-10 border rounded px-3 text-left bg-white flex items-center justify-between"
                 >
                   {titleObj.title || "Select Module"}
@@ -227,6 +231,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                           onClick={() => {
                             if (!option.subModules.length) {
                               setTitleObj(prev => ({ ...prev, title: option.name, open: false }));
+                              setModule(option.name); 
                             }
                           }}
                         >
@@ -241,7 +246,10 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                               <div
                                 key={sub}
                                 className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                                onClick={() => setTitleObj(prev => ({ ...prev, title: sub, open: false }))}
+                                onClick={() =>{
+                                  setTitleObj(prev => ({ ...prev, title: sub, open: false }))
+                                  setModule(sub);
+                                }}
                               >
                                 {sub}
                               </div>

@@ -58,6 +58,7 @@ import { FaPhoneAlt,FaFax  } from "react-icons/fa";
 import { RiShieldKeyholeLine } from "react-icons/ri";
 import { TiTabsOutline } from "react-icons/ti";
 import { BsFillCaretDownFill,BsFillCaretUpFill  } from "react-icons/bs";
+import { GoTriangleDown } from "react-icons/go";
 const iconMap = {
   BsPersonWorkspace, HiViewBoards, HiUserGroup, RiSettings5Fill, HiDotsHorizontal,
   RxOpenInNewWindow, MdOutlineManageAccounts, RiDeleteBinLine, IoMdAdd, GrRadialSelected,
@@ -79,7 +80,7 @@ const iconMap = {
   MdOutlineDescription, FaTools, FaUserLarge, RiUserCommunityLine, TbNumber123, CiUser, VscTools,
   SlCloudUpload, IoGlobe, GoGrabber, IoChevronBackOutline, MdDoubleArrow, AiOutlineSwap, CgArrowsExchangeAltV,
   RiKey2Line,RiAdminLine ,FaSitemap,FaPassport,BiDetail,FaPhoneAlt,FaFax ,FaMoneyBills ,RiShieldKeyholeLine,
-  FaCrosshairs ,FaUserTag,TiTabsOutline,BsFillCaretDownFill,BsFillCaretUpFill 
+  FaCrosshairs ,FaUserTag,TiTabsOutline,BsFillCaretDownFill,BsFillCaretUpFill ,GoTriangleDown
 
 };
 
