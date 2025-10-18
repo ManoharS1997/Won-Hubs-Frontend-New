@@ -597,7 +597,7 @@ const createNotification=()=>{
   const [notificationData,setNotificationData]=useState({})
   return (
     <div className='h-[100%] w-[100%] hidden'>
-      <EditorRichUI />
+      <EditorRichUI path="notification" />
     </div>
   )
 }

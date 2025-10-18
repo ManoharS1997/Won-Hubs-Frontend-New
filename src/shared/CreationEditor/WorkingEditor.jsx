@@ -85,7 +85,6 @@ const EditorRichUI = ({ path }) => {
   });
   const fontFamilies = ['Arial', 'Times New Roman', 'Courier New', 'Georgia', 'Verdana', 'Poppins', 'Roboto'];
   const fontSizes = ['12px', '14px', '16px', '18px', '20px', '24px', '28px'];
-
   const colorPalette = [
     '#000000', '#2C3E50', '#34495E', '#7F8C8D', '#BDC3C7',
     '#FFFFFF', '#FF0000', '#E91E63', '#9C27B0', '#673AB7',
@@ -591,7 +590,7 @@ const EditorRichUI = ({ path }) => {
     const content = editorRef.current?.innerHTML || "";
     console.log(content, "Content Here")
     localStorage.setItem("editorContent", content);
-    Navigate(path)
+    Navigate(`/${path}/preview`);
   };
   useEffect(() => {
     const savedContent = localStorage.getItem("editorContent");
@@ -643,7 +642,7 @@ const EditorRichUI = ({ path }) => {
               type="button"
               onClick={saveContentToLocalStorage}
             >
-              <span>Finish</span>
+              <span>Preview</span>
               <svg
                 className="transition-transform duration-500 ease-in-out transform group-hover:translate-x-[10px]"
                 xmlns="http://www.w3.org/2000/svg"
@@ -659,8 +658,8 @@ const EditorRichUI = ({ path }) => {
         </div>
 
         <div className="w-[79vw] min-h-[95%] mt-10 mx-auto  p-0">
-          <div style={{ maxWidth:"97%" ,margin: '20px auto', border: '2px solid #dcdcdc', borderRadius: 8, minHeight: "95%", maxHeight:"98%" }} 
-          className='!mr-2 flex-1'>
+          <div style={{ maxWidth: "97%", margin: '20px auto', border: '2px solid #dcdcdc', borderRadius: 8, minHeight: "95%", maxHeight: "98%" }}
+            className='!mr-2 flex-1'>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '1rem', borderBottom: '1px solid #eee', background: '#fafafa', alignItems: 'center' }}>
               {/* Formatting */}
               <ToolButton id="bold" Icon={FaBold} title="Bold" activeState={active.bold} />
@@ -712,11 +711,9 @@ const EditorRichUI = ({ path }) => {
                 style={{ display: 'none' }}
                 onChange={onWordFilePicked}
               />
-
               {/* Code */}
               <ToolButton id="code" Icon={FaCode} title="Insert Code Block" />
             </div>
-
             {/* <div
             ref={editorRef}
             contentEditable
