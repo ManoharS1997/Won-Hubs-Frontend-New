@@ -10,7 +10,7 @@ export default function PreviewModal({
   formButtons,
   tabs,
   state,
-  recordId
+  recordId,
 }) {
   const navigation = useNavigate();
   const [values, setValues] = useState({});
@@ -174,8 +174,10 @@ export default function PreviewModal({
     }
   };
 
+  console.log(tabs,"=====")
+
   const handleSave = async () => {
-    let Method=recordId ?"PUT":"POST"
+    let Method = recordId ? "PUT" : "POST";
     try {
       setSaving(true);
       const payload = {
@@ -183,6 +185,7 @@ export default function PreviewModal({
         formFields,
         formButtons,
         tabs,
+        column: twoColumn,
         departmentName: state?.departmentName,
         category: state?.category,
         selectedViews: state?.selectedViews,
@@ -190,8 +193,10 @@ export default function PreviewModal({
         selectedDepartments: state?.selectedDepartments,
       };
 
-      const url=recordId?`${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`:`${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer`
-    
+      const url = recordId
+        ? `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`
+        : `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer`;
+
       const res = await fetch(url, {
         method: Method,
         headers: { "Content-Type": "application/json" },
@@ -203,13 +208,13 @@ export default function PreviewModal({
       alert("Form saved successfully!");
       navigation("/create/new/design");
     } catch (err) {
-      console.log(err,"Error Heree")
+      console.log(err, "Error Heree");
       alert("Error saving form");
     } finally {
       setSaving(false);
     }
   };
-
+  console.log(twoColumn);
   return (
     <div className="bg-white rounded-xl p-2 w-full">
       {/* Header */}
@@ -343,12 +348,12 @@ export default function PreviewModal({
           }`}
         >
           {saving
-          ? recordId
-            ? "Updating..."
-            : "Saving..."
-          : recordId
-          ? "Update"
-          : "Save"}
+            ? recordId
+              ? "Updating..."
+              : "Saving..."
+            : recordId
+            ? "Update"
+            : "Save"}
         </button>
       </div>
     </div>
@@ -369,6 +374,7 @@ PreviewModal.propTypes = {
   formFields: PropTypes.arrayOf(PropTypes.object).isRequired,
   formButtons: PropTypes.arrayOf(PropTypes.object).isRequired,
   state: PropTypes.any.isRequired,
+  recordId: PropTypes.any.isRequired,
   tabs: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,

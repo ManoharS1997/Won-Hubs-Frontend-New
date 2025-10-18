@@ -5,25 +5,21 @@ import { useState } from "react";
 import renderIcons from "../../../../../shared/functions/renderIcons";
 
 const PREDEFINED_FIELDS = [
-  { type: "text", label: "Text" },
-  { type: "email", label: "Email" },
-  { type: "number", label: "Number" },
-  { type: "date", label: "Date" },
-  { type: "time", label: "Time" },
-  {
-    type: "dropdown",
-    label: "Dropdown",
-    options: ["Option 1", "Option 2", "Option 3"],
-  },
-  { type: "radio", label: "Radio", options: ["Option A", "Option B"] },
-  { type: "checkbox", label: "Checkbox", options: ["Check 1", "Check 2"] },
+  { type: "text", label: "Id" },
+  { type: "text", label: "Name" },
+  { type: "text", label: "Channel" },
+  { type: "text", label: "Org Id" },
+  { type: "text", label: "Action Plan" },
+  { type: "text", label: "External Notes" },
+  { type: "text", label: "Internal Notes" },
+  { type: "text", label: "Label" },
+  { type: "text", label: "On Behalf Of" },
 ];
 
 const PREDEFINED_BUTTONS = [
   { type: "submit", label: "Submit" },
-  { type: "reset", label: "Reset" },
   { type: "update", label: "Update" },
-  { type: "cancel", label: "Cancel" },
+  { type: "delete", label: "Delete" },
 ];
 
 export default function FormBuilder({
@@ -39,20 +35,32 @@ export default function FormBuilder({
   setFormFields,
 }) {
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
-  const onAddFieldModalSubmit = ({ label, type, options }) => {
+  const [filteredFields, setFilteredFields] = useState(PREDEFINED_FIELDS);
+  const [filteredButtons, setFilteredButtons] = useState(PREDEFINED_BUTTONS);
+
+  // When user submits Add Field Modal
+  const onAddFieldModalSubmit = ({ label, type, options, required }) => {
     setFormFields((prev) => [
       ...prev,
       {
         label,
         type,
         name: `${label}-${prev.length}`,
+        required: !!required,
         ...(options ? { options } : {}),
       },
     ]);
     setShowAddFieldModal(false);
   };
-  const [filteredFields, setFilteredFields] = useState(PREDEFINED_FIELDS);
-  const [filteredButtons, setFilteredButtons] = useState(PREDEFINED_BUTTONS);
+
+  // Toggle required flag for an existing field
+  const toggleRequired = (index) => {
+    setFormFields((prev) =>
+      prev.map((field, i) =>
+        i === index ? { ...field, required: !field.required } : field
+      )
+    );
+  };
 
   return (
     <section className="bg-white p-4 rounded-2xl shadow-lg border border-indigo-100 flex-grow min-w-[320px] transition">
@@ -70,14 +78,11 @@ export default function FormBuilder({
             Fields
           </h3>
           {/* Search Bar */}
-          <div
-            className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
-        mb-2"
-          >
+          <div className="flex items-center border border-[#ccc] rounded-md px-2 py-1 gap-2 mb-2">
             <input
               type="search"
               placeholder="Search Fields"
-              className=" outline-none px-2 py-1"
+              className="outline-none px-2 py-1"
               onChange={(e) => {
                 const query = e.target.value.toLowerCase();
                 setFilteredFields(
@@ -90,7 +95,8 @@ export default function FormBuilder({
             {renderIcons("FaSearch", 15, "gray")}
           </div>
         </div>
-        {/* Predefined Fields Section */}
+
+        {/* Predefined Fields */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
           {filteredFields.map((f) => (
             <DraggableButton
@@ -98,25 +104,16 @@ export default function FormBuilder({
               item={f}
               category="field"
               onDragStart={onDragStart}
-              className="
-                bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
-                border border-blue-600/40
-                text-white 
-                font-medium 
-                rounded-md 
-                px-5 py-2.5 
-                shadow-sm 
-                transition-all 
-                duration-300
+              className="bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
+                border border-blue-600/40 text-white font-medium rounded-md 
+                px-5 py-2.5 shadow-sm transition-all duration-300
                 hover:from-blue-700 hover:via-blue-900 hover:to-blue-500
-                hover:shadow-md 
-                active:scale-95
-                whitespace-nowrap
-              "
+                hover:shadow-md active:scale-95 whitespace-nowrap"
             >
               {f.label}
             </DraggableButton>
           ))}
+
           <div className="flex justify-between w-[97%] items-center">
             <button
               style={{ borderRadius: 6 }}
@@ -150,7 +147,7 @@ export default function FormBuilder({
             </p>
           )}
 
-          {/* Responsive grid layout */}
+          {/* Field List */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {formFields.map((field, i) => (
               <div
@@ -162,16 +159,29 @@ export default function FormBuilder({
                   <span className="text-gray-500 italic text-sm">
                     ({field.type})
                   </span>
+                  {field.required && (
+                    <span className="text-red-500 text-sm ml-1">*</span>
+                  )}
                 </div>
-                <button
-                  style={{ borderRadius: 8 }}
-                  onClick={() => removeField(i)}
-                  className="text-red-500 hover:text-red-700 text-lg font-bold transition"
-                  type="button"
-                  aria-label="Remove field"
-                >
-                  ×
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => toggleRequired(i)}
+                    title="Toggle required"
+                    className={`text-sm font-semibold ${
+                      field.required ? "text-red-500" : "text-gray-400"
+                    } hover:text-red-600 transition`}
+                  >
+                    {field.required ? "Req" : "Opt"}
+                  </button>
+                  <button
+                    onClick={() => removeField(i)}
+                    className="text-red-500 hover:text-red-700 text-lg font-bold transition"
+                    type="button"
+                    aria-label="Remove field"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -192,13 +202,10 @@ export default function FormBuilder({
           >
             Buttons
           </h3>
-          <div
-            className="flex items-center border-1 border-[#ccc] rounded-md px-2 py-1 gap-2
-        mb-2"
-          >
+          <div className="flex items-center border border-[#ccc] rounded-md px-2 py-1 gap-2 mb-2">
             <input
               type="search"
-              placeholder="Search Fields"
+              placeholder="Search Buttons"
               className="outline-none px-2 py-1"
               onChange={(e) => {
                 const query = e.target.value.toLowerCase();
@@ -212,7 +219,7 @@ export default function FormBuilder({
             {renderIcons("FaSearch", 15, "gray")}
           </div>
         </div>
-        {/* Predefined Buttons Section */}
+
         <div className="flex flex-wrap items-center gap-3 mb-2">
           {filteredButtons.map((b) => (
             <DraggableButton
@@ -220,28 +227,17 @@ export default function FormBuilder({
               item={b}
               category="button"
               onDragStart={onDragStart}
-              className="
-        bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
-        border border-blue-600/40
-        text-white 
-        font-medium 
-        rounded-md
-        px-5 py-2.5 
-        shadow-sm 
-        transition-all 
-        duration-300
-        hover:from-blue-700 hover:via-blue-900 hover:to-blue-500
-        hover:shadow-md 
-        active:scale-95
-        whitespace-nowrap
-      "
+              className="bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
+                border border-blue-600/40 text-white font-medium rounded-md
+                px-5 py-2.5 shadow-sm transition-all duration-300
+                hover:from-blue-700 hover:via-blue-900 hover:to-blue-500
+                hover:shadow-md active:scale-95 whitespace-nowrap"
             >
               {b.label}
             </DraggableButton>
           ))}
         </div>
 
-        {/* Separate row for "+ Custom" and "+more" buttons */}
         <div className="flex justify-between items-center w-full mt-2 mb-4">
           <button
             style={{ borderRadius: 8 }}
@@ -255,7 +251,6 @@ export default function FormBuilder({
           </button>
         </div>
 
-        {/* Drop Zone for Buttons */}
         <div
           className="border-2 border-dashed border-indigo-300 rounded-xl h-32 overflow-auto p-4 bg-indigo-50/30 hover:bg-indigo-50 transition"
           onDrop={onDropButton}
@@ -267,7 +262,6 @@ export default function FormBuilder({
             </p>
           )}
 
-          {/* Responsive grid layout */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {formButtons.map((btn, i) => (
               <div
@@ -295,16 +289,12 @@ export default function FormBuilder({
 FormBuilder.propTypes = {
   formFields: PropTypes.arrayOf(PropTypes.object).isRequired,
   formButtons: PropTypes.arrayOf(PropTypes.object).isRequired,
-  addCustomField: PropTypes.func.isRequired,
   addCustomButton: PropTypes.func.isRequired,
   onDragStart: PropTypes.func.isRequired,
-  onDrop: PropTypes.func.isRequired,
+  onDropField: PropTypes.func.isRequired,
+  onDropButton: PropTypes.func.isRequired,
   allowDrop: PropTypes.func.isRequired,
   removeField: PropTypes.func.isRequired,
   removeButton: PropTypes.func.isRequired,
-
-  // Separate handlers
-  onDropButton: PropTypes.func,
-  onDropField: PropTypes.func,
-  setFormFields: PropTypes.setFormFields,
+  setFormFields: PropTypes.func.isRequired,
 };
