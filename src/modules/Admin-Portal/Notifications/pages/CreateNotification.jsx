@@ -241,7 +241,7 @@ import EditorRichUI from '../../../../shared/CreationEditor/WorkingEditor'
 //             </FieldsList>
 //           </div>
 
-         
+
 //           <div className="relative w-[83vw] min-h-[90%] ">
 //             <div className="absolute right-8 z-10">
 //               <FinishBtn type="button"
@@ -593,11 +593,60 @@ import EditorRichUI from '../../../../shared/CreationEditor/WorkingEditor'
 // }
 // export default CreateNotification
 
-const CreateNotification=()=>{
-  const [notificationData,setNotificationData]=useState({})
+const CreateNotification = ({ recordId }) => {
+  // console.log(JSON.parse(localStorage.getItem("notificationData"),"Create Notification Page"))
+  const [notificationData, setNotificationData] = useState(JSON.parse(localStorage.getItem("notificationData")) || {})
+  const [editorContent, setEditorContent] = useState("")
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (recordId) {
+          await getNotificationData();
+        }
+      } catch (error) {
+        console.log("Error fetching notification data:", error);
+      }
+    };
+
+    fetchData();
+  }, [recordId]);
+
+  const getNotificationData = async () => {
+    try {
+      console.log("Triggering Hereee");
+
+      const url = `${import.meta.env.VITE_HOSTED_API_URL}/notifications/${recordId}`;
+      const options = { method: "GET" };
+      const response = await fetch(url, options);
+      console.log(response, "Response Hereee")
+      const data = await response.json();
+      console.log(data, "data here from Create Notification");
+
+      setNotificationData({
+        from: { value: data.record?.from_address || "" },
+        name: { value: data.record?.name || "" },
+        to: { value: data.record?.to_address || "" },
+        type: { value: data.record?.type || "" },
+        subject: { value: data.record?.subject || "" },
+        cc: { value: data.record?.cc || "" },
+        description: { value: data.record?.description || "" },
+      });
+      setEditorContent(data.record?.email_body || "");
+    } catch (error) {
+      console.log("Error fetching notification data:", error);
+    }
+  };
+  // console.log(notificationData, "notificationData in Create Notification Page");
   return (
-    <div className='h-[100%] w-[100%] hidden'>
-      <EditorRichUI path="notification" />
+    <div className='h-[100%] w-[100%]'>
+      {notificationData &&
+        <EditorRichUI 
+          path="notifications"
+          defaultFieldsData={notificationData}
+          content={editorContent}
+          isUpdate={recordId ? true : false}
+          recordId={recordId}
+        />}
     </div>
   )
 }

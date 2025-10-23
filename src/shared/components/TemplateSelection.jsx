@@ -27,7 +27,6 @@ const capitalize = (str = "") =>
 const TemplateSelection = ({ lists, configureFields, title, path, tablename }) => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [selectedTab, setSelectedTab] = useState(lists?.[0]?.type ?? "");
-
     const [configureData, setConfigureData] = useState(
         configureFields.reduce((acc, field) => {
             acc[field.name] = { value: "", isMandatory: field.isMandatory || false };
@@ -132,8 +131,6 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
 
         Navigate(`/${path}/new`, { replace: true });
     };
-
-
     return (
         <WonContext.Consumer>
             {() => (

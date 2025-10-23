@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   FaBold,
   FaItalic,
@@ -30,7 +30,7 @@ import { useNavigate } from 'react-router-dom';
 import mammoth from 'mammoth';
 import EditableFields from './EditableFields';
 
-const fieldsList = [
+export const fieldsList = [
   { fieldName: 'Address', isAdded: false, value: 'India  -6-284-1, Uma Shankar Nagar, Revenue Ward -17 , YSR Tadigadapa, 520007.' },
   { fieldName: 'Assigned Member', isAdded: false, value: 'Kartheek Muppiri' },
   { fieldName: 'Category', isAdded: false, value: 'WON-Platform' },
@@ -55,8 +55,11 @@ const FONT_SIZE_MAP = {
   '20px': 6,
   '24px': 7,
 };
-const EditorRichUI = (props) => {
-  console.log(props,"Path here jhvbdsfjbfdhgb")
+
+const EditorRichUI = ({path="",defaultFieldsData={},content="",isUpdate,recordId}) => {
+  // console.log(defaultFieldsData,"defaultFieldsData in EditorRichUI")
+  // console.log(path,"path in EditorRichUI")
+ 
   const editorRef = useRef(null);
   const fileInputRef = useRef(null);
   const savedCollection = useRef(null);
@@ -75,7 +78,8 @@ const EditorRichUI = (props) => {
   });
   const [showImageModal, setShowImageModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
-  const [detailsObject, setDetailsObject] = useState(JSON.parse(localStorage.getItem('notificationData')))
+  const [emailData,setEmailData]=useState(defaultFieldsData);
+  const [detailsObject, setDetailsObject] = useState(JSON.parse(localStorage.getItem(`${path}Data`)))||defaultFieldsData;
   const [videoData, setVideoData] = useState({
     sourceType: "link",
     url: "",
@@ -98,6 +102,7 @@ const EditorRichUI = (props) => {
   ];
   const Navigate = useNavigate()
   const wordFileInputRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState(''); 
 
   const emojis = [
     '😀', '😂', '😅', '😍', '😘', '😎', '🤩', '😢', '😭', '😡', '🤔', '🙄',
@@ -136,6 +141,7 @@ const EditorRichUI = (props) => {
     document.addEventListener('selectionchange', saveSelection);
     return () => document.removeEventListener('selectionchange', saveSelection);
   }, []);
+
 
   const exec = (cmd, val = null) => {
     editorRef.current?.focus();
@@ -248,8 +254,6 @@ const EditorRichUI = (props) => {
     setImageData({ sourceType: 'link', url: '', file: null, width: '', height: '' });
     setShowImageModal(false);
   };
-
-
   const onFilePicked = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -327,6 +331,7 @@ const EditorRichUI = (props) => {
           gap: 8,
           border: '1px solid transparent',
         }}
+        type="button"
       >
         {Icon && <Icon />}
         <span style={{ fontSize: 14 }}>{labelRender ? labelRender() : title}</span>
@@ -473,102 +478,50 @@ const EditorRichUI = (props) => {
       console.log("🔗 Inserted video link:", src);
     }
   };
-  // Call insertVideoWithDebug(src, width, height, playHere)
-  function insertVideoWithDebug(src, width = 400, height = 250, playHere = true) {
+
+  function insertVideoFile(file, width = 400, height = 250, playHere = true) {
+    if (!file) return;
     const editor = editorRef.current;
-    if (!editor) { console.error('no editorRef'); return; }
+    if (!editor) return;
 
     const sel = window.getSelection();
 
-    // Create wrapper
-    const wrap = document.createElement('div');
-    wrap.style.margin = '10px 0';
-    wrap.style.display = 'flex';
-    wrap.style.justifyContent = 'center';
+    // Convert file to object URL
+    const url = URL.createObjectURL(file);
 
-    // Create video element (or iframe for youtube)
-    const isYouTube = (u) => /youtube\.com|youtu\.be/.test(u);
-    let node;
-    if (playHere && isYouTube(src)) {
-      const id = (src.split('v=')[1] || src.split('/').pop() || '').split('&')[0];
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube.com/embed/${id}`;
-      iframe.width = width;
-      iframe.height = height;
-      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-      iframe.allowFullscreen = true;
-      node = iframe;
-    } else if (playHere) {
-      const v = document.createElement('video');
-      v.controls = true;
-      v.width = width;
-      v.height = height;
+    // Create video element
+    const videoWrapper = document.createElement('div');
+    videoWrapper.style.margin = '10px 0';
+    videoWrapper.style.display = 'flex';
+    videoWrapper.style.justifyContent = 'center';
 
-      // If src looks like base64 or blob or plain url, prefer setting <source>
-      const source = document.createElement('source');
-      source.src = src;
-      // Try to set type if obvious
-      if (/\.(mp4)(\?.*)?$/.test(src)) source.type = 'video/mp4';
-      if (/\.(webm)(\?.*)?$/.test(src)) source.type = 'video/webm';
-      if (/\.(ogg|ogv)(\?.*)?$/.test(src)) source.type = 'video/ogg';
+    const video = document.createElement('video');
+    video.src = url;
+    video.controls = true;
+    video.width = width;
+    video.height = height;
+    video.style.borderRadius = '8px';
+    video.style.display = 'block';
 
-      v.appendChild(source);
-      node = v;
+    videoWrapper.appendChild(video);
 
-      // Attach debugging listeners
-      v.addEventListener('loadedmetadata', () => console.log('DBG: loadedmetadata — duration=', v.duration));
-      v.addEventListener('canplay', () => console.log('DBG: canplay'));
-      v.addEventListener('canplaythrough', () => console.log('DBG: canplaythrough'));
-      v.addEventListener('error', (e) => {
-        console.error('DBG: video element error', e, v.error);
-        // try fallback: set src directly on video (some sources need it)
-        // v.src = src;
-      });
-      v.addEventListener('stalled', () => console.warn('DBG: stalled'));
-      v.addEventListener('suspend', () => console.warn('DBG: suspend'));
-      v.addEventListener('waiting', () => console.warn('DBG: waiting'));
-      v.addEventListener('playing', () => console.log('DBG: playing'));
-      v.addEventListener('pause', () => console.log('DBG: paused'));
-    } else {
-      // fallback link
-      const a = document.createElement('a');
-      a.href = src;
-      a.target = '_blank';
-      a.textContent = 'Open video';
-      node = a;
-    }
-
-    wrap.appendChild(node);
-
-    // Insert into editor (preserve selection if inside editor)
+    // Insert at selection or end
     if (!sel.rangeCount || !editor.contains(sel.anchorNode)) {
-      console.warn('DBG: selection missing or outside editor — appending at end');
-      editor.appendChild(wrap);
+      editor.appendChild(videoWrapper);
     } else {
       const range = sel.getRangeAt(0);
       range.deleteContents();
-      range.insertNode(wrap);
-      range.setStartAfter(wrap);
+      range.insertNode(videoWrapper);
+      range.setStartAfter(videoWrapper);
       range.collapse(true);
       sel.removeAllRanges();
       sel.addRange(range);
     }
 
-    // Log node and src
-    console.log('DBG: inserted video node', node, 'currentSrc:', node.currentSrc || node.src || (node.querySelector && node.querySelector('source')?.src));
-
-    // Try autoplay test (muted) to verify playable
-    if (playHere && node.tagName === 'VIDEO') {
-      node.muted = true;
-      node.play().then(() => {
-        console.log('DBG: autoplay test succeeded (muted)');
-        node.pause();
-        node.muted = false;
-      }).catch(err => {
-        console.warn('DBG: autoplay test failed (expected if not muted):', err);
-      });
-    }
+    // Revoke object URL when done (optional)
+    video.addEventListener('loadeddata', () => URL.revokeObjectURL(url));
   }
+
   //Word functions
   const handleWordInsert = () => {
     wordFileInputRef.current?.click();
@@ -587,12 +540,11 @@ const EditorRichUI = (props) => {
     }
   };
 
-  const saveContentToLocalStorage = () => {
-    const content = editorRef.current?.innerHTML || "";
-    console.log(content, "Content Here")
-    localStorage.setItem("editorContent", content);
-    Navigate(`/notifications/preview/testing`);
-  };
+const saveContentToLocalStorage = (navigate = false) => {
+  const content = editorRef.current?.innerHTML || "";
+  localStorage.setItem("editorContent", content);
+  if (navigate) Navigate(`/notifications/preview/testing`,{state:{detailsObject:detailsObject,editorContent:content,path:path,isUpdate:isUpdate,recordId:recordId}});
+};
 
   useEffect(() => {
     const savedContent = localStorage.getItem("editorContent");
@@ -600,11 +552,37 @@ const EditorRichUI = (props) => {
       editorRef.current.innerHTML = savedContent;
     }
   }, []);
+  useEffect(() => {
+  if (content && editorRef.current) {
+    // Only set if the content isn't already inside
+    if (editorRef.current.innerHTML !== content) {
+      editorRef.current.innerHTML = content;
+    }
+  }
+}, [content, defaultFieldsData]);
+
+useEffect(() => {
+    if (Object.keys(defaultFieldsData).length > 0) {
+      setDetailsObject(defaultFieldsData);
+      // localStorage.setItem(`${path}Data`, JSON.stringify(defaultFieldsData));
+    }
+  }, [defaultFieldsData, path]);
+
+  const handleFieldsUpdate = (updatedData) => {
+    setDetailsObject(updatedData);
+    localStorage.setItem(`${path}Data`, JSON.stringify(updatedData));
+  };
+
+
+  // console.log(defaultFieldsData, "notificationData in Editor Page");
 
   return (
     <div className='flex h-[100%] w-[100%]'>
       <div className="hidden w-[17vw] h-full md:flex flex-col p-4 bg-[#353535] text-white overflow-y-auto custom-scrollbar">
-        <h2 className="text-center">Additional Fields</h2>
+        <h2 className="text-center"> Fields</h2>
+        <div>
+          <input type="text" placeholder="Search fields..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        </div>
         <ul className="flex flex-col gap-[10px] pl-0">
           {fieldsListData.map((item) =>
             item.isAdded ? null : (
@@ -620,12 +598,12 @@ const EditorRichUI = (props) => {
           )}
         </ul>
       </div>
-      <div className='overflow-y-auto custom-scrollbar p-0 m-0 w-full'>
+      <div className='overflow-y-auto custom-scrollbar p-2 m-0 w-full'>
         <div className="flex items-start gap-4 w-full mt-2">
           {/* Editable Fields */}
-          <div className="flex-1">
-            <EditableFields />
-          </div>
+          {detailsObject && (
+            <EditableFields  data={detailsObject}    onUpdate={handleFieldsUpdate} path={path} />
+          )}
           {/* Finish Button */}
           <div className="flex items-end mt-2">
             <button
@@ -642,7 +620,7 @@ const EditorRichUI = (props) => {
         group
       "
               type="button"
-              onClick={saveContentToLocalStorage}
+              onClick={() => saveContentToLocalStorage(true)}
             >
               <span>Preview</span>
               <svg
@@ -658,11 +636,34 @@ const EditorRichUI = (props) => {
             </button>
           </div>
         </div>
+        <div className="w-[90vw] md:w-[75vw] lg:w-[67vw] mx-auto mt-4 mb-0 min-h-[40vh] p-0 max-h-[50vh]">
+          <div
+            style={{
+              maxWidth: "97%",
+              margin: "20px auto",
+              border: "2px solid #dcdcdc",
+              borderRadius: 8,
+              height: "68vh", // fixed height (main editor stays same size)
+              display: "flex",
+              flexDirection: "column",
+              background: "#fff",
+            }}
+            className="!mr-2 flex-1 shadow-sm"
+          >
 
-        <div className="w-[79vw] min-h-[95%] mt-10 mx-auto  p-0">
-          <div style={{ maxWidth: "97%", margin: '20px auto', border: '2px solid #dcdcdc', borderRadius: 8, minHeight: "95%", maxHeight: "98%" }}
-            className='!mr-2 flex-1'>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '1rem', borderBottom: '1px solid #eee', background: '#fafafa', alignItems: 'center' }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 8,
+                padding: "0.75rem 1rem",
+                borderBottom: "1px solid #eee",
+                background: "#fafafa",
+                alignItems: "center",
+                flexShrink: 0,
+              }}
+              className="overflow-x-auto scrollbar-hide" // Allows horizontal scroll on very small screens
+            >
               {/* Formatting */}
               <ToolButton id="bold" Icon={FaBold} title="Bold" activeState={active.bold} />
               <ToolButton id="italic" Icon={FaItalic} title="Italic" activeState={active.italic} />
@@ -716,34 +717,27 @@ const EditorRichUI = (props) => {
               {/* Code */}
               <ToolButton id="code" Icon={FaCode} title="Insert Code Block" />
             </div>
-            {/* <div
-            ref={editorRef}
-            contentEditable
-            suppressContentEditableWarning
-            spellCheck
-            style={{ minHeight: 320, padding: 16, outline: 'none', fontFamily, fontSize, color }}
-            onKeyDown={handleKeyDown}
-          >
-            <p>Start typing your content here...</p>
-          </div> */}
             <div
               ref={editorRef}
               contentEditable
               suppressContentEditableWarning
               spellCheck
               style={{
-                minHeight: 320,          // Minimum editor height
-                maxHeight: '80vh',       // Maximum height before scrolling (adjust as needed)
-                padding: 16,
-                outline: 'none',
+                flexGrow: 1,
+                padding: "1rem",
+                outline: "none",
                 fontFamily,
                 fontSize,
                 color,
-                overflowY: 'auto',       // Vertical scroll only when content exceeds maxHeight
-                overflowX: 'hidden',     // Prevent horizontal scroll
+                overflowY: "auto",
+                overflowX: "hidden",
+                lineHeight: 1.6,
+                background: "#fff",
               }}
               onKeyDown={handleKeyDown}
-              onInput={saveContentToLocalStorage}
+             onInput={() => saveContentToLocalStorage(false)}
+
+              className='custom-scrollbar'
             >
               <p>Start typing your content here...</p>
             </div>
@@ -756,27 +750,31 @@ const EditorRichUI = (props) => {
       {showImageModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-md w-[400px] flex flex-col gap-4">
-            <h2 className="text-lg font-semibold">Insert Image</h2>
-            <div className="flex gap-2">
-              <label className="flex-1">
-                <input
-                  type="radio"
-                  name="sourceType"
-                  checked={imageData.sourceType === 'link'}
-                  onChange={() => setImageData(prev => ({ ...prev, sourceType: 'link' }))}
-                />
+            <h2 className="text-md font-semibold mb-0">Insert Image</h2>
+            <div className="flex gap-2 border-b border-gray-200 ">
+              <button
+                type="button"
+                onClick={() => setImageData(prev => ({ ...prev, sourceType: 'link' }))}
+                className={`flex-1 text-sm py-1 font-medium transition-all duration-150  bg-transparent w-10 ${imageData.sourceType === 'link'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-600 hover:text-blue-500'
+                  }`}
+              >
                 Link
-              </label>
-              <label className="flex-1">
-                <input
-                  type="radio"
-                  name="sourceType"
-                  checked={imageData.sourceType === 'file'}
-                  onChange={() => setImageData(prev => ({ ...prev, sourceType: 'file' }))}
-                />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setImageData(prev => ({ ...prev, sourceType: 'file' }))}
+                className={`flex-1 text-sm py-1 font-medium transition-all duration-150 bg-transparent ${imageData.sourceType === 'file'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-600 hover:text-blue-500'
+                  }`}
+              >
                 File
-              </label>
+              </button>
             </div>
+
 
             {imageData.sourceType === 'link' ? (
               <input
@@ -813,28 +811,36 @@ const EditorRichUI = (props) => {
 
             <div className="flex justify-end gap-2">
               <button onClick={() => setShowImageModal(false)} className="px-4 py-2 border rounded">Cancel</button>
-              <button onClick={handleImageModalInsert} className="px-4 py-2 bg-blue-500 text-white rounded">Insert</button>
+              <button onClick={handleImageModalInsert} className="px-4 py-2 !bg-blue-500 text-white rounded">Insert</button>
             </div>
           </div>
         </div>
       )}
       {showVideoModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-md w-[400px] flex flex-col gap-4">
-            <h2 className="text-lg font-semibold text-center">Insert Video</h2>
+            <h2 className="text-md font-semibold text-center mb-0">Insert Video</h2>
 
             <div className="flex gap-3 justify-center">
               <button
-                className={`px-3 py-1 rounded-md ${videoData.sourceType === "link" ? "bg-blue-500 text-white" : "bg-gray-200"
+                className={`px-3 py-1 rounded-md border-b-2 transition-all !bg-transparent ${videoData.sourceType === "link"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-700"
                   }`}
-                onClick={() => setVideoData({ ...videoData, sourceType: "link", file: null })}
+                onClick={() =>
+                  setVideoData({ ...videoData, sourceType: "link", file: null })
+                }
               >
                 Video Link
               </button>
               <button
-                className={`px-3 py-1 rounded-md ${videoData.sourceType === "file" ? "bg-blue-500 text-white" : "bg-gray-200"
+                className={`px-3 py-1 rounded-md border-b-2 transition-all !bg-transparent ${videoData.sourceType === "file"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-700"
                   }`}
-                onClick={() => setVideoData({ ...videoData, sourceType: "file", url: "" })}
+                onClick={() =>
+                  setVideoData({ ...videoData, sourceType: "file", url: "" })
+                }
               >
                 Upload File
               </button>
@@ -891,18 +897,14 @@ const EditorRichUI = (props) => {
                 Cancel
               </button>
               <button
-                className="bg-blue-500 text-white px-3 py-1 rounded-md"
+                className="!bg-blue-500 text-white px-3 py-1 !rounded-md"
                 onClick={() => {
                   if (videoData.sourceType === "link" && videoData.url) {
                     insertVideo(videoData.url, videoData.width, videoData.height, videoData.playHere);
                   } else if (videoData.sourceType === "file" && videoData.file) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) =>
-                      // insertVideo(ev.target.result, videoData.width, videoData.height, videoData.playHere);
-                      insertVideoWithDebug('https://your-host/path/video.mp4', 640, 360, true);
-
-                    reader.readAsDataURL(videoData.file);
+                    insertVideoFile(videoData.file, videoData.width, videoData.height);
                   }
+
                   setShowVideoModal(false);
                   setVideoData({
                     sourceType: "link",
@@ -916,6 +918,7 @@ const EditorRichUI = (props) => {
               >
                 Insert Video
               </button>
+
             </div>
           </div>
         </div>
