@@ -182,18 +182,14 @@ const CreateAlerts=({recordId})=>{
       const url = `${import.meta.env.VITE_HOSTED_API_URL}/alerts/${recordId}`;
       const options = { method: "GET" };
       const response = await fetch(url, options);
-      console.log(response, "Response Hereee")
+      // console.log(response, "Response Hereee")
       const data = await response.json();
       console.log(data, "data here from Alerts");
-      // const parsedData = data.record?.email_body
-      //   ? JSON.parse(data.record.email_body)
-      //   : initialValue;
-      // console.log(parsedData, "parsed Hereee");
-      // setNotificationContent(parsedData);
-      // setNotificationData(data.record);
       setAlertData({
         name: { value: data.record?.name || "" },
         to: { value: data.record?.to_address || "" },
+        from: { value: data.record?.from_address || "" },
+        description: { value: data.record?.description || "" },
         type: { value: data.record?.type || "" },
         subject: { value: data.record?.subject || "" },
         cc: { value: data.record?.cc || "" },
@@ -209,6 +205,8 @@ const CreateAlerts=({recordId})=>{
       <EditorRichUI path="alerts" 
       defaultFieldsData={alertData}
       content={editorContent}
+          isUpdate={recordId ? true : false}
+          recordId={recordId}
        />
     </div>
   )

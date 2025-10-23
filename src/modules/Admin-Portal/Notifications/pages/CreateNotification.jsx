@@ -618,9 +618,9 @@ const CreateNotification = ({ recordId }) => {
       const url = `${import.meta.env.VITE_HOSTED_API_URL}/notifications/${recordId}`;
       const options = { method: "GET" };
       const response = await fetch(url, options);
-      console.log(response, "Response Hereee")
+      // console.log(response, "Response Hereee")
       const data = await response.json();
-      console.log(data, "data here from Create Notification");
+      // console.log(data, "data here from Create Notification");
 
       setNotificationData({
         from: { value: data.record?.from_address || "" },
