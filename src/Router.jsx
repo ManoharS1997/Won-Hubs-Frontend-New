@@ -155,10 +155,11 @@ import FormDesignerPage from "./modules/Admin-Portal/form/formDesignerPage.jsx";
 import AlertTemplateView from "./modules/Admin-Portal/Alerts/pages/AlertsTemplateSelection.jsx";
 import PreviewAlerts from "./modules/Admin-Portal/Alerts/pages/AlertsPreview.jsx";
 import TemplateSelectionForTemplate from "./modules/Admin-Portal/Templates/pages/TemplateSelectionForTemplates.jsx";
-import CreateEditor from "./shared/CreationEditor/CreateEditor.jsx";
+// import CreateEditor from "./shared/CreationEditor/CreateEditor.jsx";
 import SlateEditor from "./shared/CreationEditor/CreateEditor.jsx";
 import EditorRichUI from "./shared/CreationEditor/WorkingEditor.jsx";
 import PreviewEditor from "./shared/CreationEditor/PreviewEditor.jsx";
+import CreateFeedBack2 from "./modules/Admin-Portal/Feedback/pages/CreateFeedBack2.jsx";
 
 const router = createBrowserRouter([
   // Public routes (no authentication required)
@@ -521,6 +522,10 @@ const router = createBrowserRouter([
             element: <CreateFeedback />,
           },
           {
+            path: "/create/feedback2",
+            element: <CreateFeedBack2 />,
+          },
+          {
             path: "/Create Feedback Screens",
             element: <CreateFeedbackScreens />,
           },
@@ -658,14 +663,14 @@ const router = createBrowserRouter([
             path: "/create/notification",
             element: <NotificationTemplates />,
           },
-          // {
-          //   path: "/notifications/:id",
-          //   element: <CreateNotification />,
-          // },
           {
             path: "/notifications/:id",
-            element: <EditorRichUI />
+            element: <CreateNotification />,
           },
+          // {
+          //   path: "/notifications/:id",
+          //   element: <EditorRichUI />
+          // },
           {
             path: "/notification-preview",
             element: <PreviewNotification />,

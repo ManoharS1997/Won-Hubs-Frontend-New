@@ -149,7 +149,7 @@ export const CheckEmailAvailability = async (email) => {
 //   } catch (err) {
 //     console.error("Error uploading the bulk data.", err);
 //   }
-// };
+// }; kartheek
 
 export const BulkUploadData = async (formData) => {
   // console.log(Cookies.get('accessToken'))
@@ -1275,6 +1275,8 @@ const GetPayload = (formname, formData) => {
       return extractValues(formData);
     case "department":
       return extractValues(formData);
+    case "notification":
+      return extractValues(formData);
   }
 };
 
@@ -1430,6 +1432,34 @@ export const deleteAlert = async (recordId) => {
 };
 
 // ------------------------------------------------------- connections table operations -----------------------------------------
+
+export const CreateNotificationFunction =async(formName,formData,isUpdate,recordId)=>{
+  console.log(formData, "form Data in CRUD");
+  console.log(formName, "name ");
+  const options={
+    method:`${isUpdate ? "PUT" : "POST"}`,
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:`Bearer ${Cookies.get("accessToken")}`
+    },
+    body:JSON.stringify(formData)
+  }
+const url = isUpdate 
+  ? `${apiUrl}/${formName}/update/${recordId}` 
+  : `${apiUrl}/${formName}/new`;
+  try {
+    const response = await fetch(url, options);
+    console.log(response,"response From CreateNotification");
+    if (response.ok) {
+      console.log("Notification created successfully!");
+      localStorage.removeItem(`${formName}Data`);
+    } else {
+      console.error("Error creating notification:", response.statusText);
+    }
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
 
 // creates new connection in the connections table
 export const createConnection = async (

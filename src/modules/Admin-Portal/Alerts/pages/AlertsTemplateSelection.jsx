@@ -70,7 +70,7 @@ const AlertTemplateView = () => {
   }, []);
 
   const configureFields = [
-    { name: "title", label: "Title", type: "text", isMandatory: true },
+    { name: "name", label: "Name", type: "text", isMandatory: true },
     { name: "from", label: "From", type: "text", isMandatory: true },
     { name: "to", label: "To", type: "text", isMandatory: true },
     { name: "cc", label: "CC", type: "text", isMandatory: true },
@@ -84,6 +84,7 @@ const AlertTemplateView = () => {
       ],
       isMandatory: true,
     },
+    {name: "subject", label: "Subject", type: "text", isMandatory: true },
     { name: "description", label: "Description", type: "textarea", isMandatory: true }, // Content at the end
 
   ];
