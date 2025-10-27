@@ -5,6 +5,7 @@ export default function EditableFields({ data, path, onUpdate }) {
   const [detailsObject, setDetailsObject] = useState(data);
   const [editable, setEditable] = useState(false);
   const [open, setOpen] = useState(true);
+  // console.log(data, "data in editable fields");
 
   // 🔹 When parent data changes, refresh local copy
   useEffect(() => {
@@ -27,10 +28,10 @@ export default function EditableFields({ data, path, onUpdate }) {
   };
 
   return (
-    <div className="w-[95%] min-h-[8vh] mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-3">
+    <div className="w-[95%] min-h-[8vh] mx-auto ">
+      <div className="flex flex-col sm:flex-row sm:items-center  gap-5">
         <h3 className="text-md font-bold m-0">Fields</h3>
-        <div className="flex gap-3">
+        <div className="flex gap-3 w-[fit] ">
           <button onClick={() => setOpen(prev => !prev)}>
             {open ? <FaChevronUp /> : <FaChevronDown />}
           </button>
@@ -46,7 +47,7 @@ export default function EditableFields({ data, path, onUpdate }) {
       </div>
 
       {open && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3 mb-1">
           {[
             "Name",
             "From",

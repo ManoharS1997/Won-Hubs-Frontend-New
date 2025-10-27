@@ -172,7 +172,7 @@ export default function DetailedView({ recordId, tableName, formData }) {
       tableCols: tab.tableCols,
     })) || []),
   ];
-
+console.log(recordFields,"recordFields");
   return (
     <div className="w-full h-fit max-h-[82vh] overflow-hidden flex flex-col gap-2 p-0 rounded-[0.5rem] bg-[var(--background-color)] text-[var(--text-color)]">
       {/* 🔹 Tabs */}

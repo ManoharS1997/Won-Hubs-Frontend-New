@@ -87,37 +87,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
         }
 
         try {
-            if (tablename === "feedback") {
-                // ✅ Build initialState format for feedback
-                const feedbackContent = {
-                    ...configureData,
-                    image: "",
-                    active: true,
-                    dateOfSubmission: new Date().toISOString(),
-                    responses: [],
-                    sections: [
-                        {
-                            id: 1,
-                            sectionTitle: configureData?.formTitle?.value || "",
-                            sectionDescription: configureData?.formDescription?.value || "",
-                            content: [
-                                {
-                                    id: uuidv4(),
-                                    question: configureData?.question?.value || "",
-                                    type: { datatype: "Short Text", data: [] },
-                                    required: configureData?.required?.value === "true" || false,
-                                },
-                            ],
-                        },
-                    ],
-                };
-
-                // ✅ Store only one localStorage item
-                localStorage.setItem("feedbackData", JSON.stringify(feedbackContent));
-            } else {
-                // default behavior for other tables
-                localStorage.setItem(`${tablename}Data`, JSON.stringify(configureData));
-            }
+            localStorage.setItem(`${tablename}Data`, JSON.stringify(configureData));
         } catch (error) {
             console.error("LocalStorage quota exceeded:", error);
             Swal.fire({

@@ -633,6 +633,13 @@ body, html, #root, .App {
   scrollbar-color: rgba(0,0,0,0.4) transparent; /* thumb and track */
 }
 
+/* global.css */
+.ql-editor {
+  min-height: 2.5rem !important;
+  height: 2.5rem !important;
+  padding: 0.25rem 0.5rem;
+  overflow-y: hidden;
+}
 
 
 /* body {

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { replace, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { IoImageOutline } from "react-icons/io5";
+import QuestionCard from "../../modules/Admin-Portal/Feedback/pages/QuestionCard";
 
 //component Imports
 
@@ -10,26 +12,28 @@ import { CreateNotificationFunction } from "../../utils/CheckAndExecuteFlows/CRU
 const PreviewEditor = () => {
     const location = useLocation();
     const Navigate = useNavigate();
-    const { detailsObject, editorContent,path,isUpdate,recordId } = location.state || {};
+    const { detailsObject, editorContent, path, isUpdate, recordId } = location.state || {};
     // console.log(detailsObject,"detailsObject in preview editor");
     // console.log(editorContent,"editorContent in preview editor");
     // console.log(path,"path in preview editor");
 
 
     const getValue = (key) => detailsObject?.[key]?.value || "";
-
     const [showCC, setShowCC] = useState(false);
     const onFinish = async () => {
         // Implement finish logic here
-        const formData={
+        const formData = {
             ...detailsObject,
-            content:editorContent
+            content: editorContent
         }
-        const  response = await CreateNotificationFunction(path,formData,isUpdate,recordId);
-        console.log(response,"response From preview editor")
+        const response = await CreateNotificationFunction(path, formData, isUpdate, recordId);
+        console.log(response, "response From preview editor")
         localStorage.removeItem("editorContent");
-        const navigatedPath=path.charAt(0).toUpperCase() + path.slice(1);
-        // navigate(`All ${navigatedPath}s`,{ replace: true });
+        localStorage.removeItem(`questionsData`);
+        localStorage.removeItem(`feedbackData`);
+        const navigatedPath = path.charAt(0).toUpperCase() + path.slice(1) + "s";
+        console.log(navigatedPath, "navigatedPath");
+        Navigate(`/All ${navigatedPath}`, { replace: true });
     }
 
     return (
@@ -41,7 +45,7 @@ const PreviewEditor = () => {
                     onClick={onFinish}
                     className="float-right px-4 py-2 !bg-[#150363] hover:bg-blue-700 text-white !rounded-lg ml-8"
                 >
-                   {recordId ? "Update" : "Create"} 
+                    {recordId ? "Update" : "Create"}
                 </button>
             </div>
 
@@ -93,16 +97,38 @@ const PreviewEditor = () => {
 
             {/* Email Content */}
             <div className="flex justify-center items-start  bg-transparent h-[65vh] w-full md:w-[95%] mx-auto  overflow-hidden p-0 mt-2">
+                {path && path.toLowerCase() !== "feedback" && (
+                    <div className=" border-gray-300  m-2 p-5 w-full md:w-[96%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-sm border-2">
+                        <div
+                            className="text-gray-800 leading-relaxed text-[15px]"
+                            style={{ fontFamily: "Segoe UI, Arial, sans-serif" }}
+                            dangerouslySetInnerHTML={{
+                                __html: editorContent || "<p>No content available</p>",
+                            }}
+                        ></div>
 
-                <div className=" border-gray-300  m-2 p-5 w-full md:w-[96%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-sm border-2">
-                    <div
-                        className="text-gray-800 leading-relaxed text-[15px]"
-                        style={{ fontFamily: "Segoe UI, Arial, sans-serif" }}
-                        dangerouslySetInnerHTML={{
-                            __html: editorContent || "<p>No content available</p>",
-                        }}
-                    ></div>
-                </div>
+                    </div>
+                )}
+                {path && path.toLowerCase() === "feedback" && (
+                    <div className="m-2  w-full md:w-[96%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-md  flex flex-col gap-2">
+                        <div className="w-[70%] mx-auto p-0">
+                            <div
+                                className="w-full h-[200px] relative rounded-[15px] bg-gray-180 shadow bg-center bg-no-repeat bg-contain border-1 border-blue-800"
+                                style={{ backgroundImage: `url(${editorContent.imageFile})` }}
+                            >
+                                <label
+                                    htmlFor="templateImg"
+                                    className="absolute bottom-[5px] right-[5px] p-[3px] rounded-full border border-gray-300 text-black cursor-pointer bg-white hover:bg-gray-200 transition"
+                                >
+                                    <IoImageOutline size={20} />
+                                </label>
+                                <input id="templateImg" type="file" accept="image/*" className="hidden" />
+                            </div>
+                        </div>
+                        <QuestionCard isPreview={true} />
+                    </div>
+                )}
+
             </div>
 
         </div>

@@ -123,6 +123,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     console.log(dbResponse, "DbResponse Hereee")
     if (dbResponse.data) {
       const { formFields, formButtons, tabs, module } = dbResponse.data
+      console.log(module, "Form Fields from DB");
       setFormFields(formFields)
       setFormButtons(formButtons)
       setTabs(tabs)
@@ -213,7 +214,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                   }}
                   className="w-full h-10 border rounded px-3 text-left bg-white flex items-center justify-between"
                 >
-                  {titleObj.title || "Select Module"}
+                  {module || "Select Module"}
                   <span className="text-gray-500">▾</span>
                 </button>
 

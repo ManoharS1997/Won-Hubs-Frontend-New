@@ -519,7 +519,7 @@ const router = createBrowserRouter([
           },
           {
             path: "/feedback/:id",
-            element: <CreateFeedback />,
+            element: <CreateFeedBack2 />,
           },
           {
             path: "/create/feedback2",

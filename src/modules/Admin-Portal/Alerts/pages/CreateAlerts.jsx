@@ -194,7 +194,7 @@ const CreateAlerts=({recordId})=>{
         subject: { value: data.record?.subject || "" },
         cc: { value: data.record?.cc || "" },
       });
-      setEditorContent(data.record?.email_body || "");
+      setEditorContent(data.record?.content || "");
     } catch (error) {
       console.log("Error fetching notification data:", error);
     }
