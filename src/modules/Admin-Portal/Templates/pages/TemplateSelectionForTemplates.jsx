@@ -70,12 +70,12 @@ const TemplateSelectionForTemplate = () => {
     }, []);
 
     const configureFields = [
-        { name: "title", label: "Title", type: "text", isMandatory: true }, // Main identifier
-        { name: "from", label: "From", type: "text", isMandatory: true }, // Sender
+        { name: "name", label: "Name", type: "text", isMandatory: true }, // Main identifier
+        { name: "from", label: "From", type: "email", isMandatory: true }, // Sender
         {
-            name: "to", label: "To", type: "text", isMandatory: true,
+            name: "to", label: "To", type: "email", isMandatory: true,
         }, // Recipient
-        { name: "cc", label: "CC", type: "text", isMandatory: true }, 
+        { name: "cc", label: "CC", type: "email", isMandatory: true }, 
         { name: "subject", label: "Subject", type: "text", isMandatory: true }, // CC field comes after To
         {
             name: "type",
@@ -89,22 +89,22 @@ const TemplateSelectionForTemplate = () => {
             ],
             isMandatory: true,
         },
-        {
-            name: "type",
-            label: "Style",
-            type: "dropdown",
-            options: [
-                // Feedback origin / Template Type
-                { label: "Landscape", value: "landscape" },
-                { label: "Portrait", value: "portrait" },
-                { label: "Executive", value: "executive" },
-                { label: "Envelope", value: "envelope" },
-                { label: "A4", value: "a4" },
-                { label: "A5", value: "a5" },
-            ],
+        // {
+        //     name: "type",
+        //     label: "Style",
+        //     type: "dropdown",
+        //     options: [
+        //         // Feedback origin / Template Type
+        //         { label: "Landscape", value: "landscape" },
+        //         { label: "Portrait", value: "portrait" },
+        //         { label: "Executive", value: "executive" },
+        //         { label: "Envelope", value: "envelope" },
+        //         { label: "A4", value: "a4" },
+        //         { label: "A5", value: "a5" },
+        //     ],
 
-            isMandatory: true,
-        }, // Type of notification
+        //     isMandatory: true,
+        // }, // Type of notification
         { name: "description", label: "Description", type: "textarea", isMandatory: true } // Content at the end
     ];
 
@@ -116,7 +116,7 @@ const TemplateSelectionForTemplate = () => {
                     lists={templates}
                     configureFields={configureFields}
                     title="Create Template"
-                    path="template"
+                    path="flowcheck"
                     tablename="template"
                 />
             )}

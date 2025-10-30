@@ -824,6 +824,7 @@ export const updateTableData = async (
 };
 // get AnyRecord From Any Table
 export const GetAnyRecordFromAnyTable = async (tableName, recordId) => {
+  // console.log(tableName,recordId,"Paramaeters Heree")
   try {
     const url = `${apiUrl}/api/table/getRecordData/${tableName}/${recordId}`;
     const options = {
@@ -1345,6 +1346,7 @@ export const deleteUser = async (recordId) => {
 
 //get addUserForm fields
 export const GetAddUserFormFields = async (param) => {
+  console.log(param, "param in get add user form fields");
   try {
     const url = `${apiUrl}/api/add/fields/${param}`;
     const options = {
@@ -1355,8 +1357,10 @@ export const GetAddUserFormFields = async (param) => {
       },
     };
     const response = await fetch(url, options);
+    console.log(response, "get add user form fields response in crud");
     if (response.ok) {
       const data = await response.json();
+      console.log(data, "add user form fields data in crud");
       return data;
     }
   } catch (err) {

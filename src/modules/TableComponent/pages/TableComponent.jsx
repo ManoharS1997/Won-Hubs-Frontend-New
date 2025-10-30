@@ -42,6 +42,7 @@ import CreateFeedback from '../../Admin-Portal/Feedback/pages/CreateFeedback';
 import { selectedGridRowsCountSelector } from '@mui/x-data-grid';
 import FormDesignerPage from '../../Admin-Portal/form/formDesignerPage';
 import CreateFeedBack2 from '../../Admin-Portal/Feedback/pages/CreateFeedBack2';
+import FlowStepComponent from '../../Admin-Portal/Templates/pages/FlowStep';
 const conditions = ['Like', 'Not Like', 'Equals To', 'Not Equals To']
 
 // <<<<<Model Styles
@@ -510,7 +511,7 @@ export default function TableComponent({
   }
   const renderTabView = (tableName) => {
     // console.log(tableName,"@@@")
-    console.log(selectedTab, tableName, "###")
+    // console.log(selectedTab, tableName, "###")
     switch (tableName) {
       case "notifications":
         return <CreateNotification recordId={selectedTab} />
@@ -521,7 +522,7 @@ export default function TableComponent({
         return <CreateFeedBack2 recordId={selectedTab} />
       
       case 'templates':
-        return <CreateTemplate recordId={selectedTab} />
+        return <FlowStepComponent recordId={selectedTab} />
       case 'designs':
         return <FormDesignerPage recordId={selectedTab} />
       default:

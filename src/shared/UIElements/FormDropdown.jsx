@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 import renderIcons from "../functions/renderIcons";
 import Cookies from "js-cookie";
+import { Value } from "sass";
 
 const customStyles = {
   container: (base, state) => ({
@@ -71,9 +72,15 @@ const customStyles = {
 export default function FormDropdown({
   defaultValue, isDisabled, isLoading, isClearable, onChangeHandler,
   isRtl, isSearchable, options, label, type, isMandatory, name, noLabel,
-  api_data, apiData, fieldData, iconName,
+  api_data, apiData, fieldData, iconName,onDetailedView,value
 }) {
   const [optionsData, setOptionsData] = useState(options || [])
+  // console.log(onDetailedView,"Heree")
+  // console.log(options,"options Here")
+  // console.log(defaultValue,"default Here")
+  // console.log(value,"value Here")
+
+
 
   useEffect(() => {
     if (apiData) {
@@ -123,7 +130,7 @@ export default function FormDropdown({
         <Select
           className="basic-single"
           classNamePrefix="select"
-          value={optionsData.find(option => option.value === defaultValue?.value)}
+          value={!onDetailedView?optionsData.find(option => option.value === defaultValue?.value):optionsData.find(option => option.value === value)}
           onChange={onChangeHandler}
           isDisabled={isDisabled}
           isLoading={isLoading}

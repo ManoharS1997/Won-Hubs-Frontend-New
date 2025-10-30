@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { MdOutlineDescription } from "react-icons/md";
+
 import {
   FaBold,
   FaItalic,
@@ -21,7 +23,8 @@ import {
   FaOutdent,
   FaEraser,
   FaVideo,
-  FaFileWord
+  FaFileWord,
+  FaMinus
 } from 'react-icons/fa';
 import { VscTextSize } from "react-icons/vsc";
 import { IoColorPalette } from "react-icons/io5";
@@ -29,6 +32,9 @@ import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
 import mammoth from 'mammoth';
 import EditableFields from './EditableFields';
+import './Editor.css'
+import { MdInsertPageBreak } from "react-icons/md";
+
 
 export const fieldsList = [
   { fieldName: 'Address', isAdded: false, value: 'India  -6-284-1, Uma Shankar Nagar, Revenue Ward -17 , YSR Tadigadapa, 520007.' },
@@ -56,10 +62,10 @@ const FONT_SIZE_MAP = {
   '24px': 7,
 };
 
-const EditorRichUI = ({path="",defaultFieldsData={},content="",isUpdate,recordId}) => {
+const EditorRichUI = ({ path = "", defaultFieldsData = {}, content = "", isUpdate, recordId }) => {
   // console.log(defaultFieldsData,"defaultFieldsData in EditorRichUI")
   // console.log(path,"path in EditorRichUI")
- 
+
   const editorRef = useRef(null);
   const fileInputRef = useRef(null);
   const savedCollection = useRef(null);
@@ -78,8 +84,10 @@ const EditorRichUI = ({path="",defaultFieldsData={},content="",isUpdate,recordId
   });
   const [showImageModal, setShowImageModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
-  const [emailData,setEmailData]=useState(defaultFieldsData);
-  const [detailsObject, setDetailsObject] = useState(JSON.parse(localStorage.getItem(`${path}Data`)))||defaultFieldsData;
+  const [emailData, setEmailData] = useState(defaultFieldsData);
+  const [detailsObject, setDetailsObject] = useState(JSON.parse(localStorage.getItem(`${path}Data`))) || defaultFieldsData;
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+
   const [videoData, setVideoData] = useState({
     sourceType: "link",
     url: "",
@@ -100,9 +108,24 @@ const EditorRichUI = ({path="",defaultFieldsData={},content="",isUpdate,recordId
     '#039BE5', '#00ACC1', '#00897B', '#43A047', '#7CB342',
     '#C0CA33', '#FDD835', '#FFB300', '#FB8C00', '#F4511E',
   ];
+  const pageSizes = {
+    A0: { width: "841mm", height: "1189mm" },
+    A1: { width: "594mm", height: "841mm" },
+    A2: { width: "420mm", height: "594mm" },
+    A3: { width: "297mm", height: "420mm" },
+    A4: { width: "210mm", height: "297mm" },
+    A5: { width: "148mm", height: "210mm" },
+    Letter: { width: "8.5in", height: "11in" },
+    Legal: { width: "8.5in", height: "14in" },
+    Tabloid: { width: "11in", height: "17in" },
+    Executive: { width: "7.25in", height: "10.5in" },
+    B4: { width: "250mm", height: "353mm" },
+    B5: { width: "176mm", height: "250mm" },
+  };
+
   const Navigate = useNavigate()
   const wordFileInputRef = useRef(null);
-  const [searchTerm, setSearchTerm] = useState(''); 
+  const [searchTerm, setSearchTerm] = useState('');
 
   const emojis = [
     '😀', '😂', '😅', '😍', '😘', '😎', '🤩', '😢', '😭', '😡', '🤔', '🙄',
@@ -154,7 +177,41 @@ const EditorRichUI = ({path="",defaultFieldsData={},content="",isUpdate,recordId
     document.dispatchEvent(new Event('selectionchange'));
   };
 
-  const handleButton = (id) => {
+  const handlePageSizeChange = (size) => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const sizes = {
+      A0: { width: "841mm", height: "1189mm" },
+      A1: { width: "594mm", height: "841mm" },
+      A2: { width: "420mm", height: "594mm" },
+      A3: { width: "297mm", height: "420mm" },
+      A4: { width: "210mm", height: "297mm" },
+      A5: { width: "148mm", height: "210mm" },
+      A6: { width: "105mm", height: "148mm" },
+      Letter: { width: "216mm", height: "279mm" },
+      Legal: { width: "216mm", height: "356mm" },
+      Tabloid: { width: "279mm", height: "432mm" },
+      Executive: { width: "184mm", height: "267mm" },
+      B4: { width: "250mm", height: "353mm" },
+      B5: { width: "176mm", height: "250mm" },
+    };
+
+    const selected = sizes[size];
+    if (!selected) return;
+
+    editor.style.width = selected.width;
+    editor.style.minHeight = selected.height;
+    editor.style.margin = "20px auto";
+    editor.style.padding = "20mm";
+    editor.style.backgroundColor = "#fff";
+    editor.style.boxShadow = "0 0 5px rgba(0,0,0,0.2)";
+    editor.style.transition = "all 0.3s ease";
+  };
+
+
+
+  const handleButton = (id, value) => {
     switch (id) {
       case 'bold': exec('bold'); break;
       case 'italic': exec('italic'); break;
@@ -176,6 +233,10 @@ const EditorRichUI = ({path="",defaultFieldsData={},content="",isUpdate,recordId
       case 'image': setShowImageModal(true); break;
       case 'video': setShowVideoModal(true); break;
       case "word": handleWordInsert(); break;
+      case "pageBreak":
+        insertPageBreak(); break;
+      case "pageSize": handlePageSizeChange(value); break;
+
       default: break;
     }
   };
@@ -320,7 +381,16 @@ const EditorRichUI = ({path="",defaultFieldsData={},content="",isUpdate,recordId
     <div style={{ position: 'relative', margin: 4 }}>
       <button
         onMouseDown={(e) => e.preventDefault()}
-        onClick={() => setOpenDropdown((p) => (p === keyName ? null : keyName))}
+        onClick={(e) => {
+          e.preventDefault();
+          const rect = e.currentTarget.getBoundingClientRect();
+          setDropdownPosition({
+            top: rect.bottom + window.scrollY + 4,
+            left: rect.left + window.scrollX,
+          });
+          setOpenDropdown((p) => (p === keyName ? null : keyName));
+        }}
+
         title={title}
         style={{
           cursor: 'pointer',
@@ -340,23 +410,32 @@ const EditorRichUI = ({path="",defaultFieldsData={},content="",isUpdate,recordId
       {openDropdown === keyName && (
         <div
           style={{
-            position: 'absolute',
-            top: 48,
-            left: 0,
+            position: 'fixed', // ✅ instead of absolute
+            top: dropdownPosition.top,
+            left: dropdownPosition.left,
             border: '1px solid #ddd',
             background: '#fff',
-            zIndex: 50,
+            zIndex: 9999, // ✅ ensures it's on top
             boxShadow: '0 8px 24px rgba(0,0,0,.12)',
             borderRadius: 8,
             padding: 10,
-            width: keyName === 'color' || keyName === 'emoji' ? 260 : 'auto',
+            width:
+              keyName === 'color' || keyName === 'emoji'
+                ? 260
+                : 'auto',
             maxHeight: 200,
             overflowY: 'auto',
             display: 'grid',
-            gridTemplateColumns: keyName === 'color' ? 'repeat(10, 22px)' : keyName === 'emoji' ? 'repeat(8, 1fr)' : 'auto',
+            gridTemplateColumns:
+              keyName === 'color'
+                ? 'repeat(10, 22px)'
+                : keyName === 'emoji'
+                  ? 'repeat(8, 1fr)'
+                  : 'auto',
             gap: 6,
           }}
         >
+
           {options.map((opt) => (
             <div
               key={opt}
@@ -367,6 +446,7 @@ const EditorRichUI = ({path="",defaultFieldsData={},content="",isUpdate,recordId
                 else if (keyName === 'emoji') insertEmoji(opt);
                 else if (keyName === 'font-family') applyFontFamily(opt);
                 else if (keyName === 'font-size') applyFontSize(opt);
+                else if (keyName === 'pageSize') handlePageSizeChange(opt)
                 setOpenDropdown(null);
               }}
               style={keyName === 'color'
@@ -521,7 +601,6 @@ const EditorRichUI = ({path="",defaultFieldsData={},content="",isUpdate,recordId
     // Revoke object URL when done (optional)
     video.addEventListener('loadeddata', () => URL.revokeObjectURL(url));
   }
-
   //Word functions
   const handleWordInsert = () => {
     wordFileInputRef.current?.click();
@@ -540,11 +619,11 @@ const EditorRichUI = ({path="",defaultFieldsData={},content="",isUpdate,recordId
     }
   };
 
-const saveContentToLocalStorage = (navigate = false) => {
-  const content = editorRef.current?.innerHTML || "";
-  localStorage.setItem("editorContent", content);
-  if (navigate) Navigate(`/notifications/preview/testing`,{state:{detailsObject:detailsObject,editorContent:content,path:path,isUpdate:isUpdate,recordId:recordId}});
-};
+  const saveContentToLocalStorage = (navigate = false) => {
+    const content = editorRef.current?.innerHTML || "";
+    localStorage.setItem("editorContent", content);
+    if (navigate) Navigate(`/notifications/preview/testing`, { state: { detailsObject: detailsObject, editorContent: content, path: path, isUpdate: isUpdate, recordId: recordId } });
+  };
 
   useEffect(() => {
     const savedContent = localStorage.getItem("editorContent");
@@ -553,18 +632,17 @@ const saveContentToLocalStorage = (navigate = false) => {
     }
   }, []);
   useEffect(() => {
-  if (content && editorRef.current) {
-    // Only set if the content isn't already inside
-    if (editorRef.current.innerHTML !== content) {
-      editorRef.current.innerHTML = content;
+    if (content && editorRef.current) {
+      // Only set if the content isn't already inside
+      if (editorRef.current.innerHTML !== content) {
+        editorRef.current.innerHTML = content;
+      }
     }
-  }
-}, [content, defaultFieldsData]);
+  }, [content, defaultFieldsData]);
 
-useEffect(() => {
+  useEffect(() => {
     if (Object.keys(defaultFieldsData).length > 0) {
       setDetailsObject(defaultFieldsData);
-      // localStorage.setItem(`${path}Data`, JSON.stringify(defaultFieldsData));
     }
   }, [defaultFieldsData, path]);
 
@@ -573,11 +651,78 @@ useEffect(() => {
     localStorage.setItem(`${path}Data`, JSON.stringify(updatedData));
   };
 
+  const insertPageBreak = () => {
+    const editor = editorRef.current;
+    if (!editor) return;
 
-  // console.log(defaultFieldsData, "notificationData in Editor Page");
+    // Force focus into editor
+    editor.focus();
+
+    const selection = window.getSelection();
+    if (!selection || !selection.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+
+    // Ensure selection is inside editor
+    if (!editor.contains(range.startContainer)) {
+      // Move caret to end of editor if not inside
+      const newRange = document.createRange();
+      newRange.selectNodeContents(editor);
+      newRange.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
+    }
+
+    // Create wrapper div
+    const wrapper = document.createElement("div");
+    wrapper.className = "page-break";
+    wrapper.contentEditable = "false";
+
+    // Dashed line
+    const line = document.createElement("div");
+    line.className = "page-break-line";
+    wrapper.appendChild(line);
+
+    // ❌ Remove button
+    const removeBtn = document.createElement("span");
+    removeBtn.innerHTML = "✖";
+    removeBtn.className = "remove-break-btn";
+    removeBtn.title = "Remove Page Break";
+    wrapper.appendChild(removeBtn);
+
+    // Remove on click (only when ❌ clicked)
+    removeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      wrapper.remove();
+    });
+
+    // Insert at cursor
+    const currentRange = selection.getRangeAt(0);
+    currentRange.insertNode(wrapper);
+
+    // Move cursor after break
+    currentRange.setStartAfter(wrapper);
+    currentRange.setEndAfter(wrapper);
+    selection.removeAllRanges();
+    selection.addRange(currentRange);
+  };
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const handleClick = (e) => {
+      if (e.target.classList.contains("page-break")) {
+        e.target.remove(); // remove page break if clicked
+      }
+    };
+
+    editor.addEventListener("click", handleClick);
+    return () => editor.removeEventListener("click", handleClick);
+  }, []);
+
 
   return (
-    <div className='flex h-[100%] w-[100%]'>
+    <div className='flex h-full w-full'>
       <div className="hidden w-[17vw] h-full md:flex flex-col p-4 bg-[#353535] text-white overflow-y-auto custom-scrollbar">
         <h2 className="text-center"> Fields</h2>
         <div>
@@ -598,16 +743,16 @@ useEffect(() => {
           )}
         </ul>
       </div>
-      <div className='overflow-y-auto custom-scrollbar p-2 m-0 w-full'>
-        <div className="flex items-start gap-4 w-full mt-2">
-          {/* Editable Fields */}
-          {detailsObject && (
-            <EditableFields  data={detailsObject}    onUpdate={handleFieldsUpdate} path={path} />
-          )}
-          {/* Finish Button */}
-          <div className="flex items-end mt-2">
-            <button
-              className="
+      <div className='overflow-y-auto custom-scrollbar p-2 m-0 w-full overflow-hidden'>
+        {/* <div className="flex items-start gap-4 w-full mt-2"> */}
+        {/* Editable Fields */}
+        {/* {detailsObject && (
+            <EditableFields data={detailsObject} onUpdate={handleFieldsUpdate} path={path} />
+          )} */}
+        {/* Finish Button */}
+        <div className="flex items-end mt-2 justify-end">
+          <button
+            className="
         bg-black text-white 
         flex items-center justify-between 
         px-4 py-1 
@@ -619,24 +764,24 @@ useEffect(() => {
         !rounded-full
         group
       "
-              type="button"
-              onClick={() => saveContentToLocalStorage(true)}
+            type="button"
+            onClick={() => saveContentToLocalStorage(true)}
+          >
+            <span>Preview</span>
+            <svg
+              className="transition-transform duration-500 ease-in-out transform group-hover:translate-x-[10px]"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="40"
+              fill="currentColor"
+              viewBox="0 0 16 16"
             >
-              <span>Preview</span>
-              <svg
-                className="transition-transform duration-500 ease-in-out transform group-hover:translate-x-[10px]"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="40"
-                fill="currentColor"
-                viewBox="0 0 16 16"
-              >
-                <path d="M1 8h14M9 3l6 5-6 5" />
-              </svg>
-            </button>
-          </div>
+              <path d="M1 8h14M9 3l6 5-6 5" />
+            </svg>
+          </button>
         </div>
-        <div className="w-[90vw] md:w-[75vw] lg:w-[67vw] mx-auto mt-4 mb-0 min-h-[40vh] p-0 max-h-[50vh]">
+        {/* </div> */}
+        <div className="w-[73vw] mx-auto mt-4 mb-0 h-[70vh] flex flex-col border  rounded-md bg-white">
           <div
             style={{
               maxWidth: "97%",
@@ -648,7 +793,7 @@ useEffect(() => {
               flexDirection: "column",
               background: "#fff",
             }}
-            className="!mr-2 flex-1 shadow-sm"
+            className="!mr-2 flex-1"
           >
 
             <div
@@ -661,6 +806,8 @@ useEffect(() => {
                 background: "#fafafa",
                 alignItems: "center",
                 flexShrink: 0,
+                position: 'relative',
+                zIndex: 10
               }}
               className="overflow-x-auto scrollbar-hide" // Allows horizontal scroll on very small screens
             >
@@ -715,9 +862,24 @@ useEffect(() => {
                 onChange={onWordFilePicked}
               />
               {/* Code */}
+              {/* <ToolButton Icon={FaMinus} title="Insert Page Break" /> */}
               <ToolButton id="code" Icon={FaCode} title="Insert Code Block" />
+              <button className='h-fit w-fit' type="button" onClick={insertPageBreak} title="Page Break"><span><MdInsertPageBreak/></span> </button>
+              <Dropdown
+                keyName="pageSize"
+                title='Size'
+                options={[
+                  "A0", "A1", "A2", "A3", "A4", "A5", "A6",
+                  "Letter", "Legal", "Tabloid", "Executive",
+                  "B4", "B5"
+                ]}
+                Icon={MdOutlineDescription}
+                onOptionClick={(opt) => handleButton("pageSize", opt)}
+              />
+
             </div>
-            <div
+            {/* editor Area div */}
+            {/* <div
               ref={editorRef}
               contentEditable
               suppressContentEditableWarning
@@ -735,18 +897,41 @@ useEffect(() => {
                 background: "#fff",
               }}
               onKeyDown={handleKeyDown}
-             onInput={() => saveContentToLocalStorage(false)}
+              onInput={() => saveContentToLocalStorage(false)}
 
-              className='custom-scrollbar'
+              className='custom-scrollbar editor-area'
             >
               <p>Start typing your content here...</p>
+            </div> */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50 p-2">
+              <div
+                ref={editorRef}
+                contentEditable
+                suppressContentEditableWarning
+                spellCheck
+                style={{
+                  width: pageSizes["A4"]?.width || "210mm",
+                  minHeight: pageSizes["A4"]?.height || "297mm",
+                  margin: "20px auto",
+                  padding: "20mm",
+                  background: "#fff",
+                  boxShadow: "0 0 5px rgba(0,0,0,0.2)",
+                  borderRadius: "8px",
+                  transition: "all 0.3s ease",
+                }}
+                className="custom-scrollbar"
+                onKeyDown={handleKeyDown}
+                onInput={() => saveContentToLocalStorage(false)}
+              >
+                <p>Start typing your content here...</p>
+              </div>
             </div>
             <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={onFilePicked} />
           </div>
         </div>
       </div>
 
-      {/* --- Image Modal --- */}
+
       {showImageModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-md w-[400px] flex flex-col gap-4">

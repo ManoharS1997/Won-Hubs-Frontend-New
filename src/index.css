@@ -640,6 +640,11 @@ body, html, #root, .App {
   padding: 0.25rem 0.5rem;
   overflow-y: hidden;
 }
+.page-break:hover {
+  border-top: 2px dashed #555;
+  background: #f7f7f7;
+}
+
 
 
 /* body {

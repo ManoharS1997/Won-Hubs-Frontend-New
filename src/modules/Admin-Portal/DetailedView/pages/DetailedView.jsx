@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { getRecordData } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
+import { GetAddUserFormFields, getRecordData } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 import convertName from "../../../../utils/conevrtName";
 import FormInput from "../../../../shared/UIElements/FormInput";
 import PropTypes from "prop-types";
 import axios from "axios";
 import SourceForm from "../../Design/components/formDesigner/SourceForm";
+import RenderFields from "../../../../shared/components/FormFieldsRendering";
 
 const RECORD_TABS = [{ id: 1, name: "Details" }];
 
@@ -15,11 +16,13 @@ DetailedView.propTypes = {
 };
 
 export default function DetailedView({ recordId, tableName, formData }) {
+  console.log(tableName, "Here..,")
   const [recordData, setRecordData] = useState(null);
   const [recordFields, setRecordFields] = useState([]);
   const [activeTab, setActiveTab] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [formFieldsWithtypes, setFormFieldsWithtypes] = useState([]);
 
   console.log("FORMDATA ===>", formData);
 
@@ -36,6 +39,10 @@ export default function DetailedView({ recordId, tableName, formData }) {
     setError(null);
     try {
       const { data } = await getRecordData(tableName, recordId);
+      const recordFieldsResponse = await GetAddUserFormFields(tableName)
+      setFormFieldsWithtypes(recordFieldsResponse.data);
+
+
       if (data?.[0]) {
         setRecordData(data[0]);
         setRecordFields(Object.keys(data[0]));
@@ -60,12 +67,12 @@ export default function DetailedView({ recordId, tableName, formData }) {
         method === "GET"
           ? await axios.get(endpoint)
           : method === "POST"
-          ? await axios.post(endpoint, recordData)
-          : method === "PUT"
-          ? await axios.put(endpoint, recordData)
-          : method === "DELETE"
-          ? await axios.delete(endpoint)
-          : null;
+            ? await axios.post(endpoint, recordData)
+            : method === "PUT"
+              ? await axios.put(endpoint, recordData)
+              : method === "DELETE"
+                ? await axios.delete(endpoint)
+                : null;
 
       alert(`${btn.label} successful!`);
       console.log("Response:", res?.data);
@@ -172,7 +179,8 @@ export default function DetailedView({ recordId, tableName, formData }) {
       tableCols: tab.tableCols,
     })) || []),
   ];
-console.log(recordFields,"recordFields");
+  console.log(recordData,"recordData");
+  console.log(formFieldsWithtypes, "FormFieldsWithType")
   return (
     <div className="w-full h-fit max-h-[82vh] overflow-hidden flex flex-col gap-2 p-0 rounded-[0.5rem] bg-[var(--background-color)] text-[var(--text-color)]">
       {/* 🔹 Tabs */}
@@ -182,11 +190,10 @@ console.log(recordFields,"recordFields");
             <li
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-1 rounded-t-[0.3rem] cursor-pointer text-nowrap font-semibold transition-all ${
-                activeTab === tab.id
-                  ? "bg-white text-[var(--primary-color)]"
-                  : "text-white hover:bg-[#ccc] hover:text-black"
-              }`}
+              className={`px-4 py-1 rounded-t-[0.3rem] cursor-pointer text-nowrap font-semibold transition-all ${activeTab === tab.id
+                ? "bg-white text-[var(--primary-color)]"
+                : "text-white hover:bg-[#ccc] hover:text-black"
+                }`}
             >
               {tab.name}
             </li>
@@ -227,7 +234,7 @@ console.log(recordFields,"recordFields");
         {activeTab === 1 ? (
           // Default Details tab
           <ul className="grid md:grid-cols-2 gap-4 p-4 overflow-auto rounded-b-[1rem]">
-            {recordFields.map((field) => (
+            {/* {recordFields.map((field) => (
               <li key={field} className="flex items-center gap-4">
                 <FormInput
                   inputType="text"
@@ -236,6 +243,32 @@ console.log(recordFields,"recordFields");
                   value={recordData?.[field] ?? ""}
                   placeholder="Enter value"
                 />
+              </li>
+            ))} */}
+            {formFieldsWithtypes.length > 0 && formFieldsWithtypes.map((field) => (
+              <li key={field} className="flex items-center gap-4">
+
+                <>
+                  {/* <div className="w-full md:w-1/2 h-fit gap-4 flex flex-col p-2">
+                  {formFieldsWithtypes
+                    .filter((_, index) => index % 2 === 0) // Even index items
+                    .map((field) =>
+                      RenderFields({
+                        ...field,
+                        // value: formFields[field.name]?.value,
+                      })
+                    )}
+                </div> */}
+
+
+                  {RenderFields({
+                    ...field,
+                    // value: formFields[field.name]?.value,
+                    value: recordData?.[field.name]
+                  })}
+                  {/* </div> */}
+                </>
+
               </li>
             ))}
           </ul>
