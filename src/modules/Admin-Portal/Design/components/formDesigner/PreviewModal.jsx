@@ -174,7 +174,6 @@ export default function PreviewModal({
     }
   };
 
-  console.log(tabs,"=====")
 
   const handleSave = async () => {
     let Method = recordId ? "PUT" : "POST";
