@@ -236,7 +236,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                   }}
                   className="w-full h-10 border rounded px-3 text-left bg-white flex items-center justify-between"
                 >
-                  {titleObj.title || "Select Module"}
+                  {module || "Select Module"}
                   <span className="text-gray-500">▾</span>
                 </button>
 

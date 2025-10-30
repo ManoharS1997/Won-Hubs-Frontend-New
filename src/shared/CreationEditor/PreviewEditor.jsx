@@ -1,56 +1,54 @@
-import React, { useState } from "react";
-import { replace, useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { IoImageOutline } from "react-icons/io5";
+import QuestionCard from "../../modules/Admin-Portal/Feedback/pages/QuestionCard";
+import "./PreviewEditor.css";
 
 //component Imports
-
 import renderIcons from "../functions/renderIcons";
 import { CreateNotificationFunction } from "../../utils/CheckAndExecuteFlows/CRUDoperations";
 
-const PreviewEditor = () => {
+const PreviewEditor = (props) => {
     const location = useLocation();
     const Navigate = useNavigate();
-    const { detailsObject, editorContent,path,isUpdate,recordId } = location.state || {};
-    // console.log(detailsObject,"detailsObject in preview editor");
-    // console.log(editorContent,"editorContent in preview editor");
-    // console.log(path,"path in preview editor");
-
+    const { detailsObject, editorContent, path, isUpdate, recordId } = location.state || props;
 
     const getValue = (key) => detailsObject?.[key]?.value || "";
-
     const [showCC, setShowCC] = useState(false);
+
     const onFinish = async () => {
-        // Implement finish logic here
-        const formData={
+        const formData = {
             ...detailsObject,
-            content:editorContent
-        }
-        const  response = await CreateNotificationFunction(path,formData,isUpdate,recordId);
-        console.log(response,"response From preview editor")
+            content: editorContent,
+        };
+        const response = await CreateNotificationFunction(path, formData, isUpdate, recordId);
+        console.log(response, "response From preview editor");
         localStorage.removeItem("editorContent");
-        const navigatedPath=path.charAt(0).toUpperCase() + path.slice(1);
-        // navigate(`All ${navigatedPath}s`,{ replace: true });
-    }
+        localStorage.removeItem(`questionsData`);
+        localStorage.removeItem(`feedbackData`);
+        const navigatedPath = path.charAt(0).toUpperCase() + path.slice(1) + "s";
+        Navigate(`/All ${navigatedPath}`, { replace: true });
+    };
 
     return (
         <div className="h-[100%] w-[100%] overflow-hidden">
             {/* Top Bar */}
             <div className="mt-3 mb-2 min-h-[5vh] px-3">
-                <button className="mt-10" onClick={() => Navigate(-1)}>{renderIcons("IoIosArrowBack", 25)}</button>
+                <button className="mt-10" onClick={() => Navigate(-1)}>
+                    {renderIcons("IoIosArrowBack", 25)}
+                </button>
                 <button
                     onClick={onFinish}
                     className="float-right px-4 py-2 !bg-[#150363] hover:bg-blue-700 text-white !rounded-lg ml-8"
                 >
-                   {recordId ? "Update" : "Create"} 
+                    {recordId ? "Update" : "Create"}
                 </button>
             </div>
 
             {/* Header */}
             <div className="flex justify-between px-4 mb-1">
                 <h4 className="mb-1">{getValue("name") || "No Title"}</h4>
-                <span className="text-gray-400 text-[15px]">
-                    {new Date().toLocaleString()}
-                </span>
+                <span className="text-gray-400 text-[15px]">{new Date().toLocaleString()}</span>
             </div>
 
             {/* From / To / CC */}
@@ -65,9 +63,7 @@ const PreviewEditor = () => {
                         </button>
                     </div>
                     {showCC && (
-                        <p className="text-gray-500 mb-0 p-0 m-0">
-                            {getValue("cc") || "cc@example.com"}
-                        </p>
+                        <p className="text-gray-500 mb-0 p-0 m-0">{getValue("cc") || "cc@example.com"}</p>
                     )}
                 </div>
 
@@ -85,30 +81,63 @@ const PreviewEditor = () => {
                 </p>
                 <div className="ml-20 mt-2">
                     <p className="m-0 p-0 text-gray-600">
-                        {getValue("description") ||
-                            "No description available for this message."}
+                        {getValue("description") || "No description available for this message."}
                     </p>
                 </div>
             </div>
 
             {/* Email Content */}
-            <div className="flex justify-center items-start  bg-transparent h-[65vh] w-full md:w-[95%] mx-auto  overflow-hidden p-0 mt-2">
+            <div className="flex justify-center items-start bg-transparent h-[65vh] w-full md:w-[95%] mx-auto overflow-hidden p-0 mt-2">
+                {path && path.toLowerCase() !== "feedback" && (
+                    <div className="border-gray-300 m-2 p-5 w-full md:w-[96%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-sm border-2">
+                        {(() => {
+                            // Updated regex: matches any <div class="page-break">...</div> with any content inside
+                            const pages = (editorContent || "").split(
+                                /<div class="page-break"[\s\S]*?<\/div>/g
+                            );
 
-                <div className=" border-gray-300  m-2 p-5 w-full md:w-[96%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-sm border-2">
-                    <div
-                        className="text-gray-800 leading-relaxed text-[15px]"
-                        style={{ fontFamily: "Segoe UI, Arial, sans-serif" }}
-                        dangerouslySetInnerHTML={{
-                            __html: editorContent || "<p>No content available</p>",
-                        }}
-                    ></div>
-                </div>
+                            console.log("Pages ->", pages);
+
+                            const pageSize = "A4";
+
+                            return pages.map((pageHtml, index) => (
+                                <div key={index}>
+                                    <div
+                                        className={`preview-page page-${pageSize}`}
+                                        dangerouslySetInnerHTML={{ __html: pageHtml.trim() || "<p></p>" }}
+                                    />
+                                    {index < pages.length - 1 && (
+                                        <div className="page-break-line" title="Page Break — hover to remove"></div>
+                                    )}
+                                </div>
+                            ));
+                        })()}
+
+                    </div>
+                )}
+
+                {path && path.toLowerCase() === "feedback" && (
+                    <div className="m-2 w-full md:w-[96%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-md flex flex-col gap-2">
+                        <div className="w-[70%] mx-auto p-0">
+                            <div
+                                className="w-full h-[200px] relative rounded-[15px] bg-gray-180 shadow bg-center bg-no-repeat bg-contain border-1 border-blue-800"
+                                style={{ backgroundImage: `url(${editorContent.imageFile})` }}
+                            >
+                                <label
+                                    htmlFor="templateImg"
+                                    className="absolute bottom-[5px] right-[5px] p-[3px] rounded-full border border-gray-300 text-black cursor-pointer bg-white hover:bg-gray-200 transition"
+                                >
+                                    <IoImageOutline size={20} />
+                                </label>
+                                <input id="templateImg" type="file" accept="image/*" className="hidden" />
+                            </div>
+                        </div>
+                        <QuestionCard isPreview={true} />
+                    </div>
+                )}
             </div>
-
         </div>
-
     );
 };
 
 export default PreviewEditor;
-

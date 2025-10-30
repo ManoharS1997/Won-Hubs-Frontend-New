@@ -160,6 +160,8 @@ import SlateEditor from "./shared/CreationEditor/CreateEditor.jsx";
 import EditorRichUI from "./shared/CreationEditor/WorkingEditor.jsx";
 import PreviewEditor from "./shared/CreationEditor/PreviewEditor.jsx";
 import CreateFeedBack2 from "./modules/Admin-Portal/Feedback/pages/CreateFeedBack2.jsx";
+import FlowStepComponent from "./modules/Admin-Portal/Templates/pages/FlowStep.jsx";
+import TestEditor from "./shared/CreationEditor/EditorTest.jsx";
 
 const router = createBrowserRouter([
   // Public routes (no authentication required)
@@ -519,7 +521,7 @@ const router = createBrowserRouter([
           },
           {
             path: "/feedback/:id",
-            element: <CreateFeedback />,
+            element: <CreateFeedBack2 />,
           },
           {
             path: "/create/feedback2",
@@ -727,6 +729,14 @@ const router = createBrowserRouter([
             path: "/notifications/preview/testing",
             element: <PreviewEditor />,
           },
+          {
+            path: '/flowCheck/new',
+            element: <FlowStepComponent />
+          },
+            {
+            path: '/test',
+            element: <TestEditor />
+          }
 
         ],
       },

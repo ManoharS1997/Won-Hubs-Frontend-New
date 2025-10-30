@@ -1,0 +1,48 @@
+/* -----------------------------
+   PAGE PREVIEW LAYOUT STYLES
+--------------------------------*/
+
+.preview-page {
+  background: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  margin: 20px auto;
+  padding: 20mm;
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+/* Default: A4 */
+.page-A4 {
+  width: 210mm;
+  min-height: 297mm;
+}
+
+/* Other common page sizes */
+.page-A0 { width: 841mm; min-height: 1189mm; }
+.page-A1 { width: 594mm; min-height: 841mm; }
+.page-A2 { width: 420mm; min-height: 594mm; }
+.page-A3 { width: 297mm; min-height: 420mm; }
+.page-A5 { width: 148mm; min-height: 210mm; }
+.page-A6 { width: 105mm; min-height: 148mm; }
+
+.page-Letter { width: 216mm; min-height: 279mm; }
+.page-Legal { width: 216mm; min-height: 356mm; }
+.page-Tabloid { width: 279mm; min-height: 432mm; }
+.page-Executive { width: 184mm; min-height: 267mm; }
+
+.page-B4 { width: 250mm; min-height: 353mm; }
+.page-B5 { width: 176mm; min-height: 250mm; }
+
+/* -----------------------------
+   PAGE BREAK VISUAL STYLE
+--------------------------------*/
+
+.page-break {
+  width: 100%;
+  height: 0;
+  border: none;
+  border-bottom: 2px dashed #999;
+  margin: 20px 0;
+  page-break-after: always;
+}

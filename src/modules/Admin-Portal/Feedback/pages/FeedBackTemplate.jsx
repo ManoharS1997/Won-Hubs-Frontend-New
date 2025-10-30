@@ -383,16 +383,12 @@ const FeedBackTemplateView = () => {
   }, []);
 
   const configureFields = [
-    { name: "title", label: "Title", type: "text", isMandatory: true }, // Main identifier
+    { name: "name", label: "Name", type: "text", isMandatory: true }, // Main identifier
     { name: "from", label: "From", type: "text", isMandatory: true }, // Sender
     {
-      name: "to", label: "To", type: "dropdown", isMandatory: true, options: [
-        { label: "Users", value: "users" },
-        { label: "Roles", value: "roles" },
-      ],
-    }, 
-    
-    { name: "subject", label: "Subject", type: "text", isMandatory: true }, // CC field comes after To
+      name: "to", label: "To", type: "text", isMandatory: true,
+    },
+    { name: "cc", label: "CC", type: "text", isMandatory: false }, // CC field comes after To
     {
       name: "type",
       label: "Type",
@@ -404,7 +400,9 @@ const FeedBackTemplateView = () => {
         { label: "Management/Stakeholder", value: "management_feedback" }
       ],
       isMandatory: true,
-    }, // Type of notification
+    },
+    { name: "subject", label: "Subject", type: "text", isMandatory: true }, // CC field comes after To
+    // Type of notification
     { name: "description", label: "Description", type: "textarea", isMandatory: true }, // Content at the end
   ];
 

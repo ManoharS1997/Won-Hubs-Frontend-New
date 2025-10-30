@@ -27,7 +27,10 @@ import {
   GrRadialSelected, GrMore, GrResources, GrShieldSecurity, GrIntegration,
   GrAppsRounded, GrDocumentUpdate
 } from "react-icons/gr";
-import { FaStarOfLife, FaMinus, FaUserShield, FaSearch, FaHospitalAlt, FaTools, } from "react-icons/fa";
+import { FaStarOfLife, FaMinus, FaUserShield, FaSearch, FaHospitalAlt, FaTools, FaBuilding,FaUserCheck,
+ FaTasks,FaPaperclip,FaDollarSign,FaUsersCog,FaBook,FaUser,
+  FaCalendarDay,FaObjectGroup,FaHashtag
+} from "react-icons/fa";
 import {
   TbApi, TbHeartRateMonitor, TbAlertTriangle, TbReportAnalytics, TbReportSearch,
   TbTemplate, TbUsers, TbTransform, TbLayoutDashboardFilled, TbSettingsCog, TbUserCode,
@@ -45,7 +48,7 @@ import { FcWorkflow, FcDepartment } from "react-icons/fc";
 import { BsCalendar4Event, BsFillPersonVcardFill } from "react-icons/bs";
 import { GoProjectTemplate, GoGrabber } from "react-icons/go";
 import { TiFlowMerge } from "react-icons/ti";
-import { FaBuildingShield, FaHandshakeSimple, FaStore, FaRocket, FaUserLarge } from "react-icons/fa6";
+import { FaBuildingShield, FaHandshakeSimple, FaStore, FaRocket, FaUserLarge, FaU } from "react-icons/fa6";
 import { SlLocationPin, SlCloudUpload } from "react-icons/sl";
 import { VscTools } from "react-icons/vsc";
 import { AiOutlineSwap } from "react-icons/ai";
@@ -59,6 +62,8 @@ import { RiShieldKeyholeLine } from "react-icons/ri";
 import { TiTabsOutline } from "react-icons/ti";
 import { BsFillCaretDownFill,BsFillCaretUpFill  } from "react-icons/bs";
 import { GoTriangleDown } from "react-icons/go";
+import { IoNewspaperOutline } from "react-icons/io5";
+import { GrChannel } from "react-icons/gr";
 const iconMap = {
   BsPersonWorkspace, HiViewBoards, HiUserGroup, RiSettings5Fill, HiDotsHorizontal,
   RxOpenInNewWindow, MdOutlineManageAccounts, RiDeleteBinLine, IoMdAdd, GrRadialSelected,
@@ -80,7 +85,8 @@ const iconMap = {
   MdOutlineDescription, FaTools, FaUserLarge, RiUserCommunityLine, TbNumber123, CiUser, VscTools,
   SlCloudUpload, IoGlobe, GoGrabber, IoChevronBackOutline, MdDoubleArrow, AiOutlineSwap, CgArrowsExchangeAltV,
   RiKey2Line,RiAdminLine ,FaSitemap,FaPassport,BiDetail,FaPhoneAlt,FaFax ,FaMoneyBills ,RiShieldKeyholeLine,
-  FaCrosshairs ,FaUserTag,TiTabsOutline,BsFillCaretDownFill,BsFillCaretUpFill ,GoTriangleDown
+  FaCrosshairs ,FaUserTag,TiTabsOutline,BsFillCaretDownFill,BsFillCaretUpFill ,GoTriangleDown,IoNewspaperOutline,
+  GrChannel,FaBuilding,FaUserCheck,FaDollarSign,FaUserTag,FaTasks,FaHashtag,FaUsersCog,FaBook,FaCalendarDay,FaObjectGroup,FaUser
 
 };
 
