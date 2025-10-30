@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import AddFieldModal from "./AddFieldModal";
 import renderIcons from "../../../../../shared/functions/renderIcons";
 import AddButtonEventModal from "./AddButtonEventModal";
+import AddTableEventModal from "./AddTableEventModal";
+import AddTableActionEventModal from "./AddTableActionEventModal";
 
 const PREDEFINED_TABS = ["History", "Settings"];
 
@@ -27,7 +29,7 @@ const PREDEFINED_BUTTONS = [
 const TABLE_ACTIONS = [
   { type: "edit", label: "Edit" },
   { type: "delete", label: "Delete" },
-  { type: "update", label: "Update" },
+  { type: "view", label: "View" },
 ];
 
 const fieldTypesWithOptions = ["dropdown", "radio", "checkbox"];
@@ -395,23 +397,30 @@ function Tab({
           <table className="w-full table-auto border border-gray-300 rounded-md text-center shadow-sm">
             <thead className="bg-indigo-200 text-indigo-700 font-semibold">
               <tr>
-                {tab.tableCols.map((col) => (
-                  <th
-                    key={col.name}
-                    className="border border-gray-300 px-4 py-2"
-                  >
-                    {col.label}
-                  </th>
-                ))}
-                {tab.tableCols.some((c) => c.type === "action") && (
+                {/* Render all non-action column headers */}
+                {tab.tableCols
+                  .filter((col) => col.type !== "action")
+                  .map((col) => (
+                    <th
+                      key={col.name}
+                      className="border border-gray-300 px-4 py-2"
+                    >
+                      {col.label}
+                    </th>
+                  ))}
+
+                {/* Render single "Actions" header if there are any action columns */}
+                {tab.tableCols.some((col) => col.type === "action") && (
                   <th className="border border-gray-300 px-4 py-2">Actions</th>
                 )}
               </tr>
             </thead>
+
             <tbody>
               <tr>
+                {/* Render dummy row data for each non-action column */}
                 {tab.tableCols
-                  .filter((c) => c.type !== "action")
+                  .filter((col) => col.type !== "action")
                   .map((col) => (
                     <td
                       key={col.name}
@@ -419,20 +428,41 @@ function Tab({
                     >
                       {fieldSupportsOptions(col.type)
                         ? (col.options || []).join(", ")
-                        : `[${col.type}]`}
+                        : `${col.type}`}
                     </td>
                   ))}
-                {tab.tableCols.some((c) => c.type === "action") && (
-                  <td className="border border-gray-300 px-4 py-2 space-x-2">
-                    <button className="bg-indigo-600 text-white px-2 py-1 rounded hover:bg-indigo-700 transition">
-                      Edit
-                    </button>
-                    <button className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition">
-                      Delete
-                    </button>
-                    <button className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transition">
-                      Update
-                    </button>
+
+                {/* Render a single cell for all action buttons */}
+                {tab.tableCols.some((col) => col.type === "action") && (
+                  <td className="border border-gray-300 px-4 py-2">
+                    <div className="flex justify-center gap-2">
+                      {tab.tableCols
+                        .filter((col) => col.type === "action")
+                        .map((actionCol) => {
+                          let btnStyle =
+                            actionCol.label.toLowerCase() === "edit"
+                              ? "bg-indigo-600 hover:bg-indigo-700"
+                              : actionCol.label.toLowerCase() === "delete"
+                              ? "bg-red-600 hover:bg-red-700"
+                              : actionCol.label.toLowerCase() === "view"
+                              ? "bg-yellow-500 hover:bg-yellow-600"
+                              : "bg-gray-500 hover:bg-gray-600";
+
+                          return (
+                            <button
+                              key={actionCol.name}
+                              className={`${btnStyle} text-white px-3 py-1 rounded transition`}
+                              onClick={() => {
+                                alert(
+                                  `Trigger ${actionCol.label} API: ${actionCol.apiConfig.description}`
+                                );
+                              }}
+                            >
+                              {actionCol.label}
+                            </button>
+                          );
+                        })}
+                    </div>
                   </td>
                 )}
               </tr>
@@ -634,7 +664,10 @@ TabDesigner.propTypes = {
 export default function TabDesigner({ tabs, setTabs, module }) {
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
   const [fieldModalTabIdx, setFieldModalTabIdx] = useState(null);
-  // const [activeTab, setActiveTab] = useState('')
+  const [openActionModal, setOpenActionModal] = useState(false);
+  const [selectedTabIndex, setSelectedTabIndex] = useState(null);
+  const [selectedActionLabel, setSelectedActionLabel] = useState("");
+  const [openTableEventModal, setOpenTableEventModal] = useState(false);
   const [filteredTabs, setFilteredTabs] = useState(PREDEFINED_TABS);
   const [addingButton, setAddingButton] = useState({
     open: false,
@@ -657,6 +690,18 @@ export default function TabDesigner({ tabs, setTabs, module }) {
   }) => {
     let label =
       labelFromModal || addingButton.buttonData?.label || "Custom Button";
+    const currentTab = tabs[addingButton.tabIdx];
+    if (!currentTab) return;
+
+    const existingButton = currentTab.buttons?.find(
+      (btn) => btn?.label?.toLowerCase().trim() === label?.toLowerCase().trim()
+    );
+
+    if (existingButton) {
+      alert(`Button "${label}" already exists in ${currentTab?.name}.`);
+      return;
+    }
+
     const newButton = {
       label,
       type: "button",
@@ -685,7 +730,10 @@ export default function TabDesigner({ tabs, setTabs, module }) {
   const onDropTab = (e) => {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
-    if (data.category === "tab" && !tabs.find((t) => t.name === data.item)) {
+    if (
+      data.category === "tab" &&
+      !tabs.some((t) => t.name.toLowerCase() === data.item.toLowerCase())
+    ) {
       setTabs((prev) => [
         ...prev,
         { name: data.item, type: "", fields: [], buttons: [], tableCols: [] },
@@ -695,12 +743,15 @@ export default function TabDesigner({ tabs, setTabs, module }) {
 
   const addCustomTab = () => {
     const name = prompt("Enter tab name");
-    if (name && !tabs.find((t) => t.name === name)) {
-      setTabs((prev) => [
-        ...prev,
-        { name, type: "", fields: [], buttons: [], tableCols: [] },
-      ]);
+    if (!name) return;
+    if (tabs.some((t) => t.name.toLowerCase() === name.toLowerCase())) {
+      alert(`Tab "${name}" already exists.`);
+      return;
     }
+    setTabs((prev) => [
+      ...prev,
+      { name, type: "", fields: [], buttons: [], tableCols: [] },
+    ]);
   };
 
   const removeTab = (tabIdx) => {
@@ -715,15 +766,99 @@ export default function TabDesigner({ tabs, setTabs, module }) {
         if (type === "form") {
           return { ...tab, type, fields: [], buttons: [], tableCols: [] };
         }
+
         if (type === "table") {
+          setSelectedTabIndex(idx);
+          setOpenTableEventModal(true);
           return { ...tab, type, fields: [], buttons: [], tableCols: [] };
         }
+
         return { ...tab, type };
       })
     );
   };
 
+  const handleTableApiSubmit = ({ apiCallData }) => {
+    if (!apiCallData || selectedTabIndex === null) return;
+    setTabs((prev) =>
+      prev.map((tab, i) =>
+        i === selectedTabIndex
+          ? {
+              ...tab,
+              apiConfig: {
+                apiUrl: apiCallData.endpoint,
+                method: apiCallData.method,
+              },
+            }
+          : tab
+      )
+    );
+
+    // close modal after setting
+    setOpenTableEventModal(false);
+    setSelectedTabIndex(null);
+  };
+
+  const handleActionApiSubmit = ({ actionLabel, apiCallData }) => {
+    if (!apiCallData || selectedTabIndex === null) return;
+
+    setTabs((prev) =>
+      prev.map((tab, i) =>
+        i === selectedTabIndex
+          ? {
+              ...tab,
+              tableCols: [
+                ...tab.tableCols,
+                {
+                  type: "action",
+                  label: actionLabel,
+                  name: actionLabel.toLowerCase(),
+                  apiConfig: {
+                    apiUrl: apiCallData.endpoint,
+                    method: apiCallData.method,
+                    description: apiCallData.description,
+                  },
+                },
+              ],
+            }
+          : tab
+      )
+    );
+
+    setOpenActionModal(false);
+    setSelectedTabIndex(null);
+    setSelectedActionLabel("");
+  };
+
   const addTabField = (idx, field) => {
+    const toCamelCase = (str) =>
+      str
+        .trim()
+        .replace(/[^a-zA-Z0-9 ]/g, " ")
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word, index) =>
+          index === 0
+            ? word.toLowerCase()
+            : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join("");
+
+    const labelStr = field.label;
+    const fieldName = toCamelCase(labelStr);
+
+    const currentTab = tabs[idx];
+    if (!currentTab) return;
+
+    const isDuplicate = currentTab.fields.some(
+      (f) => f.name.trim().toLowerCase() === fieldName.toLowerCase()
+    );
+
+    if (isDuplicate) {
+      alert(`Field "${labelStr}" is already added in ${currentTab?.name}.`);
+      return;
+    }
+
     setTabs((prev) =>
       prev.map((tab, i) =>
         i === idx
@@ -734,7 +869,7 @@ export default function TabDesigner({ tabs, setTabs, module }) {
                 {
                   ...field,
                   required: !!field.required,
-                  name: `${field.label}-${tab.fields.length}`,
+                  name: fieldName,
                 },
               ],
             }
@@ -773,9 +908,7 @@ export default function TabDesigner({ tabs, setTabs, module }) {
     );
   };
 
-  // Buttons
   const addTabButton = (idx, button) => {
-    // openAddButtonModal();
     setTabs((prev) =>
       prev.map((tab, i) =>
         i === idx ? { ...tab, buttons: [...tab.buttons, button] } : tab
@@ -796,21 +929,40 @@ export default function TabDesigner({ tabs, setTabs, module }) {
     );
   };
 
-  // Columns
   const addTabColumn = (idx, column) => {
-    setTabs((prev) =>
-      prev.map((tab, i) =>
-        i === idx
-          ? {
-              ...tab,
-              tableCols: [
-                ...tab.tableCols,
-                { ...column, name: `${column.label}-${tab.tableCols.length}` },
-              ],
-            }
-          : tab
-      )
+    const currentTab = tabs[idx];
+    if (!currentTab) return;
+
+    const isDuplicate = currentTab.tableCols.some(
+      (col) => col.label?.toLowerCase() === column.label?.toLowerCase()
     );
+
+    if (isDuplicate) {
+      alert(`Column "${column.label}" already exists in ${currentTab?.name}.`);
+      return;
+    }
+
+    // ✅ If label is Edit / Update / Delete → open modal for API mapping
+    if (["Edit", "View", "Delete"].includes(column.label)) {
+      setSelectedTabIndex(idx);
+      setSelectedActionLabel(column.label);
+      setOpenActionModal(true);
+    } else {
+      // Add regular column
+      setTabs((prev) =>
+        prev.map((tab, i) =>
+          i === idx
+            ? {
+                ...tab,
+                tableCols: [
+                  ...tab.tableCols,
+                  { ...column, name: `${column.label}` },
+                ],
+              }
+            : tab
+        )
+      );
+    }
   };
 
   const removeColumn = (tabIdx, colIdx) => {
@@ -839,24 +991,43 @@ export default function TabDesigner({ tabs, setTabs, module }) {
   const onDrop = (e, idx, type) => {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
-    if (type === "field" && data.category === "field")
+
+    if (type === "field" && data.category === "field") {
       addTabField(idx, data.item);
+    }
 
     if (type === "button" && data.category === "button") {
-      // trigger modal for both predefined and custom
+      const currentTab = tabs[idx];
+      if (!currentTab) return;
+
+      const existingButton = currentTab.buttons?.find(
+        (btn) =>
+          btn?.label?.toLowerCase().trim() ===
+          data.item?.label?.toLowerCase().trim()
+      );
+
+      if (existingButton) {
+        alert(
+          `Button "${data.item?.label}" already exists in ${currentTab?.name}.`
+        );
+        return;
+      }
+
       setAddingButton({
         open: true,
         tabIndex: null,
         buttonData: data.item,
-        tabIdx: idx, // to know where to add after submit
+        tabIdx: idx,
       });
-      return; // do NOT call addTabButton directly!
+      return;
     }
+
     if (
       type === "column" &&
       (data.category === "field" || data.category === "action")
-    )
+    ) {
       addTabColumn(idx, data.item);
+    }
   };
 
   // Modal submit
@@ -911,6 +1082,24 @@ export default function TabDesigner({ tabs, setTabs, module }) {
         }
         onSubmit={handleAddButtonModalSubmit}
         initialLabel={addingButton.buttonData?.label}
+        moduleName={module}
+      />
+
+      <AddTableEventModal
+        open={openTableEventModal}
+        onClose={() => {
+          setOpenTableEventModal(false);
+          setSelectedTabIndex(null);
+        }}
+        onSubmit={handleTableApiSubmit}
+        moduleName={module}
+      />
+
+      <AddTableActionEventModal
+        open={openActionModal}
+        onClose={() => setOpenActionModal(false)}
+        onSubmit={handleActionApiSubmit}
+        actionLabel={selectedActionLabel}
         moduleName={module}
       />
     </>
