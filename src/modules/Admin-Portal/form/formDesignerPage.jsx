@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 import AddButtonEventModal from "../Design/components/formDesigner/AddButtonEventModal";
 import { TabsContainer, TabItem } from "../MyTickets/pages/StyledComponents";
 import { set } from "date-fns";
+import renderIcons from "../../../shared/functions/renderIcons";
 
 export default function FormDesignerPage({ recordId: propRecordId }) {
 
@@ -26,19 +27,45 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
 
   // const [recordId,setRecordId]=useState(recordId)
 
-  // const titleOptions = ["Users", "Admin", "Tickets", "My Items"];
-  const titleOptions = [{
-    name: 'Users',
-    subModules: []
-  },
-  {
-    name: 'Groups',
-    subModules: []
-  },
-  {
-    name: 'My Items',
-    subModules: ['Tickets', 'Tasks', 'Approvals']
-  },
+  const titleOptions = [
+    {
+      name: 'My Items',
+      subModules: ['Tickets', 'Tasks', 'Approvals']
+    },
+    {
+      name: 'Users',
+      subModules: []
+    },
+    {
+      name: 'Groups',
+      subModules: []
+    },
+    {
+      name: 'Locations',
+      subModules: []
+    },
+    
+    {
+      name: 'Departments',
+      subModules: []
+    },
+    {
+      name: 'Companies',
+      subModules: []
+    },
+    {
+      name: 'Notifications',
+      subModules: []
+    },
+    {
+      name: 'Feedbacks',
+      subModules: []
+    },
+    {
+      name: 'Alerts',
+      subModules: []
+    },
+
   ]
   const [addingButton, setAddingButton] = useState({
     open: false,
@@ -112,8 +139,6 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
   const removeButton = (i) =>
     setFormButtons((prev) => prev.filter((_, idx) => idx !== i));
 
-
-
   const getRecordDetails = async () => {
     if (!recordId) return;
     const url = `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`
@@ -136,7 +161,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
       getRecordDetails()
     }
   }, [])
-  console.log(titleObj,"title Obj Hereee")
+  console.log(titleObj, "title Obj Hereee")
 
 
   return (
@@ -147,7 +172,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
           <div>
             <div className="flex items-center w-full justify-between mb-2">
               <h3 className="font-semibold !text-blue-800 !text-[22px]">
-                Form Designer
+              <button>{renderIcons('Io')}</button>  Form Designer
               </h3>
               {/* Center: Tab Buttons */}
               <div className="flex-1 flex justify-center">
@@ -210,7 +235,6 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                 <button
                   onClick={() => {
                     setTitleObj(prev => ({ ...prev, open: !prev.open }));
-                  
                   }}
                   className="w-full h-10 border rounded px-3 text-left bg-white flex items-center justify-between"
                 >
@@ -224,31 +248,53 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                       <div
                         key={option.name}
                         className="relative group px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                        onMouseEnter={() => setTitleObj(prev => ({ ...prev, hovered: option.name }))}
-                        onMouseLeave={() => setTitleObj(prev => ({ ...prev, hovered: "" }))}
+                        onMouseEnter={() =>
+                          setTitleObj(prev => ({ ...prev, hovered: option.name }))
+                        }
+                        onMouseLeave={() =>
+                          setTitleObj(prev => ({ ...prev, hovered: "" }))
+                        }
                       >
                         <div
                           className="flex justify-between items-center"
                           onClick={() => {
                             if (!option.subModules.length) {
-                              setTitleObj(prev => ({ ...prev, title: option.name, open: false }));
-                              setModule(option.name); 
+                              setTitleObj(prev => ({
+                                ...prev,
+                                title: option.name,
+                                open: false
+                              }));
+                              setModule(option.name);
                             }
                           }}
                         >
                           <span>{option.name}</span>
-                          {option.subModules.length > 0 && <span className="text-gray-400">›</span>}
+                          {option.subModules.length > 0 && (
+                            <span className="text-gray-400">‹</span> // now points left
+                          )}
                         </div>
 
-                        {/* Submodules */}
+                        {/* Submodules - now shown to the LEFT */}
                         {option.subModules.length > 0 && titleObj.hovered === option.name && (
-                          <div className="absolute left-full top-0 ml-1 w-40 bg-white border rounded shadow-md z-20">
+                          <div
+                            className="absolute right-full top-0 mr-1 w-40 bg-white border rounded shadow-md z-20"
+                            onMouseEnter={() =>
+                              setTitleObj(prev => ({ ...prev, hovered: option.name }))
+                            }
+                            onMouseLeave={() =>
+                              setTitleObj(prev => ({ ...prev, hovered: "" }))
+                            }
+                          >
                             {option.subModules.map((sub) => (
                               <div
                                 key={sub}
                                 className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                                onClick={() =>{
-                                  setTitleObj(prev => ({ ...prev, title: sub, open: false }))
+                                onClick={() => {
+                                  setTitleObj(prev => ({
+                                    ...prev,
+                                    title: sub,
+                                    open: false
+                                  }));
                                   setModule(sub);
                                 }}
                               >
@@ -263,10 +309,8 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                 )}
               </div>
 
-
             </div>
           </div>
-
           {/* Conditional Screens */}
           <div className="grid grid-cols-1 gap-8">
             {/* Form Designer */}
