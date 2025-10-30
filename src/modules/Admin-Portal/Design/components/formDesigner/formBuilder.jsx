@@ -40,12 +40,21 @@ export default function FormBuilder({
 
   // When user submits Add Field Modal
   const onAddFieldModalSubmit = ({ label, type, options, required }) => {
+    console.log(formFields)
+    if (
+      formFields.some(
+        (field) => field.label.toLowerCase() === label.toLowerCase()
+      )
+    ) {
+      alert(`Field "${label}" already added.`);
+      return;
+    }
     setFormFields((prev) => [
       ...prev,
       {
         label,
         type,
-        name: `${label}-${prev.length}`,
+        name: label,
         required: !!required,
         ...(options ? { options } : {}),
       },

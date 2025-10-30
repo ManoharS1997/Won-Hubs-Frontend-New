@@ -5,12 +5,15 @@ import TabDesigner from "../Design/components/formDesigner/TabDesigner";
 import { useLocation } from "react-router-dom";
 import AddButtonEventModal from "../Design/components/formDesigner/AddButtonEventModal";
 import { TabsContainer, TabItem } from "../MyTickets/pages/StyledComponents";
-import { set } from "date-fns";
+import PropTypes from "prop-types";
+
+FormDesignerPage.propTypes = {
+  recordId: PropTypes.any.isRequired,
+};
 
 export default function FormDesignerPage({ recordId: propRecordId }) {
-
   const { state } = useLocation();
-  console.log(state, "Here state")
+  console.log(state, "Here state");
   const recordId = propRecordId || state?.recordId;
   const [module, setModule] = React.useState("");
   const [formFields, setFormFields] = React.useState([]);
@@ -19,27 +22,25 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
   const [showTabs, setShowTabs] = React.useState(false);
   const [tabs, setTabs] = React.useState([]);
   const [titleObj, setTitleObj] = useState({
-    title: "",   // selected module/submodule
-    hovered: "", // option being hovered
-    open: false, // dropdown open/close
+    title: "",
+    hovered: "",
+    open: false,
   });
 
-  // const [recordId,setRecordId]=useState(recordId)
-
-  // const titleOptions = ["Users", "Admin", "Tickets", "My Items"];
-  const titleOptions = [{
-    name: 'Users',
-    subModules: []
-  },
-  {
-    name: 'Groups',
-    subModules: []
-  },
-  {
-    name: 'My Items',
-    subModules: ['Tickets', 'Tasks', 'Approvals']
-  },
-  ]
+  const titleOptions = [
+    {
+      name: "Users",
+      subModules: [],
+    },
+    {
+      name: "Groups",
+      subModules: [],
+    },
+    {
+      name: "My Items",
+      subModules: ["Tickets", "Tasks", "Approvals"],
+    },
+  ];
   const [addingButton, setAddingButton] = useState({
     open: false,
     tabIndex: null,
@@ -59,9 +60,17 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
     if (data.category === "field") {
+      if (
+        formFields.some(
+          (field) => field.label.toLowerCase() === data.item.label.toLowerCase()
+        )
+      ) {
+        alert(`Field "${data.item.label}" already added.`);
+        return;
+      }
       setFormFields((prev) => [
         ...prev,
-        { ...data.item, name: `${data.item.label}-${prev.length}` },
+        { ...data.item, name: `${data.item.label}` },
       ]);
     }
   };
@@ -72,6 +81,15 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     if (module?.length > 0) {
       const data = JSON.parse(e.dataTransfer.getData("application/json"));
       if (data.category === "button") {
+        if (
+          formButtons.some(
+            (btn) => btn.label.toLowerCase() === data.item.label.toLowerCase()
+          )
+        ) {
+          alert(`Field "${data.item.label}" already added.`);
+          return;
+        }
+        console.log(addingButton);
         setAddingButton({ open: true, tabIndex: null, buttonData: data.item });
       }
     } else {
@@ -96,6 +114,12 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
   }) => {
     let label =
       labelFromModal || addingButton.buttonData?.label || "Custom Button";
+    if (
+      formButtons.some((btn) => btn.label.toLowerCase() === label.toLowerCase())
+    ) {
+      alert(`Field "${label}" already added.`);
+      return;
+    }
     const newButton = {
       label,
       type: "button",
@@ -107,37 +131,36 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     setAddingButton({ open: false, tabIndex: null, buttonData: null });
   };
 
+  console.log(formButtons, "===");
+
   const removeField = (i) =>
     setFormFields((prev) => prev.filter((_, idx) => idx !== i));
   const removeButton = (i) =>
     setFormButtons((prev) => prev.filter((_, idx) => idx !== i));
 
-
-
   const getRecordDetails = async () => {
     if (!recordId) return;
-    const url = `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`
-    const response = await fetch(url)
+    const url = `${
+      import.meta.env.VITE_HOSTED_API_URL
+    }/api/form-designer/${recordId}`;
+    const response = await fetch(url);
     // console.log(response,"Record Response");
-    const dbResponse = await response.json()
-    console.log(dbResponse, "DbResponse Hereee")
+    const dbResponse = await response.json();
+    console.log(dbResponse, "DbResponse Hereee");
     if (dbResponse.data) {
-      const { formFields, formButtons, tabs, module } = dbResponse.data
-      console.log(module, "Form Fields from DB");
-      setFormFields(formFields)
-      setFormButtons(formButtons)
-      setTabs(tabs)
-      setModule(module)
+      const { formFields, formButtons, tabs, module } = dbResponse.data;
+      setFormFields(formFields);
+      setFormButtons(formButtons);
+      setTabs(tabs);
+      setModule(module);
     }
-  }
+  };
 
   useEffect(() => {
     if (recordId) {
-      getRecordDetails()
+      getRecordDetails();
     }
-  }, [])
-  console.log(titleObj,"title Obj Hereee")
-
+  }, []);
 
   return (
     <>
@@ -209,8 +232,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
               <div className="relative inline-block w-48">
                 <button
                   onClick={() => {
-                    setTitleObj(prev => ({ ...prev, open: !prev.open }));
-                  
+                    setTitleObj((prev) => ({ ...prev, open: !prev.open }));
                   }}
                   className="w-full h-10 border rounded px-3 text-left bg-white flex items-center justify-between"
                 >
@@ -224,46 +246,62 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                       <div
                         key={option.name}
                         className="relative group px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                        onMouseEnter={() => setTitleObj(prev => ({ ...prev, hovered: option.name }))}
-                        onMouseLeave={() => setTitleObj(prev => ({ ...prev, hovered: "" }))}
+                        onMouseEnter={() =>
+                          setTitleObj((prev) => ({
+                            ...prev,
+                            hovered: option.name,
+                          }))
+                        }
+                        onMouseLeave={() =>
+                          setTitleObj((prev) => ({ ...prev, hovered: "" }))
+                        }
                       >
                         <div
                           className="flex justify-between items-center"
                           onClick={() => {
                             if (!option.subModules.length) {
-                              setTitleObj(prev => ({ ...prev, title: option.name, open: false }));
-                              setModule(option.name); 
+                              setTitleObj((prev) => ({
+                                ...prev,
+                                title: option.name,
+                                open: false,
+                              }));
+                              setModule(option.name);
                             }
                           }}
                         >
                           <span>{option.name}</span>
-                          {option.subModules.length > 0 && <span className="text-gray-400">›</span>}
+                          {option.subModules.length > 0 && (
+                            <span className="text-gray-400">›</span>
+                          )}
                         </div>
 
                         {/* Submodules */}
-                        {option.subModules.length > 0 && titleObj.hovered === option.name && (
-                          <div className="absolute left-full top-0 ml-1 w-40 bg-white border rounded shadow-md z-20">
-                            {option.subModules.map((sub) => (
-                              <div
-                                key={sub}
-                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                                onClick={() =>{
-                                  setTitleObj(prev => ({ ...prev, title: sub, open: false }))
-                                  setModule(sub);
-                                }}
-                              >
-                                {sub}
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        {option.subModules.length > 0 &&
+                          titleObj.hovered === option.name && (
+                            <div className="absolute left-full top-0 ml-1 w-40 bg-white border rounded shadow-md z-20">
+                              {option.subModules.map((sub) => (
+                                <div
+                                  key={sub}
+                                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                                  onClick={() => {
+                                    setTitleObj((prev) => ({
+                                      ...prev,
+                                      title: sub,
+                                      open: false,
+                                    }));
+                                    setModule(sub);
+                                  }}
+                                >
+                                  {sub}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-
-
             </div>
           </div>
 
