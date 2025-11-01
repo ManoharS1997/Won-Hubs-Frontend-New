@@ -743,14 +743,14 @@ const EditorRichUI = ({ path = "", defaultFieldsData = {}, content = "", isUpdat
           )}
         </ul>
       </div>
-      <div className='overflow-y-auto custom-scrollbar p-2 m-0 w-full overflow-hidden'>
+      <div className='overflow-y-auto custom-scrollbar  m-0 w-full overflow-hidden'>
         {/* <div className="flex items-start gap-4 w-full mt-2"> */}
         {/* Editable Fields */}
         {/* {detailsObject && (
             <EditableFields data={detailsObject} onUpdate={handleFieldsUpdate} path={path} />
           )} */}
         {/* Finish Button */}
-        <div className="flex items-end mt-2 justify-end">
+        {/* <div className="flex items-end mt-2 justify-end">
           <button
             className="
         bg-black text-white 
@@ -779,23 +779,24 @@ const EditorRichUI = ({ path = "", defaultFieldsData = {}, content = "", isUpdat
               <path d="M1 8h14M9 3l6 5-6 5" />
             </svg>
           </button>
-        </div>
+        </div> */}
         {/* </div> */}
-        <div className="w-[73vw] mx-auto mt-4 mb-0 h-[70vh] flex flex-col border  rounded-md bg-white">
+        <div className="w-[73vw] mx-auto mt-4 mb-0 h-[75vh] flex flex-col  rounded-md bg-white ">
           <div
             style={{
               maxWidth: "97%",
-              margin: "20px auto",
+              margin:'2px',
               border: "2px solid #dcdcdc",
               borderRadius: 8,
-              height: "68vh", // fixed height (main editor stays same size)
+              height: "68vh",
               display: "flex",
               flexDirection: "column",
               background: "#fff",
+              
             }}
             className="!mr-2 flex-1"
           >
-
+{/* toolBar container */}
             <div
               style={{
                 display: "flex",
@@ -879,30 +880,7 @@ const EditorRichUI = ({ path = "", defaultFieldsData = {}, content = "", isUpdat
 
             </div>
             {/* editor Area div */}
-            {/* <div
-              ref={editorRef}
-              contentEditable
-              suppressContentEditableWarning
-              spellCheck
-              style={{
-                flexGrow: 1,
-                padding: "1rem",
-                outline: "none",
-                fontFamily,
-                fontSize,
-                color,
-                overflowY: "auto",
-                overflowX: "hidden",
-                lineHeight: 1.6,
-                background: "#fff",
-              }}
-              onKeyDown={handleKeyDown}
-              onInput={() => saveContentToLocalStorage(false)}
-
-              className='custom-scrollbar editor-area'
-            >
-              <p>Start typing your content here...</p>
-            </div> */}
+            
             <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50 p-2">
               <div
                 ref={editorRef}

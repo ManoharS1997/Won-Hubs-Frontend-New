@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import FormBuilder from "../Design/components/formDesigner/formBuilder";
 import PreviewModal from "../Design/components/formDesigner/PreviewModal";
 import TabDesigner from "../Design/components/formDesigner/TabDesigner";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AddButtonEventModal from "../Design/components/formDesigner/AddButtonEventModal";
 import { TabsContainer, TabItem } from "../MyTickets/pages/StyledComponents";
 import { set } from "date-fns";
@@ -28,6 +28,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     hovered: "",
     open: false,
   });
+  const Navigate=useNavigate()
 
   // const [recordId,setRecordId]=useState(recordId)
 
@@ -48,7 +49,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
       name: 'Locations',
       subModules: []
     },
-    
+
     {
       name: 'Departments',
       subModules: []
@@ -170,9 +171,8 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
 
   const getRecordDetails = async () => {
     if (!recordId) return;
-    const url = `${
-      import.meta.env.VITE_HOSTED_API_URL
-    }/api/form-designer/${recordId}`;
+    const url = `${import.meta.env.VITE_HOSTED_API_URL
+      }/api/form-designer/${recordId}`;
     const response = await fetch(url);
     // console.log(response,"Record Response");
     const dbResponse = await response.json();
@@ -190,13 +190,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     if (recordId) {
       getRecordDetails();
     }
-<<<<<<< HEAD
-  }, [])
-  console.log(titleObj, "title Obj Hereee")
-
-=======
   }, []);
->>>>>>> 217f44c7af67082d623dee6a7b6576d99ca8688e
 
   return (
     <>
@@ -205,9 +199,13 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
           {/* Header Tabs */}
           <div>
             <div className="flex items-center w-full justify-between mb-2">
-              <h3 className="font-semibold !text-blue-800 !text-[22px]">
-              <button>{renderIcons('Io')}</button>  Form Designer
+              <h3 className="font-semibold !text-blue-800 !text-[22px] flex items-center gap-2">
+                <button className="m-0 p-0 bg-transparent flex items-center justify-center" onClick={()=>{Navigate('/create/new/design')}}>
+                  {renderIcons('IoIosArrowBack', 30, '#08107D')}
+                </button>
+                <span>Form Designer</span>
               </h3>
+
               {/* Center: Tab Buttons */}
               <div className="flex-1 flex justify-center">
                 <TabsContainer style={{ marginBottom: 20 }}>
@@ -233,7 +231,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                       }
                     }}
                   >
-                    Tab Designer
+                    Tabs
                   </TabItem>
                   <TabItem
                     type="button"
@@ -251,28 +249,11 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                   </TabItem>
                 </TabsContainer>
               </div>
-              {/* <div className="relative">
-  <select
-    value={module}
-    onChange={(e) => setModule(e.target.value)}
-    className="w-48 h-10 p-2 border rounded"
-  >
-    <option value="">Select Module</option>
-    {titleOptions.map((option) => (
-      <option key={option.name} value={option.name}>
-        {option.name}
-      </option>
-    ))}
-  </select>
-            </div> */}
+
               <div className="relative inline-block w-48">
                 <button
                   onClick={() => {
-<<<<<<< HEAD
-                    setTitleObj(prev => ({ ...prev, open: !prev.open }));
-=======
                     setTitleObj((prev) => ({ ...prev, open: !prev.open }));
->>>>>>> 217f44c7af67082d623dee6a7b6576d99ca8688e
                   }}
                   className="w-full h-10 border rounded px-3 text-left bg-white flex items-center justify-between"
                 >
@@ -287,12 +268,6 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                         key={option.name}
                         className="relative group px-3 py-2 hover:bg-gray-100 cursor-pointer"
                         onMouseEnter={() =>
-<<<<<<< HEAD
-                          setTitleObj(prev => ({ ...prev, hovered: option.name }))
-                        }
-                        onMouseLeave={() =>
-                          setTitleObj(prev => ({ ...prev, hovered: "" }))
-=======
                           setTitleObj((prev) => ({
                             ...prev,
                             hovered: option.name,
@@ -300,24 +275,16 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                         }
                         onMouseLeave={() =>
                           setTitleObj((prev) => ({ ...prev, hovered: "" }))
->>>>>>> 217f44c7af67082d623dee6a7b6576d99ca8688e
                         }
                       >
                         <div
                           className="flex justify-between items-center"
                           onClick={() => {
                             if (!option.subModules.length) {
-<<<<<<< HEAD
                               setTitleObj(prev => ({
                                 ...prev,
                                 title: option.name,
                                 open: false
-=======
-                              setTitleObj((prev) => ({
-                                ...prev,
-                                title: option.name,
-                                open: false,
->>>>>>> 217f44c7af67082d623dee6a7b6576d99ca8688e
                               }));
                               setModule(option.name);
                             }
@@ -325,7 +292,6 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                         >
                           <span>{option.name}</span>
                           {option.subModules.length > 0 && (
-<<<<<<< HEAD
                             <span className="text-gray-400">‹</span> // now points left
                           )}
                         </div>
@@ -359,43 +325,12 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                             ))}
                           </div>
                         )}
-=======
-                            <span className="text-gray-400">›</span>
-                          )}
-                        </div>
-
-                        {/* Submodules */}
-                        {option.subModules.length > 0 &&
-                          titleObj.hovered === option.name && (
-                            <div className="absolute left-full top-0 ml-1 w-40 bg-white border rounded shadow-md z-20">
-                              {option.subModules.map((sub) => (
-                                <div
-                                  key={sub}
-                                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                                  onClick={() => {
-                                    setTitleObj((prev) => ({
-                                      ...prev,
-                                      title: sub,
-                                      open: false,
-                                    }));
-                                    setModule(sub);
-                                  }}
-                                >
-                                  {sub}
-                                </div>
-                              ))}
-                            </div>
-                          )}
->>>>>>> 217f44c7af67082d623dee6a7b6576d99ca8688e
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-<<<<<<< HEAD
 
-=======
->>>>>>> 217f44c7af67082d623dee6a7b6576d99ca8688e
             </div>
           </div>
           {/* Conditional Screens */}
