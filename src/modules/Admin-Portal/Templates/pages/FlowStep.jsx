@@ -4,16 +4,19 @@ import EditorRichUI from "../../../../shared/CreationEditor/WorkingEditor";
 import PreviewEditor from "../../../../shared/CreationEditor/PreviewEditor";
 import Fields from "../../../../shared/CreationEditor/Fields";
 import { GetAnyRecordFromAnyTable } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
+import { useLocation } from "react-router-dom";
 
-
-const FlowStepComponent = ({ recordId }) => {
-    
+const FlowStepComponent = ({ recordId}) => {
+    const location=useLocation()
     const [flowStep, setFlowStep] = useState(0)
     const [templates, setTemplates] = useState([]);
     const [selectedTab, setSelectedTab] = useState('Fields')
     const [data,setData] = useState(JSON.parse(localStorage.getItem('templateData'))||{})
+    const [path,setPath]=useState("")
+    // const {path}=Location?.state
     // console.log(data)
     const content = localStorage.getItem("editorContent")
+    // console.log(content)
     useEffect(() => {
         const fetchTemplates = async () => {
             try {
@@ -71,6 +74,13 @@ const FlowStepComponent = ({ recordId }) => {
                 ]);
             }
         };
+        if(location){
+            console.log(location,"Location")
+            if(location.state){
+               const {path}=location.state
+               setPath(path)
+            }
+        }
         fetchTemplates();
     }, []);
    
@@ -148,13 +158,13 @@ const FlowStepComponent = ({ recordId }) => {
 
 
                 {
-                    selectedTab === "Fields" && <Fields configureFields={configureFields} data={data} />
+                    selectedTab === "Fields" && <Fields data={data}  path="template"/>
                 }
                 {
-                    selectedTab === "Editor" && <EditorRichUI path="template" />
+                    selectedTab === "Editor" && <EditorRichUI path={path} />
                 }
                 {
-                    selectedTab === "Preview" && <PreviewEditor path="template" detailsObject={data} editorContent={content} />
+                    selectedTab === "Preview" && <PreviewEditor path={path} detailsObject={data} editorContent={content} />
                 }
 
 

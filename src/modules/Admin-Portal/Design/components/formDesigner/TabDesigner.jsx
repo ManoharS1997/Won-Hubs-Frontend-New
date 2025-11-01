@@ -155,11 +155,10 @@ function Tab({
             <button
               onClick={() => setTabType(tabIdx, "form")}
               className={`px-5 py-2 text-sm font-medium transition-all duration-200
-      ${
-        tab.type === "form"
-          ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
-          : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
-      }
+      ${tab.type === "form"
+                  ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
+                  : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
+                }
       rounded-l-md
     `}
             >
@@ -168,11 +167,10 @@ function Tab({
             <button
               onClick={() => setTabType(tabIdx, "table")}
               className={`px-5 py-2 text-sm font-medium transition-all duration-200
-      ${
-        tab.type === "table"
-          ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
-          : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
-      }
+      ${tab.type === "table"
+                  ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
+                  : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
+                }
       rounded-r-md
     `}
             >
@@ -239,9 +237,8 @@ function Tab({
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => toggleRequired(tabIdx, idx)}
-                        className={`text-sm font-semibold ${
-                          field.required ? "text-red-500" : "text-gray-400"
-                        } hover:text-red-600 transition`}
+                        className={`text-sm font-semibold ${field.required ? "text-red-500" : "text-gray-400"
+                          } hover:text-red-600 transition`}
                         title="Toggle required"
                       >
                         {field.required ? "Req" : "Opt"}
@@ -348,7 +345,7 @@ function Tab({
                   item={action}
                   category="action"
                   onDragStart={onDragStart}
-                  className="px-3 py-1 bg-blue-500 text-white rounded cursor-grab text-sm shadow-sm"
+                  className="px-3 py-1 !bg-blue-500 text-white rounded cursor-grab text-sm shadow-sm"
                 >
                   {action.label}
                 </DraggableButton>
@@ -359,7 +356,7 @@ function Tab({
                   const label = prompt("Enter column label");
                   if (label) addTabColumn(tabIdx, { type: "custom", label });
                 }}
-                className="px-3 py-1 bg-green-600 text-white rounded cursor-pointer hover:bg-green-700"
+                className="px-3 py-1 !bg-green-600 text-white rounded cursor-pointer hover:bg-green-700"
               >
                 + Custom Column
               </button>
@@ -394,37 +391,50 @@ function Tab({
             )}
           </div>
 
-          <table className="w-full table-auto border border-gray-300 rounded-md text-center shadow-sm">
+          <table className="w-full table-fixed border border-gray-300 rounded-md text-center shadow-sm">
             <thead className="bg-indigo-200 text-indigo-700 font-semibold">
               <tr>
-                {/* Render all non-action column headers */}
+                {/* Non-action headers */}
                 {tab.tableCols
                   .filter((col) => col.type !== "action")
                   .map((col) => (
                     <th
                       key={col.name}
                       className="border border-gray-300 px-4 py-2"
+                      style={{
+                        width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                      }}
                     >
                       {col.label}
                     </th>
                   ))}
 
-                {/* Render single "Actions" header if there are any action columns */}
+                {/* Single "Actions" header */}
                 {tab.tableCols.some((col) => col.type === "action") && (
-                  <th className="border border-gray-300 px-4 py-2">Actions</th>
+                  <th
+                    className="border border-gray-300 px-4 py-2"
+                    style={{
+                      width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                    }}
+                  >
+                    Actions
+                  </th>
                 )}
               </tr>
             </thead>
 
             <tbody>
               <tr>
-                {/* Render dummy row data for each non-action column */}
+                {/* Non-action data cells */}
                 {tab.tableCols
                   .filter((col) => col.type !== "action")
                   .map((col) => (
                     <td
                       key={col.name}
-                      className="border border-gray-300 px-4 py-2"
+                      className="border border-gray-300 px-4 py-2 truncate"
+                      style={{
+                        width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                      }}
                     >
                       {fieldSupportsOptions(col.type)
                         ? (col.options || []).join(", ")
@@ -432,31 +442,36 @@ function Tab({
                     </td>
                   ))}
 
-                {/* Render a single cell for all action buttons */}
+                {/* Single Actions cell */}
                 {tab.tableCols.some((col) => col.type === "action") && (
-                  <td className="border border-gray-300 px-4 py-2">
+                  <td
+                    className="border border-gray-300 px-4 py-2"
+                    style={{
+                      width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                    }}
+                  >
                     <div className="flex justify-center gap-2">
                       {tab.tableCols
                         .filter((col) => col.type === "action")
                         .map((actionCol) => {
                           let btnStyle =
                             actionCol.label.toLowerCase() === "edit"
-                              ? "bg-indigo-600 hover:bg-indigo-700"
+                              ? "!bg-indigo-600 hover:bg-indigo-700"
                               : actionCol.label.toLowerCase() === "delete"
-                              ? "bg-red-600 hover:bg-red-700"
-                              : actionCol.label.toLowerCase() === "view"
-                              ? "bg-yellow-500 hover:bg-yellow-600"
-                              : "bg-gray-500 hover:bg-gray-600";
+                                ? "!bg-red-600 hover:bg-red-700"
+                                : actionCol.label.toLowerCase() === "view"
+                                  ? "!bg-yellow-500 hover:bg-yellow-600"
+                                  : "!bg-gray-500 hover:bg-gray-600";
 
                           return (
                             <button
                               key={actionCol.name}
-                              className={`${btnStyle} text-white px-3 py-1 rounded transition`}
-                              onClick={() => {
+                              className={`${btnStyle} text-white px-3 py-1 rounded transition text-sm`}
+                              onClick={() =>
                                 alert(
                                   `Trigger ${actionCol.label} API: ${actionCol.apiConfig.description}`
-                                );
-                              }}
+                                )
+                              }
                             >
                               {actionCol.label}
                             </button>
@@ -468,6 +483,7 @@ function Tab({
               </tr>
             </tbody>
           </table>
+
         </>
       )}
     </section>
@@ -519,6 +535,9 @@ function TabsDesigner({
   addCustomButton,
   toggleRequired,
 }) {
+  const [showAllButtonFields, setShowAllButtonFields] = useState(false);
+  const [updatedTabsList, setUpdatedTabsList] = useState(tabsList)
+  console.log(updatedTabsList, "updatedList hereee")
   return (
     <section className="bg-white rounded-lg  mx-auto mt-2 min-h-full">
       <div className="flex justify-between mt-0 mb-2">
@@ -543,26 +562,30 @@ function TabsDesigner({
             className="outline-none px-2 py-1"
             onChange={(e) => {
               const query = e.target.value.toLowerCase();
-              updateTabFilters(
-                PREDEFINED_TABS.filter((tab) =>
-                  tab.label.toLowerCase().includes(query)
-                )
+              // updateTabFilters(
+              //   PREDEFINED_TABS.filter((tab) =>
+              //     tab.label.toLowerCase().includes(query)
+              //   )
+              // );
+              const filteredTabs = tabsList.filter((item) =>
+                item.toLowerCase().includes(query)
               );
+              setUpdatedTabsList(filteredTabs)
+
             }}
           />
 
           {renderIcons("FaSearch", 15, "gray")}
         </div>
       </div>
+      {/* Tabs Rendering */}
       <div className="flex flex-wrap gap-3 mb-6">
-        {tabsList.map((t) => (
+        {(showAllButtonFields ? updatedTabsList : updatedTabsList.slice(0, 4)).map((t) => (
           <DraggableButton
-            // style={{ borderRadius: '8px' }}
             key={t}
             item={t}
             category="tab"
             onDragStart={onDragStart}
-            // className="px-3 py-1 rounded bg-indigo-100 text-indigo-700 cursor-grab shadow-sm"
             className="
         bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
         border border-blue-600/40
@@ -583,20 +606,28 @@ function TabsDesigner({
           </DraggableButton>
         ))}
       </div>
+
       <div className="flex w-full justify-between items-center mb-4">
         <button
           onClick={addCustomTab}
-          className="px-3 py-2  rounded !bg-green-600 text-white hover:bg-green-700 shadow-sm"
+          className="px-3 py-2 rounded !bg-green-600 text-white hover:bg-green-700 shadow-sm"
           type="button"
         >
           + Custom
         </button>
-        <button className="bg-transparent p-0 m-0 text-blue-500">+more</button>
+
+        <button
+          className="bg-transparent p-0 m-0 text-blue-600 font-medium hover:underline"
+          onClick={() => setShowAllButtonFields((prev) => !prev)}
+        >
+          {showAllButtonFields ? 'Show Less' : '+ More'}
+        </button>
       </div>
+
       <div
         onDrop={onDropTab}
         onDragOver={allowDrop}
-        className="border border-dashed border-indigo-400 min-h-[15rem] p-4 rounded"
+        className="border-2 !border-dashed !border-indigo-400 min-h-[15rem] p-4 !rounded"
       >
         {tabs.length === 0 ? (
           <p className="text-center text-gray-500 italic mt-10">
@@ -784,12 +815,12 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === selectedTabIndex
           ? {
-              ...tab,
-              apiConfig: {
-                apiUrl: apiCallData.endpoint,
-                method: apiCallData.method,
-              },
-            }
+            ...tab,
+            apiConfig: {
+              apiUrl: apiCallData.endpoint,
+              method: apiCallData.method,
+            },
+          }
           : tab
       )
     );
@@ -806,21 +837,21 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === selectedTabIndex
           ? {
-              ...tab,
-              tableCols: [
-                ...tab.tableCols,
-                {
-                  type: "action",
-                  label: actionLabel,
-                  name: actionLabel.toLowerCase(),
-                  apiConfig: {
-                    apiUrl: apiCallData.endpoint,
-                    method: apiCallData.method,
-                    description: apiCallData.description,
-                  },
+            ...tab,
+            tableCols: [
+              ...tab.tableCols,
+              {
+                type: "action",
+                label: actionLabel,
+                name: actionLabel.toLowerCase(),
+                apiConfig: {
+                  apiUrl: apiCallData.endpoint,
+                  method: apiCallData.method,
+                  description: apiCallData.description,
                 },
-              ],
-            }
+              },
+            ],
+          }
           : tab
       )
     );
@@ -863,16 +894,16 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === idx
           ? {
-              ...tab,
-              fields: [
-                ...tab.fields,
-                {
-                  ...field,
-                  required: !!field.required,
-                  name: fieldName,
-                },
-              ],
-            }
+            ...tab,
+            fields: [
+              ...tab.fields,
+              {
+                ...field,
+                required: !!field.required,
+                name: fieldName,
+              },
+            ],
+          }
           : tab
       )
     );
@@ -883,11 +914,11 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-              ...tab,
-              fields: tab.fields.map((field, j) =>
-                j === fieldIdx ? { ...field, required: !field.required } : field
-              ),
-            }
+            ...tab,
+            fields: tab.fields.map((field, j) =>
+              j === fieldIdx ? { ...field, required: !field.required } : field
+            ),
+          }
           : tab
       )
     );
@@ -921,9 +952,9 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-              ...tab,
-              buttons: tab.buttons.filter((_, idx) => idx !== buttonIdx),
-            }
+            ...tab,
+            buttons: tab.buttons.filter((_, idx) => idx !== buttonIdx),
+          }
           : tab
       )
     );
@@ -953,12 +984,12 @@ export default function TabDesigner({ tabs, setTabs, module }) {
         prev.map((tab, i) =>
           i === idx
             ? {
-                ...tab,
-                tableCols: [
-                  ...tab.tableCols,
-                  { ...column, name: `${column.label}` },
-                ],
-              }
+              ...tab,
+              tableCols: [
+                ...tab.tableCols,
+                { ...column, name: `${column.label}` },
+              ],
+            }
             : tab
         )
       );
@@ -970,9 +1001,9 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-              ...tab,
-              tableCols: tab.tableCols.filter((_, idx) => idx !== colIdx),
-            }
+            ...tab,
+            tableCols: tab.tableCols.filter((_, idx) => idx !== colIdx),
+          }
           : tab
       )
     );

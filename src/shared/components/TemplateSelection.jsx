@@ -34,6 +34,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
         }, {})
     );
 
+    console.log(path,"In Template Selection")
     const Navigate = useNavigate();
 
     const GoBack = () => Navigate(-1);
@@ -99,7 +100,9 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
             return;
         }
 
-        Navigate(`/${path}/new`, { replace: true });
+        Navigate(`/flowcheck/new`, { replace: true },
+            { state: { path: path } }
+        );
     };
     return (
         <WonContext.Consumer>
@@ -146,11 +149,13 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                         ))}
 
                                     <li
-                                        onClick={() => setModalOpen(true)}
-                                        className="w-full h-[200px] bg-gray-50 rounded flex items-center justify-center hover:shadow-lg border-2 !border-dashed cursor-pointer"
+                                        onClick={() => Navigate(`/flowcheck/new`, { state: { path: path } }, { replace: true })}
+
+                                        className="w-full h-[200px] bg-gray-50 rounded flex items-center justify-center hover:shadow-lg border-2 border-dashed cursor-pointer transition-all"
                                     >
-                                        <p style={{ fontSize: "55px" }}>+</p>
+                                        <p className="text-[55px] text-gray-600">+</p>
                                     </li>
+
                                 </ul>
 
                                 {lists.find((l) => l.type === selectedTab)?.records?.length ===
@@ -162,7 +167,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                             </TemplateTilesContainer>
                         </CustomNotificationContainer>
 
-                        {isModalOpen && (
+                        {/* {isModalOpen && (
                             <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/20 backdrop-blur-sm">
                                 <div
                                     className="flex flex-col py-3 px-4 justify-between items-center bg-white rounded-lg gap-3 w-[400px] max-w-[90%]
@@ -174,7 +179,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                     }}
                                 >
                                     {/* Header */}
-                                    <div className="relative w-full flex items-center justify-center">
+                        {/* <div className="relative w-full flex items-center justify-center">
                                         <h2 className="!text-md font-semibold text-center w-full text-gray-800">
                                             {title}
                                         </h2>
@@ -186,11 +191,11 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                         >
                                             <IoIosClose size={18} />
                                         </button>
-                                    </div>
+                                    </div> */}
 
 
-                                    {/* Content */}
-                                    <div
+                        {/* Content */}
+                        {/* <div
                                         className="w-full flex flex-col gap-2 overflow-y-auto max-h-[55vh] scrollbar-thin 
                    scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500 scroll-smooth pr-1"
                                         style={{
@@ -238,10 +243,10 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                                 />
                                             );
                                         })}
-                                    </div>
+                                    </div> */}
 
-                                    {/* Footer Button */}
-                                    <button
+                        {/* Footer Button */}
+                        {/* <button
                                         type="submit"
                                         disabled={!isCreateBtnActive}
                                         onClick={handleSave}
@@ -254,7 +259,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                     </button>
                                 </div>
                             </div>
-                        )}
+                        )} */}
 
 
                     </SideNavAndContentContainer>

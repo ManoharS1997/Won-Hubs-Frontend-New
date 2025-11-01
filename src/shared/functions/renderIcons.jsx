@@ -64,6 +64,11 @@ import { BsFillCaretDownFill,BsFillCaretUpFill  } from "react-icons/bs";
 import { GoTriangleDown } from "react-icons/go";
 import { IoNewspaperOutline } from "react-icons/io5";
 import { GrChannel } from "react-icons/gr";
+import { TfiEmail } from "react-icons/tfi";
+import { HiOutlineMailOpen } from "react-icons/hi";
+import { LuMailOpen } from "react-icons/lu";
+import { MdOutgoingMail ,MdOutlineKeyboardArrowDown } from "react-icons/md";
+
 const iconMap = {
   BsPersonWorkspace, HiViewBoards, HiUserGroup, RiSettings5Fill, HiDotsHorizontal,
   RxOpenInNewWindow, MdOutlineManageAccounts, RiDeleteBinLine, IoMdAdd, GrRadialSelected,
@@ -86,7 +91,8 @@ const iconMap = {
   SlCloudUpload, IoGlobe, GoGrabber, IoChevronBackOutline, MdDoubleArrow, AiOutlineSwap, CgArrowsExchangeAltV,
   RiKey2Line,RiAdminLine ,FaSitemap,FaPassport,BiDetail,FaPhoneAlt,FaFax ,FaMoneyBills ,RiShieldKeyholeLine,
   FaCrosshairs ,FaUserTag,TiTabsOutline,BsFillCaretDownFill,BsFillCaretUpFill ,GoTriangleDown,IoNewspaperOutline,
-  GrChannel,FaBuilding,FaUserCheck,FaDollarSign,FaUserTag,FaTasks,FaHashtag,FaUsersCog,FaBook,FaCalendarDay,FaObjectGroup,FaUser
+  GrChannel,FaBuilding,FaUserCheck,FaDollarSign,FaTasks,FaHashtag,FaUsersCog,FaBook,FaCalendarDay,FaObjectGroup,FaUser,
+  TfiEmail,HiOutlineMailOpen ,LuMailOpen ,MdOutgoingMail,MdOutlineKeyboardArrowDown 
 
 };
 

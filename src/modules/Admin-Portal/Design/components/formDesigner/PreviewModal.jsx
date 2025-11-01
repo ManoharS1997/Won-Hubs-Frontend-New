@@ -232,18 +232,16 @@ export default function PreviewModal({
 
       {/* Form preview */}
       <form
-        className={`mx-auto w-full ${
-          twoColumn
+        className={`mx-auto w-full ${twoColumn
             ? "grid grid-cols-1 md:grid-cols-2 gap-4"
             : "grid grid-cols-1"
-        }`}
+          }`}
       >
         {formFields.map(renderField)}
 
         <div
-          className={`mt-4 flex gap-4 ${
-            twoColumn ? "col-span-2 justify-start" : ""
-          }`}
+          className={`mt-4 flex gap-4 ${twoColumn ? "col-span-2 justify-start" : ""
+            }`}
         >
           {formButtons.map((btn) => (
             <button
@@ -280,11 +278,10 @@ export default function PreviewModal({
 
               {tab.type === "form" && (
                 <form
-                  className={`mx-auto w-full ${
-                    twoColumn
+                  className={`mx-auto w-full ${twoColumn
                       ? "grid grid-cols-1 md:grid-cols-2 gap-2"
                       : "grid grid-cols-1"
-                  }`}
+                    }`}
                 >
                   {tab.fields.map(renderField)}
                   <div className="col-span-2 flex gap-4">
@@ -302,33 +299,100 @@ export default function PreviewModal({
               )}
 
               {tab.type === "table" && (
-                <table className="w-full border border-gray-300 border-collapse text-center">
-                  <thead className="bg-indigo-100">
+                <table className="w-full table-fixed border border-gray-300 rounded-md text-center shadow-sm">
+                  <thead className="bg-indigo-200 text-indigo-700 font-semibold">
                     <tr>
-                      {tab.tableCols.map((col) => (
+                      {/* Non-action headers */}
+                      {tab.tableCols
+                        .filter((col) => col.type !== "action")
+                        .map((col) => (
+                          <th
+                            key={col.name}
+                            className="border border-gray-300 px-4 py-2"
+                            style={{
+                              width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                            }}
+                          >
+                            {col.label}
+                          </th>
+                        ))}
+
+                      {/* Single "Actions" header */}
+                      {tab.tableCols.some((col) => col.type === "action") && (
                         <th
-                          key={col.name}
-                          className="border border-gray-300 p-2"
+                          className="border border-gray-300 px-4 py-2"
+                          style={{
+                            width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                          }}
                         >
-                          {col.label}
+                          Actions
                         </th>
-                      ))}
+                      )}
                     </tr>
                   </thead>
+
                   <tbody>
                     <tr>
-                      {tab.tableCols.map((col) => (
+                      {/* Non-action data cells */}
+                      {tab.tableCols
+                        .filter((col) => col.type !== "action")
+                        .map((col) => (
+                          <td
+                            key={col.name}
+                            className="border border-gray-300 px-4 py-2 truncate text-gray-700"
+                            style={{
+                              width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                            }}
+                          >
+                            {col.options && col.options.length > 0
+                              ? col.options.join(", ")
+                              : `[${col.type}]`}
+                          </td>
+                        ))}
+
+                      {/* Single Actions cell */}
+                      {tab.tableCols.some((col) => col.type === "action") && (
                         <td
-                          key={col.name}
-                          className="border border-gray-300 p-2 text-gray-700"
+                          className="border border-gray-300 px-4 py-2"
+                          style={{
+                            width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                          }}
                         >
-                          [{col.type}]
+                          <div className="flex justify-center gap-2">
+                            {tab.tableCols
+                              .filter((col) => col.type === "action")
+                              .map((actionCol) => {
+                                let btnStyle =
+                                  actionCol.label.toLowerCase() === "edit"
+                                    ? "!bg-indigo-600 hover:bg-indigo-700"
+                                    : actionCol.label.toLowerCase() === "delete"
+                                      ? "!bg-red-600 hover:bg-red-700"
+                                      : actionCol.label.toLowerCase() === "view"
+                                        ? "!bg-yellow-500 hover:bg-yellow-600"
+                                        : "!bg-gray-500 hover:bg-gray-600";
+
+                                return (
+                                  <button
+                                    key={actionCol.name}
+                                    className={`${btnStyle} text-white px-3 py-1 rounded transition text-sm`}
+                                    onClick={() =>
+                                      alert(
+                                        `Trigger ${actionCol.label} API: ${actionCol.apiConfig?.description || "N/A"}`
+                                      )
+                                    }
+                                  >
+                                    {actionCol.label}
+                                  </button>
+                                );
+                              })}
+                          </div>
                         </td>
-                      ))}
+                      )}
                     </tr>
                   </tbody>
                 </table>
               )}
+
             </section>
           ))}
         </div>
@@ -340,19 +404,18 @@ export default function PreviewModal({
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className={`px-6 py-2 !rounded-lg shadow text-white transition ${
-            saving
+          className={`px-6 py-2 !rounded-lg shadow text-white transition ${saving
               ? "!bg-gray-400 cursor-not-allowed"
               : "!bg-green-600 hover:bg-green-700"
-          }`}
+            }`}
         >
           {saving
             ? recordId
               ? "Updating..."
               : "Saving..."
             : recordId
-            ? "Update"
-            : "Save"}
+              ? "Update"
+              : "Save"}
         </button>
       </div>
     </div>
