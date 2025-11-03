@@ -6,17 +6,15 @@ import Fields from "../../../../shared/CreationEditor/Fields";
 import { GetAnyRecordFromAnyTable } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 import { useLocation } from "react-router-dom";
 
-const FlowStepComponent = ({ recordId}) => {
-    const location=useLocation()
+const FlowStepComponent = ({ recordId, path }) => {
+    const location = useLocation()
     const [flowStep, setFlowStep] = useState(0)
     const [templates, setTemplates] = useState([]);
     const [selectedTab, setSelectedTab] = useState('Fields')
-    const [data,setData] = useState(JSON.parse(localStorage.getItem('templateData'))||{})
-    const [path,setPath]=useState("")
-    // const {path}=Location?.state
-    // console.log(data)
-    const content = localStorage.getItem("editorContent")
-    // console.log(content)
+    const [data, setData] = useState(JSON.parse(localStorage.getItem('templateData')) || {})
+    const [UrlPath, setPath] = useState(path)
+    const [editorContent, setEditorContent] = useState("")
+
     useEffect(() => {
         const fetchTemplates = async () => {
             try {
@@ -74,41 +72,47 @@ const FlowStepComponent = ({ recordId}) => {
                 ]);
             }
         };
-        if(location){
-            console.log(location,"Location")
-            if(location.state){
-               const {path}=location.state
-               setPath(path)
+        if (location) {
+            // console.log(location,"Location")
+            if (location.state) {
+                const { path } = location.state
+                setPath(path)
             }
         }
         fetchTemplates();
     }, []);
-   
-    const getRecordData=async()=>{
-        // console.log("Triggering Here @getRecordData")
-        console.log(recordId)
-        const response=await GetAnyRecordFromAnyTable("templates",recordId)
-    
-        console.log(response,"Response Here @template")
-        const {cc,subject,to_address,from_address,name,type,style,short_description}=response.data[0]
-        const obj={
-            cc:{value:cc},
-            subject:{value:subject},
-            to:{value:to_address},
-            from:{value:from_address},
-            description:{value:short_description},
-            name:{value:name},
-            type:{value:type},
-            style:{value:style}
 
+
+
+    const getRecordData = async () => {
+        // console.log("Triggering Here @getRecordData")
+        console.log(recordId, "recordId Here")
+        const response = await GetAnyRecordFromAnyTable(path, recordId)
+
+        console.log(response, "Response Here @template")
+        const { cc, subject, to_address, from_address, name, short_description, content } = response.data[0]
+        const obj = {
+            cc: { value: cc },
+            subject: { value: subject },
+            to: { value: to_address },
+            from: { value: from_address },
+            description: { value: short_description },
+            name: { value: name }
         }
-            setData(obj)
+        setData(obj)
+        // setEditorContent(content)
+
+        if (path === 'notifications') {
+            const { email_body } = response.data[0]
+            setEditorContent(email_body)
+        }
     }
-     useEffect(()=>{
-        if(recordId){
+
+    useEffect(() => {
+        if (recordId) {
             getRecordData()
         }
-    },[data])
+    }, [])
 
     const configureFields = [
         { name: "name", label: "Name", type: "text", isMandatory: true }, // Main identifier
@@ -135,7 +139,8 @@ const FlowStepComponent = ({ recordId}) => {
     ];
 
 
-
+console.log(editorContent,"HEreee")
+console.log(path,"path")
     return (
         <div className="w-full h-full gap-2">
             <div className="w-full flex items-center justify-center gap-4">
@@ -158,13 +163,13 @@ const FlowStepComponent = ({ recordId}) => {
 
 
                 {
-                    selectedTab === "Fields" && <Fields data={data}  path="template"/>
+                    selectedTab === "Fields" && <Fields data={data} path={UrlPath} />
                 }
                 {
-                    selectedTab === "Editor" && <EditorRichUI path={path} />
+                    selectedTab === "Editor" && <EditorRichUI path={UrlPath} content={editorContent} />
                 }
                 {
-                    selectedTab === "Preview" && <PreviewEditor path={path} detailsObject={data} editorContent={content} />
+                    selectedTab === "Preview" && <PreviewEditor path={UrlPath} detailsObject={data} editorContent={editorContent} recordId={recordId} isUpdate={recordId?true:false} />
                 }
 
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoImageOutline } from "react-icons/io5";
 import QuestionCard from "../../modules/Admin-Portal/Feedback/pages/QuestionCard";
@@ -9,13 +9,24 @@ import renderIcons from "../functions/renderIcons";
 import { CreateNotificationFunction } from "../../utils/CheckAndExecuteFlows/CRUDoperations";
 
 const PreviewEditor = (props) => {
+    // console.log(props,"props here")
     const location = useLocation();
     const Navigate = useNavigate();
-    const { detailsObject, editorContent, path, isUpdate, recordId } = location.state || props;
+    const { detailsObject, editorContent, path, isUpdate, recordId } = props;
 
     const getValue = (key) => detailsObject?.[key]?.value || "";
     const [showCC, setShowCC] = useState(false);
     const [showFields, setShowFields] = useState(false)
+    const [displayContent, setDisplayContent] = useState(editorContent)
+    useEffect(() => {
+        const contentInLocal = localStorage.getItem("editorContent");
+
+        // only update if something valid exists in localStorage
+        if (contentInLocal && contentInLocal !== editorContent) {
+            setDisplayContent(contentInLocal);
+        }
+    }, []);
+
 
     const onFinish = async () => {
         const formData = {
@@ -27,10 +38,10 @@ const PreviewEditor = (props) => {
         localStorage.removeItem("editorContent");
         localStorage.removeItem(`questionsData`);
         localStorage.removeItem(`feedbackData`);
-        const navigatedPath = path.charAt(0).toUpperCase() + path.slice(1) + "s";
+        const navigatedPath = path === 'notifications' ? path.charAt(0).toUpperCase() + path.slice(1) : path.charAt(0).toUpperCase() + path.slice(1) + "s";
         Navigate(`/All ${navigatedPath}`, { replace: true });
     };
-    console.log(editorContent,"EditorContent")
+    console.log(editorContent, "EditorContent")
 
     return (
         <div className="h-[100%] w-[100%] overflow-hidden px-2 py-0">
@@ -113,7 +124,7 @@ const PreviewEditor = (props) => {
                     <div className="border-gray-300 m-2 p-5 w-full md:w-[96%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-sm border-2">
                         {(() => {
                             // Updated regex: matches any <div class="page-break">...</div> with any content inside
-                            const pages = (editorContent || "").split(
+                            const pages = (displayContent || "").split(
                                 /<div class="page-break"[\s\S]*?<\/div>/g
                             );
 

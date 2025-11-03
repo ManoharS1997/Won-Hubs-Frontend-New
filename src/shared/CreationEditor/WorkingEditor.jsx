@@ -62,9 +62,8 @@ const FONT_SIZE_MAP = {
   '24px': 7,
 };
 
-const EditorRichUI = ({ path = "", defaultFieldsData = {}, content = "", isUpdate, recordId }) => {
-  // console.log(defaultFieldsData,"defaultFieldsData in EditorRichUI")
-  // console.log(path,"path in EditorRichUI")
+const EditorRichUI = ({ path = "", defaultFieldsData = {}, content, isUpdate, recordId }) => {
+  console.log(content,"content Heree")
 
   const editorRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -626,19 +625,20 @@ const EditorRichUI = ({ path = "", defaultFieldsData = {}, content = "", isUpdat
   };
 
   useEffect(() => {
-    const savedContent = localStorage.getItem("editorContent");
-    if (savedContent && editorRef.current) {
-      editorRef.current.innerHTML = savedContent;
-    }
-  }, []);
-  useEffect(() => {
     if (content && editorRef.current) {
       // Only set if the content isn't already inside
       if (editorRef.current.innerHTML !== content) {
         editorRef.current.innerHTML = content;
       }
     }
-  }, [content, defaultFieldsData]);
+    const savedContent = localStorage.getItem("editorContent");
+    if (savedContent && editorRef.current) {
+      editorRef.current.innerHTML = savedContent;
+    }
+  }, []);
+  // useEffect(() => {
+    
+  // }, [content, defaultFieldsData]);
 
   useEffect(() => {
     if (Object.keys(defaultFieldsData).length > 0) {

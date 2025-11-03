@@ -3152,6 +3152,7 @@ export const getFormDetails = async (formData) => {
       body: JSON.stringify(formData),
     };
     const response = await fetch(url, options);
+    console.log(response,"response Here")
     if (response.ok) {
       const data = await response.json();
       return data;
