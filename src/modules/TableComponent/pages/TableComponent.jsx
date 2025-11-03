@@ -514,7 +514,7 @@ export default function TableComponent({
     // console.log(selectedTab, tableName, "###")
     switch (tableName) {
       case "notifications":
-        return <CreateNotification recordId={selectedTab} />
+        return <FlowStepComponent recordId={selectedTab} path="notifications"/>
       case 'alerts':
         return <CreateAlerts recordId={selectedTab} />
       

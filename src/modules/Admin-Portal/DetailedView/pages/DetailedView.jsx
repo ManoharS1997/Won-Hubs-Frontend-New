@@ -16,7 +16,7 @@ DetailedView.propTypes = {
 };
 
 export default function DetailedView({ recordId, tableName, formData }) {
-  console.log(tableName, "Here..,")
+  // console.log(tableName, "Here..,")
   const [recordData, setRecordData] = useState(null);
   const [recordFields, setRecordFields] = useState([]);
   const [activeTab, setActiveTab] = useState(1);
@@ -24,7 +24,7 @@ export default function DetailedView({ recordId, tableName, formData }) {
   const [error, setError] = useState(null);
   const [formFieldsWithtypes, setFormFieldsWithtypes] = useState([]);
 
-  console.log("FORMDATA ===>", formData);
+  // console.log("FORMDATA ===>", formData);
 
   // Fetch record details when recordId changes
   useEffect(() => {
@@ -179,8 +179,9 @@ export default function DetailedView({ recordId, tableName, formData }) {
       tableCols: tab.tableCols,
     })) || []),
   ];
-  console.log(recordData,"recordData");
-  console.log(formFieldsWithtypes, "FormFieldsWithType")
+  // console.log(recordData,"recordData");
+  // console.log(formFieldsWithtypes, "FormFieldsWithType")
+  // console.log(formData,"form Data here")
   return (
     <div className="w-full h-fit max-h-[82vh] overflow-hidden flex flex-col gap-2 p-0 rounded-[0.5rem] bg-[var(--background-color)] text-[var(--text-color)]">
       {/* 🔹 Tabs */}

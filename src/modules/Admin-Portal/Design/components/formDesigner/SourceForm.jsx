@@ -1,10 +1,13 @@
 import axios from "axios";
 import { useState } from "react";
 import PropTypes from "prop-types";
+import FormInput from "../../../../../shared/UIElements/FormInput";
 
 // ✅ Simplified field renderer using only built-in HTML elements
 function ItemCheck({ field, formValues, handleChange }) {
+
   const handleButtonClick = async () => {
+    console.log(field,"Inside Handle Button Click")
     if (field?.actionType === "API Call" && field?.apiEndpoint) {
       try {
         const method = (field?.apiMethod || "POST").toUpperCase();
@@ -38,16 +41,21 @@ function ItemCheck({ field, formValues, handleChange }) {
     case "week":
     case "color":
       return (
-        <div className="flex flex-col gap-1">
-          <label className="font-medium">{field?.label}</label>
-          <input
-            type={field?.type}
-            name={field?.name}
-            value={formValues?.[field?.name] || ""}
-            onChange={(e) => handleChange(field?.name, e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-blue-500"
-          />
-        </div>
+      
+        // <div className="flex  flex-col items-center gap-1 border group-focus-within:shadow-[0_0_0.5rem_0.1rem_var(--primary-color)] focus-within:shadow-[0_0_0.5rem_0.1rem_var(--primary-color)]">
+
+        //   <label className="font-medium">{field?.label}</label>
+        //   <input
+        //     type={field?.type}
+        //     name={field?.name}
+        //     value={formValues?.[field?.name] || ""}
+        //     onChange={(e) => handleChange(field?.name, e.target.value)}
+        //     className="border border-gray-300 rounded-md px-3 py-2 focus:outline-blue-500"
+        //   />
+        // </div>
+        <FormInput type={field.type} label={field.label}  value={formValues?.[field?.name] || ""}
+                    onChangeHandler={(e) => handleChange(field?.name, e.target.value)}
+        />
       );
 
     case "textarea":

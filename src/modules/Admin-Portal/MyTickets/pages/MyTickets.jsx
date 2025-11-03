@@ -39,6 +39,7 @@ const MyTickets = () => {
 
   useEffect(() => {
     if (userData) {
+      
       fetchFormData(JSON.parse(userData));
     }
   }, [userData]);
@@ -55,15 +56,16 @@ const MyTickets = () => {
     }
   };
   const fetchFormData = async (data) => {
+    console.log(data,"data Here")
     try {
       const result = await getFormDetails({
-        module: "My Items",
+        module: "Tickets",
         category: data.category,
         subcategory: data.subcategory,
         view: data.view,
         department: data.department,
       });
-
+      console.log(result,"result @myItem")
       if (result) {
         setFormData(result.data);
       }
