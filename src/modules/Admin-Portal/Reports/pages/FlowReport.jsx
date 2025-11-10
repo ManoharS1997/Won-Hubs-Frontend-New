@@ -1,13 +1,10 @@
-import { useState, useEffect } from "react"
-import Cookies from "js-cookie";
-import EditorRichUI from "../../../../shared/CreationEditor/WorkingEditor";
-import PreviewEditor from "../../../../shared/CreationEditor/PreviewEditor";
-import Fields from "../../../../shared/CreationEditor/Fields";
-import { GetAnyRecordFromAnyTable } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
-import { useLocation } from "react-router-dom";
-import CreateFeedBack2 from "../../Feedback/pages/CreateFeedBack2";
 
-const FlowStepComponent = ({ recordId, path }) => {
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import Fields from "../../../../shared/CreationEditor/Fields";
+
+
+const FlowReportComponent = ({ recordId, path }) => {
     const location = useLocation()
     const [flowStep, setFlowStep] = useState(0)
     const [templates, setTemplates] = useState([]);
@@ -15,10 +12,8 @@ const FlowStepComponent = ({ recordId, path }) => {
     const [data, setData] = useState(
         JSON.parse(localStorage.getItem(`${path}Data`)) || {}
     );
-
-    const [UrlPath, setPath] = useState(path)
+    const [UrlPath, setPath] = useState("reports")
     const [editorContent, setEditorContent] = useState("")
-    const [FeedBackImageURl, setFeedBackImageURl] = useState(localStorage.getItem("ImageUrl"))
 
     useEffect(() => {
         const fetchTemplates = async () => {
@@ -62,7 +57,7 @@ const FlowStepComponent = ({ recordId, path }) => {
                     // Fallback if API call fails
                     formattedLists = [
                         { type: "Fields", records: [] },
-                        { type: "Editor", records: [] },
+                        { type: "Generator", records: [] },
                         { type: "Preview", records: [] },
                     ];
                 }
@@ -87,82 +82,60 @@ const FlowStepComponent = ({ recordId, path }) => {
         }
         fetchTemplates();
     }, []);
-    const getRecordData = async () => {
-        // console.log("Triggering Here @getRecordData")
-        console.log(recordId, "recordId Here")
-        const response = await GetAnyRecordFromAnyTable(path, recordId)
+    // const getRecordData = async () => {
+    //     // console.log("Triggering Here @getRecordData")
+    //     console.log(recordId, "recordId Here")
+    //     const response = await GetAnyRecordFromAnyTable(path, recordId)
 
-        console.log(response, "Response Here @template")
-        const { cc, subject, to_address, from_address, name, short_description, content } = response.data[0]
-        const obj = {
-            cc: { value: cc },
-            subject: { value: subject },
-            to: { value: to_address },
-            from: { value: from_address },
-            description: { value: short_description },
-            name: { value: name }
-        }
-        setData(obj)
-        // setEditorContent(content)
+    //     console.log(response, "Response Here @template")
+    //     const { cc, subject, to_address, from_address, name, short_description, content } = response.data[0]
+    //     const obj = {
+    //         cc: { value: cc },
+    //         subject: { value: subject },
+    //         to: { value: to_address },
+    //         from: { value: from_address },
+    //         description: { value: short_description },
+    //         name: { value: name }
+    //     }
+    //     setData(obj)
+    //     // setEditorContent(content)
 
-        if (path === 'notifications') {
-            const { email_body } = response.data[0]
-            setEditorContent(email_body)
-        }
-    }
-    useEffect(() => {
-        if (recordId) {
-            getRecordData()
-        }
-        const setLocalData = localStorage.getItem(
-            (`${path}Data`)
-        )
-        console.log(setLocalData,"Set")
-        if (JSON.parse(setLocalData) !== data) {
-            setData(setLocalData)
-        }
-    }, [])
-    const configureFields = [
-        { name: "name", label: "Name", type: "text", isMandatory: true }, // Main identifier
-        { name: "from", label: "From", type: "text", isMandatory: true }, // Sender
-        {
-            name: "to", label: "To", type: "text", isMandatory: true,
-        }, // Recipient
-        { name: "cc", label: "CC", type: "text", isMandatory: true },
-        { name: "subject", label: "Subject", type: "text", isMandatory: true }, // CC field comes after To
-        {
-            name: "type",
-            label: "Type",
-            type: "dropdown",
-            options: [
-                // Feedback origin
-                { label: "User Feedback", value: "user_feedback" },
-                { label: "Internal Team", value: "internal_team" },
-                { label: "Management/Stakeholder", value: "management_feedback" }
-            ],
-            isMandatory: true,
-        },
-        // Type of notification
-        { name: "description", label: "Description", type: "textarea", isMandatory: true } // Content at the end
-    ];
-    // console.log(UrlPath,"Path ")
-    // console.log(data, "data here")
+    //     if (path === 'notifications') {
+    //         const { email_body } = response.data[0]
+    //         setEditorContent(email_body)
+    //     }
+    // }
+    // useEffect(() => {
+    //     if (recordId) {
+    //         getRecordData()
+    //     }
+    //     const setLocalData = localStorage.getItem(
+    //         (`${path}Data`)
+    //     )
+    //     console.log(setLocalData,"Set")
+    //     if (JSON.parse(setLocalData) !== data) {
+    //         setData(setLocalData)
+    //     }
+    // }, [])
+
+    console.log(UrlPath, "Path ")
+    console.log(data, "data here")
 
     return (
-        // <div className={` ${recordId?`w-[83vw]`:`w-[95vw]`}  flex flex-col
-        //  ${recordId?`max-h-[83vh]`:`max-h-[90vh]`} border-2 ${recordId?`max-w-[100%]`:`max-w-[100%]`} flex-shrink-0`}>
+
         <div
             className={`
     ${recordId ? "w-[95vw]" : "w-[95vw]"} 
-    ${recordId?`h-[83vh]`:`h-[93vh]`}              
+    ${recordId ? `h-[83vh]` : `h-[93vh]`}              
     flex flex-col 
     max-h-[97vh] 
     max-w-full
-    grow-0                  
+    grow-0  
+          
   `}
         >
             {/* Tabs Section */}
-            <div className={`flex justify-center items-center gap-6  bg-transparent p-0 m-0 ${recordId?'p-0':'py-4'}`}>
+            <div className={`flex justify-center items-center gap-6  bg-transparent p-0 m-0 ${recordId ? 'p-0' : 'py-4'}`}>
                 {templates.map((list, index) => (
                     <button
                         key={index}
@@ -179,9 +152,9 @@ const FlowStepComponent = ({ recordId, path }) => {
             </div>
 
             {/* Dynamic Content Area */}
-            <div className="bg-white  max-h-[100%] max-w-[100%] overflow-y-auto">
+            <div className="bg-white  max-h-[100%] max-w-[100%] overflow-y-auto px-2">
                 {selectedTab === "Fields" && <Fields data={data} path={UrlPath} />}
-                {(selectedTab === "Editor" && UrlPath !== "feedback") && <EditorRichUI path={UrlPath} content={editorContent} />}
+                {/* {(selectedTab === "Editor" && UrlPath !== "feedback") && <EditorRichUI path={UrlPath} content={editorContent} />}
                 {(selectedTab === "Editor" && UrlPath == "feedback") && <CreateFeedBack2 />}
                 {selectedTab === "Preview" && (
                     <PreviewEditor
@@ -192,11 +165,12 @@ const FlowStepComponent = ({ recordId, path }) => {
                         isUpdate={!!recordId}
                         feedbackImageUrl={FeedBackImageURl}
                     />
-                )}
+                )} */}
+                {/* <p>Hello Passionate Devoloper</p> */}
             </div>
         </div>
 
     )
 
 }
-export default FlowStepComponent
+export default FlowReportComponent

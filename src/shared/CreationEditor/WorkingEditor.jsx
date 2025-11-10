@@ -63,7 +63,7 @@ const FONT_SIZE_MAP = {
 };
 
 const EditorRichUI = ({ path = "", defaultFieldsData = {}, content, isUpdate, recordId }) => {
-  console.log(content,"content Heree")
+  // console.log(content,"content Heree")
 
   const editorRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -207,8 +207,6 @@ const EditorRichUI = ({ path = "", defaultFieldsData = {}, content, isUpdate, re
     editor.style.boxShadow = "0 0 5px rgba(0,0,0,0.2)";
     editor.style.transition = "all 0.3s ease";
   };
-
-
 
   const handleButton = (id, value) => {
     switch (id) {
@@ -722,8 +720,12 @@ const EditorRichUI = ({ path = "", defaultFieldsData = {}, content, isUpdate, re
 
 
   return (
-    <div className='flex h-full w-full'>
-      <div className="hidden w-[17vw] h-full md:flex flex-col p-4 bg-[#353535] text-white overflow-y-auto custom-scrollbar">
+    <div className='flex  w-full  h-full overflow-hidden gap-3'>
+      <div className="hidden w-[17vw] min-h-[80%] md:flex flex-col p-4
+       bg-[#353535]
+        text-white overflow-y-auto
+        custom-scrollbar  border-2 mt-4 max-h-[100%]
+        ">
         <h2 className="text-center"> Fields</h2>
         <div>
           <input type="text" placeholder="Search fields..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
@@ -743,7 +745,7 @@ const EditorRichUI = ({ path = "", defaultFieldsData = {}, content, isUpdate, re
           )}
         </ul>
       </div>
-      <div className='overflow-y-auto custom-scrollbar  m-0 w-full overflow-hidden'>
+      <div className='overflow-y-auto custom-scrollbar  w-full '>
         {/* <div className="flex items-start gap-4 w-full mt-2"> */}
         {/* Editable Fields */}
         {/* {detailsObject && (
@@ -781,10 +783,10 @@ const EditorRichUI = ({ path = "", defaultFieldsData = {}, content, isUpdate, re
           </button>
         </div> */}
         {/* </div> */}
-        <div className="w-[73vw] mx-auto mt-4 mb-0 h-[75vh] flex flex-col  rounded-md bg-white ">
+        <div className="w-[98%] mx-auto mt-4 mb-0 h-[95%] flex flex-col  rounded-md bg-white">
           <div
             style={{
-              maxWidth: "97%",
+              maxWidth: "98%",
               margin:'2px',
               border: "2px solid #dcdcdc",
               borderRadius: 8,
@@ -792,6 +794,7 @@ const EditorRichUI = ({ path = "", defaultFieldsData = {}, content, isUpdate, re
               display: "flex",
               flexDirection: "column",
               background: "#fff",
+              maxHeight:'98%'
               
             }}
             className="!mr-2 flex-1"

@@ -3,57 +3,111 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { IoImageOutline } from "react-icons/io5";
 import QuestionCard from "../../modules/Admin-Portal/Feedback/pages/QuestionCard";
 import "./PreviewEditor.css";
-
-//component Imports
+//component Imports 
 import renderIcons from "../functions/renderIcons";
 import { CreateNotificationFunction } from "../../utils/CheckAndExecuteFlows/CRUDoperations";
 
 const PreviewEditor = (props) => {
-    // console.log(props,"props here")
     const location = useLocation();
     const Navigate = useNavigate();
-    const { detailsObject, editorContent, path, isUpdate, recordId } = props;
-
-    const getValue = (key) => detailsObject?.[key]?.value || "";
+    const {
+        detailsObject,
+        editorContent,
+        path,
+        isUpdate,
+        recordId,
+        feedbackImageUrl,
+    } = props;
+    const [detailsData, setDetailsData] = useState(detailsObject || {});
     const [showCC, setShowCC] = useState(false);
-    const [showFields, setShowFields] = useState(false)
-    const [displayContent, setDisplayContent] = useState(editorContent)
+    const [showFields, setShowFields] = useState(false);
+    const [displayContent, setDisplayContent] = useState(editorContent);
+    // console.log(detailsObject,"Here Details Object")
+    // console.log(feedbackImageUrl,"Image Url Hereee")
+
+    useEffect(() => {
+        if (!detailsObject || Object.keys(detailsObject).length === 0) {
+            console.log("Triggering Inside")
+            const localData = localStorage.getItem(`${path}Data`);
+            if (localData) {
+                try {
+                    const parsed = JSON.parse(localData);
+                    setDetailsData(parsed);
+                    // console.log(" Restored details from localStorage:", parsed);
+                } catch (err) {
+                    console.log("❌ Invalid localStorage data:", err);
+                }
+            }
+        } else {
+            setDetailsData(detailsObject);
+        }
+    }, [detailsObject, path]);
+
+
     useEffect(() => {
         const contentInLocal = localStorage.getItem("editorContent");
-
-        // only update if something valid exists in localStorage
         if (contentInLocal && contentInLocal !== editorContent) {
             setDisplayContent(contentInLocal);
         }
-    }, []);
+    }, [editorContent]);
 
+
+    const getValue = (key) => detailsData?.[key]?.value || "";
 
     const onFinish = async () => {
         const formData = {
-            ...detailsObject,
+            ...detailsData,
             content: editorContent,
         };
-        const response = await CreateNotificationFunction(path, formData, isUpdate, recordId);
-        console.log(response, "response From preview editor");
-        localStorage.removeItem("editorContent");
-        localStorage.removeItem(`questionsData`);
-        localStorage.removeItem(`feedbackData`);
-        const navigatedPath = path === 'notifications' ? path.charAt(0).toUpperCase() + path.slice(1) : path.charAt(0).toUpperCase() + path.slice(1) + "s";
-        Navigate(`/All ${navigatedPath}`, { replace: true });
+        const response = await CreateNotificationFunction(
+            path,
+            formData,
+            isUpdate,
+            recordId
+        );
+        console.log("Response from preview editor:", response);
+
+        // Cleanup
+        // localStorage.removeItem("editorContent");
+        // localStorage.removeItem("questionsData");
+        // localStorage.removeItem("feedbackData");
+        localStorage.removeItem('ImageUrl')
+
+        const navigatedPath =
+            path === "notifications"
+                ? path.charAt(0).toUpperCase() + path.slice(1)
+                : path.charAt(0).toUpperCase() + path.slice(1) + "s";
+        // Navigate(`/All ${navigatedPath}`, { replace: true });
     };
-    console.log(editorContent, "EditorContent")
+
+    useEffect(() => {
+        const setLocalData = localStorage.getItem(
+            (`${path}Data`)
+        )
+        
+        if (JSON.parse(setLocalData) !== detailsData) {
+            // console.log(setLocalData, "Set","Triggering inside not ")
+            setDetailsData(setLocalData)
+        }
+    },[detailsData])
+    console.log(detailsObject,"Details Object")
 
     return (
-        <div className="h-[100%] w-[100%] overflow-hidden px-2 py-0">
-            {/* Top Bar */}
-            <div className="min-h-[2vh] px-5 flex justify-between mt-2">
+        <div
+            className={`h-[100%] w-[100%] px-2 py-0 ${showCC ? "overflow-y-auto custom-scrollbar" : "overflow-hidden"
+                }`}
+        >
+            {/* 🔹 Header Section */}
+            <div className="min-h-[2vh] flex justify-between mt-2">
                 <div className="flex items-center gap-2">
-                    <h1 className="!text-[20px] font-medium text-gray-800">Fields</h1>
+                    <h1 className="!text-[20px] font-medium text-gray-800">Email Info</h1>
                     <button
                         className="bg-transparent p-0 m-0 flex items-center justify-center"
                         onClick={() => setShowFields((prev) => !prev)}
                     >
-                        <span className="flex items-center">{renderIcons("GoTriangleDown", 22, "black")}</span>
+                        <span className="flex items-center">
+                            {renderIcons("GoTriangleDown", 22, "black")}
+                        </span>
                     </button>
                 </div>
 
@@ -73,12 +127,16 @@ const PreviewEditor = (props) => {
                 </div>
             </div>
 
-
-            {showFields &&
+            {/* 🔹 Email Details */}
+            {showFields && (
                 <>
-                    <div className="flex justify-between  mt-1 mb-0">
-                        <h4 className="mb-1">{getValue("name") || "No Title"}</h4>
-                        <span className="text-gray-400 text-[15px] mt-2      ">{new Date().toLocaleString()}</span>
+                    <div className="flex justify-between mt-1 mb-0 pl-2">
+                        <p className="text-[20px] font-bold m-0 px-4">
+                            {getValue("name") || "No Title"}
+                        </p>
+                        <span className="text-gray-400 text-[15px] mt-2">
+                            {new Date().toLocaleString()}
+                        </span>
                     </div>
 
                     {/* From / To / CC */}
@@ -89,11 +147,15 @@ const PreviewEditor = (props) => {
                                     {getValue("to") || "to@example.com"}
                                 </span>
                                 <button onClick={() => setShowCC(!showCC)}>
-                                    <span>{renderIcons("MdOutlineKeyboardArrowDown", 22, "grey")}</span>
+                                    <span>
+                                        {renderIcons("MdOutlineKeyboardArrowDown", 22, "grey")}
+                                    </span>
                                 </button>
                             </div>
                             {showCC && (
-                                <p className="text-gray-500 mb-0 p-0 m-0">{getValue("cc") || "cc@example.com"}</p>
+                                <p className="text-gray-500 mb-0 p-0 m-0">
+                                    {getValue("cc") || "cc@example.com"}
+                                </p>
                             )}
                         </div>
 
@@ -104,31 +166,29 @@ const PreviewEditor = (props) => {
                         </div>
                     </div>
 
-                    {/* Subject and Description */}
+                    {/* Subject + Description */}
                     <div className="p-2 ml-6">
-                        <p className="text-[17px] font-bold mb-1">
+                        <p className="text-[17px] font-bold m-0">
                             Subject: {getValue("subject") || "No Subject"}
                         </p>
                         <div className="ml-20 mt-2">
                             <p className="m-0 p-0 text-gray-600">
-                                {getValue("description") || "No description available for this message."}
+                                {getValue("description") ||
+                                    "No description available for this message."}
                             </p>
                         </div>
                     </div>
                 </>
-            }
+            )}
 
-            {/* Email Content */}
-            <div className="flex justify-center items-start bg-transparent h-[72vh] w-full md:w-[95%] mx-autop-0 mt-2">
+            {/* 🔹 Main Email Content */}
+            <div className="flex justify-center items-start bg-transparent h-[72vh] w-full md:w-[100%] mx-auto mt-2 md:h-[77vh]">
                 {path && path.toLowerCase() !== "feedback" && (
-                    <div className="border-gray-300 m-2 p-5 w-full md:w-[96%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-sm border-2">
+                    <div className="border-gray-300 m-2 p-5 w-full md:w-[100%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-sm border-2">
                         {(() => {
-                            // Updated regex: matches any <div class="page-break">...</div> with any content inside
                             const pages = (displayContent || "").split(
                                 /<div class="page-break"[\s\S]*?<\/div>/g
                             );
-
-                            console.log("Pages ->", pages);
 
                             const pageSize = "A4";
 
@@ -136,24 +196,29 @@ const PreviewEditor = (props) => {
                                 <div key={index}>
                                     <div
                                         className={`preview-page page-${pageSize}`}
-                                        dangerouslySetInnerHTML={{ __html: pageHtml.trim() || "<p></p>" }}
+                                        dangerouslySetInnerHTML={{
+                                            __html: pageHtml.trim() || "<p></p>",
+                                        }}
                                     />
                                     {index < pages.length - 1 && (
-                                        <div className="page-break-line" title="Page Break — hover to remove"></div>
+                                        <div
+                                            className="page-break-line"
+                                            title="Page Break — hover to remove"
+                                        ></div>
                                     )}
                                 </div>
                             ));
                         })()}
-
                     </div>
                 )}
 
+                {/* 🔹 Feedback Page */}
                 {path && path.toLowerCase() === "feedback" && (
-                    <div className="m-2 w-full md:w-[96%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-md flex flex-col gap-2">
-                        <div className="w-[70%] mx-auto p-0">
+                    <div className="m-2 w-[100%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-md flex flex-col gap-2">
+                        <div className="w-[80%] mx-auto p-0">
                             <div
                                 className="w-full h-[200px] relative rounded-[15px] bg-gray-180 shadow bg-center bg-no-repeat bg-contain border-1 border-blue-800"
-                                style={{ backgroundImage: `url(${editorContent.imageFile})` }}
+                                style={{ backgroundImage: `url(${feedbackImageUrl})` }}
                             >
                                 <label
                                     htmlFor="templateImg"
@@ -161,7 +226,12 @@ const PreviewEditor = (props) => {
                                 >
                                     <IoImageOutline size={20} />
                                 </label>
-                                <input id="templateImg" type="file" accept="image/*" className="hidden" />
+                                <input
+                                    id="templateImg"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                />
                             </div>
                         </div>
                         <QuestionCard isPreview={true} />

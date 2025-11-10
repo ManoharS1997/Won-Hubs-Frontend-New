@@ -34,7 +34,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
         }, {})
     );
 
-    console.log(path,"In Template Selection")
+    console.log(path, "In Template Selection")
     const Navigate = useNavigate();
 
     const GoBack = () => Navigate(-1);
@@ -99,10 +99,8 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
             });
             return;
         }
+        Navigate(`/${path}/new`, { state: { path }, replace: true });
 
-        Navigate(`/flowcheck/new`, { replace: true },
-            { state: { path: path } }
-        );
     };
     return (
         <WonContext.Consumer>
@@ -149,7 +147,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                         ))}
 
                                     <li
-                                        onClick={() => Navigate(`/flowcheck/new`, { state: { path: path } }, { replace: true })}
+                                        onClick={() => Navigate(`/${path}/new`, { state: { path: path } }, { replace: true })}
 
                                         className="w-full h-[200px] bg-gray-50 rounded flex items-center justify-center hover:shadow-lg border-2 border-dashed cursor-pointer transition-all"
                                     >

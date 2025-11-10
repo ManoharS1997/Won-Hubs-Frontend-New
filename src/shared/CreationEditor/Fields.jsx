@@ -2,9 +2,37 @@ import { useEffect, useState } from "react";
 import { Loader2, Check } from "lucide-react";
 import FormInput from "../UIElements/FormInput";
 import FormTextarea from "../UIElements/FormTextarea";
-import FormDropdown from "../UIElements/FormTextarea";
+import FormDropdown from "../UIElements/FormDropdown";
+const templateFields = {
+  name: { value: "", isMandatory: true, type: "text", label: "ReportName" },
+  view: { value: "", isMandatory: true, type: "text", label: "View" },
+  type: {
+    value: "",
+    isMandatory: true,
+    type: "dropdown",
+    label: "GraphType",
+    options: [
+      { label: "Bar-Stacked", value: "Bar-Stacked" },
+      { label: "Pie", value: "Pie" },
+      { label: "Doughnut", value: "Doughnut" },
+    ],
+  },
+  visibility: {
+    value: "",
+    isMandatory: true,
+    type: "dropdown",
+    label: "Visibility",
+    options: [
+      { label: "Public", value: "public" },
+      { label: "Private", value: "private" },
+    ],
+  },
+  description: { value: "", isMandatory: true, type: "textarea", label: "Description" },
+};
+
 
 export default function Fields({ title, data, path }) {
+  // console.log()
   const defaultFields = {
     name: { value: "", isMandatory: false, type: "text", label: "Name" },
     from: { value: "", isMandatory: true, type: "text", label: "From", iconName: "TfiEmail" },
@@ -18,16 +46,14 @@ export default function Fields({ title, data, path }) {
   const [saveStatus, setSaveStatus] = useState("idle");
   const [isLoading, setIsLoading] = useState(true);
 
-  // ✅ Load order: localStorage → data → defaultFields
   useEffect(() => {
     const saved = localStorage.getItem(`${path}Data`);
     if (saved) {
-        // console.log("Triggering in saved")
-      setFieldsState(JSON.parse(saved));
+            setFieldsState(JSON.parse(saved));
     } else if (data && Object.keys(data).length > 0) {
-   
+
       const merged = { ...defaultFields };
-      console.log(merged,"Here")
+      console.log(merged, "Here")
       Object.keys(defaultFields).forEach((key) => {
         if (data[key]) {
           merged[key].value = data[key]?.value ?? "";
@@ -38,7 +64,7 @@ export default function Fields({ title, data, path }) {
     setTimeout(() => setIsLoading(false), 200);
   }, [data, path]);
 
-  // ✅ Auto-save to localStorage
+ 
   useEffect(() => {
     if (isLoading) return;
     setSaveStatus("saving");
@@ -57,14 +83,22 @@ export default function Fields({ title, data, path }) {
     }
   }, [saveStatus]);
 
-  // 🧩 Input handlers
+  useEffect(()=>{
+    if(path==="flowreport"){
+      setFieldsState(templateFields)
+    }
+  },[path])
+
+
+
   const onChangeInput = (e) => {
-    const { name, value } = e.target;
-    setFieldsState((prev) => ({
-      ...prev,
-      [name]: { ...prev[name], value },
-    }));
-  };
+  const { id, value } = e.target;
+  setFieldsState((prev) => ({
+    ...prev,
+    [id]: { ...prev[id], value },
+  }));
+};
+
 
   const onChangeDropdown = (e, id) => {
     setFieldsState((prev) => ({
@@ -76,11 +110,11 @@ export default function Fields({ title, data, path }) {
   const capitalize = (str = "") =>
     str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
-  // 🧱 Render Field
   const renderField = (key, field) => {
     const value = field?.value || "";
 
     if (field.type === "dropdown") {
+      console.log("Triggering in dropdown in render Field")
       return (
         <FormDropdown
           key={key}
@@ -117,7 +151,7 @@ export default function Fields({ title, data, path }) {
         isMandatory={field.isMandatory}
         placeholder={`Enter ${capitalize(field.label || key)}`}
         onChangeHandler={onChangeInput}
-        iconName={field.iconName}
+      // iconName={field.iconName}
       />
     );
   };
@@ -126,7 +160,7 @@ export default function Fields({ title, data, path }) {
 
   return (
     <div className="w-full h-full flex justify-center items-start px-4 py-6">
-      <div className="w-full md:w-[95%] lg:w-[90%] bg-white rounded-xl shadow overflow-auto flex flex-col gap-2 pb-4 relative">
+      <div className="w-full md:w-[100%] lg:w-[90%] bg-white rounded-xl shadow overflow-auto flex flex-col gap-2 pb-4 relative">
         {/* Header */}
         <div className="h-[10%] flex items-center justify-between px-6 py-3 border-gray-200">
           <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
@@ -154,14 +188,21 @@ export default function Fields({ title, data, path }) {
             <Loader2 className="animate-spin w-6 h-6 mr-2" /> Loading fields...
           </div>
         ) : entries.length > 0 ? (
-          <div className="w-full flex flex-col md:flex-row justify-between md:px-10 px-2 py-4">
-            <div className="w-full md:w-1/2 flex flex-col gap-4 p-2">
-              {entries.filter((_, i) => i % 2 === 0).map(([k, f]) => renderField(k, f))}
-            </div>
-            <div className="w-full md:w-1/2 flex flex-col gap-4 p-2">
-              {entries.filter((_, i) => i % 2 !== 0).map(([k, f]) => renderField(k, f))}
-            </div>
+          <div className="w-full flex flex-col gap-4 md:px-10 px-2 py-4">
+            {entries.reduce((rows, [key, field], i) => {
+              if (i % 2 === 0) {
+                const next = entries[i + 1];
+                rows.push([[key, field], next]);
+              }
+              return rows;
+            }, []).map((pair, index) => (
+              <div key={index} className="flex flex-col md:flex-row gap-4">
+                <div className="w-full md:w-1/2">{renderField(pair[0][0], pair[0][1])}</div>
+                {pair[1] && <div className="w-full md:w-1/2">{renderField(pair[1][0], pair[1][1])}</div>}
+              </div>
+            ))}
           </div>
+
         ) : (
           <div className="flex items-center justify-center text-2xl text-gray-400 min-h-[50vh]">
             No Default Fields

@@ -516,13 +516,13 @@ export default function TableComponent({
       case "notifications":
         return <FlowStepComponent recordId={selectedTab} path="notifications"/>
       case 'alerts':
-        return <CreateAlerts recordId={selectedTab} />
+        return <FlowStepComponent recordId={selectedTab} path='alerts' />
       
       case 'feedBack':
-        return <CreateFeedBack2 recordId={selectedTab} />
+        return <FlowStepComponent recordId={selectedTab} path='feedbacks'/>
       
       case 'templates':
-        return <FlowStepComponent recordId={selectedTab} />
+        return <FlowStepComponent recordId={selectedTab} path='templates'/>
       case 'designs':
         return <FormDesignerPage recordId={selectedTab} />
       default:
@@ -530,8 +530,6 @@ export default function TableComponent({
 
     }
   };
-
-
   useEffect(() => {
     // Only run if filter is active, optionally
     if (isFilterActive) {
@@ -541,7 +539,6 @@ export default function TableComponent({
     }
   }, [filterConditions, isFilterActive, tableData]);
 
-  
   return (
     <MainContainer>
       <div className='w-full h-fit bg-[var(--bakground-color)] pb-[4px] mb-2 overflow-auto scrollbar-hide '>
@@ -772,7 +769,6 @@ export default function TableComponent({
               setTableColumnNames={setAllTableFields}
             />
           }
-
           <TableContainer>
             {isLoading ?
               <div>Data Lolading...</div> :

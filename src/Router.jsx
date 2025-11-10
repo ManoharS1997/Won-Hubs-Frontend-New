@@ -162,7 +162,8 @@ import PreviewEditor from "./shared/CreationEditor/PreviewEditor.jsx";
 import CreateFeedBack2 from "./modules/Admin-Portal/Feedback/pages/CreateFeedBack2.jsx";
 import FlowStepComponent from "./modules/Admin-Portal/Templates/pages/FlowStep.jsx";
 import TestEditor from "./shared/CreationEditor/EditorTest.jsx";
-
+import FlowReportComponent from "./modules/Admin-Portal/Reports/pages/FlowReport.jsx";
+import TemplateSelectionForReports from "./modules/Admin-Portal/Reports/pages/ReportTemplate.jsx";
 const router = createBrowserRouter([
   // Public routes (no authentication required)
   {
@@ -272,10 +273,7 @@ const router = createBrowserRouter([
     path: "/become-a-partner",
     element: <BecomePartner />,
   },
-  {
-    path: '/testing',
-    element: <EditorRichUI />
-  },
+
 
 
   // MFA authentication routes
@@ -729,14 +727,20 @@ const router = createBrowserRouter([
             path: "/notifications/preview/testing",
             element: <PreviewEditor />,
           },
+          // created by me to adjust the UI
           {
             path: '/flowCheck/new',
             element: <FlowStepComponent />
           },
             {
             path: '/test',
-            element: <TestEditor />
-          }
+            element: <TemplateSelectionForReports />
+          },
+          {
+            path:'/flowreport/new',
+            element:<FlowReportComponent />
+          },
+
 
         ],
       },
@@ -807,7 +811,7 @@ const router = createBrowserRouter([
           },
 
         ],
-      },
+      }
     ],
   },
   // Catch-all route for 404 Not Found
