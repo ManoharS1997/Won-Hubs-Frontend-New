@@ -691,8 +691,9 @@ export const getTableData = async (tableName, componentName) => {
     };
 
     const response = await fetch(url, options);
-    // console.log(response,"response From Table ")
+    console.log(response,"response From Table ")
     const data = await response.json();
+    // console.log(data,"dat@here")
     return data;
   }
 };
@@ -1360,7 +1361,7 @@ export const GetAddUserFormFields = async (param) => {
     console.log(response, "get add user form fields response in crud");
     if (response.ok) {
       const data = await response.json();
-      console.log(data, "add user form fields data in crud");
+      // console.log(data, "add user form fields data in crud");
       return data;
     }
   } catch (err) {
@@ -3143,7 +3144,7 @@ export const deleteTask = async (recordId) => {
 
 export const getFormDetails = async (formData) => {
   try {
-    const url = `${apiUrl}/api/form-designer/getModuleByFields`;
+    const url = `${apiUrl}/form-designer/getModuleByFields`;
     const options = {
       method: "POST",
       headers: {

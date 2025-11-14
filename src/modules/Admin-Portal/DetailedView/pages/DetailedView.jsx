@@ -17,7 +17,7 @@ DetailedView.propTypes = {
 
 export default function DetailedView({ recordId, tableName, formData }) {
   // console.log(tableName, "Here..,")
-  console.log(formData,"Form Data")
+  // console.log(formData,"Form Data NO1")
   const [recordData, setRecordData] = useState(null);
   const [recordFields, setRecordFields] = useState([]);
   const [activeTab, setActiveTab] = useState(1);
