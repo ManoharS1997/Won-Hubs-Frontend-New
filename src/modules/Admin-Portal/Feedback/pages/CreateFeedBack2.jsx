@@ -25,11 +25,11 @@ export const dummyList = [
   { fieldName: 'Sub-department', isAdded: false, value: 'MERN Developer' },
   { fieldName: 'Subject', isAdded: false, value: '{empty}' },
 ]
-const CreateFeedBack2 = ({ recordId }) => {
+const CreateFeedBack2 = ({ questions,recordId }) => {
   const [fieldsListData, setFieldsListData] = useState(dummyList);
   const [detailsObject, setDetailsObject] = useState(localStorage.getItem('feedbackData') ? JSON.parse(localStorage.getItem('feedbackData')) : null);
-  const [imageFile, setImageFile] = useState(null);
-  const [Questions, setQuestions] = useState([]);
+  const [imageFile, setImageFile] = useState(localStorage.getItem('ImageUrl'));
+  const [Questions, setQuestions] = useState(questions||[]);
   const Navigate = useNavigate();
   const [clickedValue, setClickedValue] = useState("");
   const [itemClicked, setItemClicked] = useState(false);
@@ -60,36 +60,8 @@ const CreateFeedBack2 = ({ recordId }) => {
     Navigate('/notifications/preview/testing', { state: { detailsObject, path: "feedback", editorContent: editorContent, isUpdate: recordId ? true : false, recordId } });
   };
 
-  useEffect(() => {
-    if (recordId) {
-      // Fetch existing feedback data based on recordId
-      const fetchFeedbackData = async () => {
-        try {
-          const response = await GetAnyRecordFromAnyTable('feedback', recordId);
-          if (response && response.data) {
-            console.log(response, "response Here")
-            const { to_address, from_address, subject, questions, image_file, description, name, cc } = response.data[0];
-            setDetailsObject({
-              to: { value: to_address },
-              from: { value: from_address },
-              subject: { value: subject },
 
-
-              description: { value: description },
-              name: { value: name },
-              cc: { value: cc }
-            });
-            setQuestions(questions || []);
-            setImageFile(image_file || null);
-          }
-        } catch (error) {
-          console.log("Error fetching feedback data:", error);
-        }
-      };
-      fetchFeedbackData();
-    }
-  }, [recordId]);
-
+console.log(questions,"Questions")
 
   return (
     <div className='flex h-[100%] w-[100%]  p-0 m-0 overflow-hidden'>

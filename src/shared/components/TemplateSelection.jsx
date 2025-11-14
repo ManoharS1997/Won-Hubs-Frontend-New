@@ -17,14 +17,11 @@ import {
 } from "../../modules/Admin-Portal/Notifications/pages/StyledNotificationTemlates";
 
 
-import FormInput from "../UIElements/FormInput";
-import FormDropdown from "../UIElements/FormDropdown";
-import FormTextarea from "../UIElements/FormTextarea";
-
 const capitalize = (str = "") =>
     str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
 const TemplateSelection = ({ lists, configureFields, title, path, tablename }) => {
+
     const [isModalOpen, setModalOpen] = useState(false);
     const [selectedTab, setSelectedTab] = useState(lists?.[0]?.type ?? "");
     const [configureData, setConfigureData] = useState(
@@ -34,7 +31,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
         }, {})
     );
 
-    console.log(path, "In Template Selection")
+    // console.log(path, "In Template Selection")
     const Navigate = useNavigate();
 
     const GoBack = () => Navigate(-1);
@@ -100,72 +97,87 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
             return;
         }
         Navigate(`/${path}/new`, { state: { path }, replace: true });
-
+        // Navigate(`/${path}${path.includes("integration") ? "" : "/new"}`, { state: { path }, replace: true });
+        // Navigate(`${Path}`)
     };
+    console.log(lists, "lists hereee")
     return (
-        <WonContext.Consumer>
-            {() => (
-                <NotificationTemplateMainContainer>
-                    <SideNavAndContentContainer>
-                        <CustomNotificationContainer>
-                            <TitleContainer className="flex items-center justify-between">
-                                <BackBtn onClick={GoBack}>
-                                    <IoIosArrowBack size={30} />
-                                </BackBtn>
 
-                                <div className="w-full flex items-center justify-center gap-4">
-                                    {lists.map((list, index) => (
-                                        <button
-                                            key={index}
-                                            className={`h-fit w-[100px] !border-b-2 transition-all duration-500 py-2 font-semibold
+        <div className="h-[92%] w-[100%]">
+            <SideNavAndContentContainer >
+                <CustomNotificationContainer>
+                    <TitleContainer className="flex items-center justify-between">
+                        <BackBtn onClick={GoBack}>
+                            <IoIosArrowBack size={30} />
+                        </BackBtn>
+
+                        <div className="w-full flex items-center justify-center gap-4">
+                            {lists.map((list, index) => (
+                                <button
+                                    key={index}
+                                    className={`h-fit w-[100px] !border-b-2 transition-all duration-500 py-2 font-semibold
                                                 bg-transparent
                         ${selectedTab === list.type
-                                                    ? "!border-black"
-                                                    : "!border-transparent"
-                                                }`}
-                                            onClick={() => setSelectedTab(list.type)}
-                                        >
-                                            {list.type}
-                                        </button>
-                                    ))}
-                                </div>
-                            </TitleContainer>
+                                            ? "!border-black"
+                                            : "!border-transparent"
+                                        }`}
+                                    onClick={() => setSelectedTab(list.type)}
+                                >
+                                    {list.type}
+                                </button>
+                            ))}
+                        </div>
+                    </TitleContainer>
 
-                            <TemplateTilesContainer className="h-full">
-                                <ul className="grid md:grid-cols-4 gap-4 bg-[var(--background-color)] rounded-lg p-4 list-none w-full h-fit m-0 overflow-auto">
-                                    {lists
-                                        .find((l) => l.type === selectedTab)
-                                        ?.records?.map((item, index) => (
-                                            <TemplateTile
-                                                key={index}
-                                                style={{
-                                                    backgroundImage: `url(${item.thumbnail || ""})`
-                                                }}
-                                            >
-                                                {item.name}
-                                            </TemplateTile>
-                                        ))}
+                    <TemplateTilesContainer className="h-full">
+                        <ul className="grid md:grid-cols-4 gap-4 bg-[var(--background-color)] rounded-lg p-4 list-none w-full h-fit m-0 overflow-auto">
 
-                                    <li
-                                        onClick={() => Navigate(`/${path}/new`, { state: { path: path } }, { replace: true })}
-
-                                        className="w-full h-[200px] bg-gray-50 rounded flex items-center justify-center hover:shadow-lg border-2 border-dashed cursor-pointer transition-all"
+                            {lists
+                               
+                                ?.records?.map((item, index) => (
+                                    <TemplateTile
+                                        key={index}
+                                        style={{
+                                            backgroundImage: `url(${item.thumbnail || ""})`,
+                                        }}
+                                        className="relative flex flex-col justify-end bg-cover bg-center text-white font-semibold p-2 rounded-lg shadow hover:shadow-lg transition-all duration-300"
                                     >
-                                        <p className="text-[55px] text-gray-600">+</p>
-                                    </li>
-
-                                </ul>
-
-                                {lists.find((l) => l.type === selectedTab)?.records?.length ===
-                                    0 && (
-                                        <div className="text-center text-gray-500 mt-4">
-                                            No templates available for this selection
+                                        <div className="bg-black/50 w-full text-center py-1 rounded">
+                                            {item.flow_name || item.name}
                                         </div>
-                                    )}
-                            </TemplateTilesContainer>
-                        </CustomNotificationContainer>
+                                    </TemplateTile>
+                                ))}
 
-                        {/* {isModalOpen && (
+                            {/* ✅ The '+' Add New Template Button */}
+                            <li
+                                onClick={() => {
+                                    // decide final route
+                                    const finalPath = path.includes("integration")
+                                        ? `/integration-editor/Desktop`
+                                        : `/${path}/new`;
+
+                                    // navigate to correct path
+                                    Navigate(finalPath, { state: { path,tablename }, replace: true });
+                                }}
+                                className="w-full h-[200px] bg-gray-50 rounded flex items-center justify-center hover:shadow-lg border-2 border-dashed cursor-pointer transition-all"
+                            >
+                                <p className="text-[55px] text-gray-600">+</p>
+                            </li>
+                        </ul>
+
+                        {/* ✅ Empty state message */}
+                        {lists.find((l) => l.type === selectedTab)?.records?.length === 0 && (
+                            <div className="text-center text-gray-500 mt-4">
+                                No templates available for this selection
+                            </div>
+                        )}
+                    </TemplateTilesContainer>
+
+
+
+                </CustomNotificationContainer>
+
+                {/* {isModalOpen && (
                             <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/20 backdrop-blur-sm">
                                 <div
                                     className="flex flex-col py-3 px-4 justify-between items-center bg-white rounded-lg gap-3 w-[400px] max-w-[90%]
@@ -177,7 +189,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                     }}
                                 >
                                     {/* Header */}
-                        {/* <div className="relative w-full flex items-center justify-center">
+                {/* <div className="relative w-full flex items-center justify-center">
                                         <h2 className="!text-md font-semibold text-center w-full text-gray-800">
                                             {title}
                                         </h2>
@@ -192,8 +204,8 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                     </div> */}
 
 
-                        {/* Content */}
-                        {/* <div
+                {/* Content */}
+                {/* <div
                                         className="w-full flex flex-col gap-2 overflow-y-auto max-h-[55vh] scrollbar-thin 
                    scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500 scroll-smooth pr-1"
                                         style={{
@@ -243,8 +255,8 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                                         })}
                                     </div> */}
 
-                        {/* Footer Button */}
-                        {/* <button
+                {/* Footer Button */}
+                {/* <button
                                         type="submit"
                                         disabled={!isCreateBtnActive}
                                         onClick={handleSave}
@@ -260,11 +272,11 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
                         )} */}
 
 
-                    </SideNavAndContentContainer>
-                </NotificationTemplateMainContainer>
-            )}
-        </WonContext.Consumer>
-    );
+            </SideNavAndContentContainer>
+        </div>
+    )
+
+
 };
 
 export default TemplateSelection;

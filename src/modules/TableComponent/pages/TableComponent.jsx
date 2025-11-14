@@ -96,7 +96,7 @@ export default function TableComponent({
   recordsPerPage, allowDeleting, createNewPath,
   id, tableData, TableColumnNames, setTableColumnNames,
   showConfigurefieldsBtn, selectedRows, tableName, title,
-  fetchTableData, rdtColValue, redirectionPath,formData
+  fetchTableData, rdtColValue, redirectionPath, formData
 }) {
 
   const [recievedTableData, setTableData] = useState(tableData)
@@ -514,19 +514,19 @@ export default function TableComponent({
     // console.log(selectedTab, tableName, "###")
     switch (tableName) {
       case "notifications":
-        return <FlowStepComponent recordId={selectedTab} path="notifications"/>
+        return <FlowStepComponent recordId={selectedTab} path="notifications" />
       case 'alerts':
         return <FlowStepComponent recordId={selectedTab} path='alerts' />
-      
+
       case 'feedBack':
-        return <FlowStepComponent recordId={selectedTab} path='feedbacks'/>
-      
+        return <FlowStepComponent recordId={selectedTab} path='feedback' />
+
       case 'templates':
-        return <FlowStepComponent recordId={selectedTab} path='templates'/>
+        return <FlowStepComponent recordId={selectedTab} path='templates' />
       case 'designs':
         return <FormDesignerPage recordId={selectedTab} />
       default:
-        return <DetailedView recordId={selectedTab} tableName={tableName} formData={formData}/>
+        return <DetailedView recordId={selectedTab} tableName={tableName} formData={formData} />
 
     }
   };

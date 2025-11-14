@@ -8,6 +8,7 @@ import { TabsContainer, TabItem } from "../MyTickets/pages/StyledComponents";
 import { set } from "date-fns";
 import renderIcons from "../../../shared/functions/renderIcons";
 import PropTypes from "prop-types";
+import Fields from "../../../shared/CreationEditor/Fields";
 
 FormDesignerPage.propTypes = {
   recordId: PropTypes.any.isRequired,
@@ -15,7 +16,7 @@ FormDesignerPage.propTypes = {
 
 export default function FormDesignerPage({ recordId: propRecordId }) {
   const { state } = useLocation();
-  console.log(state, "Here state");
+  // console.log(state, "Here state");
   const recordId = propRecordId || state?.recordId;
   const [module, setModule] = React.useState("");
   const [formFields, setFormFields] = React.useState([]);
@@ -28,7 +29,9 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     hovered: "",
     open: false,
   });
-  const Navigate=useNavigate()
+  const [showCreate, setShowCreate] = useState(true)
+  const [previousFieldsData, setPreviousFieldsData] = useState(JSON.parse(localStorage.getItem("formDesignerData")))
+  const Navigate = useNavigate()
 
   // const [recordId,setRecordId]=useState(recordId)
 
@@ -200,7 +203,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
           <div>
             <div className="flex items-center w-full justify-between mb-2">
               <h3 className="font-semibold !text-blue-800 !text-[22px] flex items-center gap-2">
-                <button className="m-0 p-0 bg-transparent flex items-center justify-center" onClick={()=>{Navigate('/create/new/design')}}>
+                <button className="m-0 p-0 bg-transparent flex items-center justify-center" onClick={() => { Navigate('/create/new/design') }}>
                   {renderIcons('IoIosArrowBack', 30, '#08107D')}
                 </button>
                 <span>Form Designer</span>
@@ -211,10 +214,23 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                 <TabsContainer style={{ marginBottom: 20 }}>
                   <TabItem
                     type="button"
-                    active={!showTabs && !showPreview}
+                    active={showCreate && !showTabs && !showPreview}
+                    onClick={() => {
+                      setShowCreate(true);
+                      setShowTabs(false);
+                      setShowPreview(false);
+                    }}
+                  >
+                    Create
+                  </TabItem>
+
+                  <TabItem
+                    type="button"
+                    active={!showTabs && !showPreview && !showCreate}
                     onClick={() => {
                       setShowTabs(false);
                       setShowPreview(false);
+                      setShowCreate(false)
                     }}
                   >
                     Fields
@@ -247,6 +263,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                   >
                     Preview
                   </TabItem>
+
                 </TabsContainer>
               </div>
 
@@ -336,7 +353,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
           {/* Conditional Screens */}
           <div className="grid grid-cols-1 gap-8">
             {/* Form Designer */}
-            {!showTabs && !showPreview && (
+            {!showTabs && !showPreview && !showCreate && (
               <FormBuilder
                 formFields={formFields}
                 formButtons={formButtons}
@@ -374,9 +391,12 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                   tabs={tabs}
                   state={state}
                   recordId={recordId}
+                  previousFieldsData={previousFieldsData}
                 />
               </section>
             )}
+
+            {showCreate && (<Fields path="formDesigner" />)}
           </div>
         </div>
       </div>

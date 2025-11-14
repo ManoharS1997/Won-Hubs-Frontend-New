@@ -149,187 +149,246 @@ const Highlight = styled.span`
 
 export default function GenerateReports({
   graphType, view, formStates,
-  filterConditions, setFilterConditions,
-  isLoading, generateAndGetReportData,
-  onCreateReport,
-  updateGaugeReportFields, gaugeReportFields
+  filterConditions, setFilterConditions = () => { },
+  isLoading, generateAndGetReportData = () => { },
+  onCreateReport = () => { },
+  updateGaugeReportFields = () => { }, gaugeReportFields = []
 }) {
+  // Safe destructuring with soft defaults for functions/booleans
   const {
-    tablesList, selectedTable, tableColumns,
-    groupBy, stackBy, aggregation, reportName, shortDescription,
-    visibility, displayTable, graphData, orderByData,
-    interval,
-
-    setGroupBy, setStackBy,
-    setAggregation, getSelectedTableColumns, setStep, setReportName,
-    setShortDescription, setVisibility, setDisplayTable,
-    setInterval
-  } = formStates
+    tablesList = [],
+    selectedTable = null,
+    tableColumns = [],
+    groupBy = null,
+    stackBy = null,
+    aggregation = null,
+    reportName = '',
+    shortDescription = '',
+    visibility = { label: 'Public', value: 'Public' },
+    displayTable = false,
+    graphData = [],
+    orderByData = [],
+    interval = '',
+    setGroupBy = () => { },
+    setStackBy = () => { },
+    setAggregation = () => { },
+    getSelectedTableColumns = () => { },
+    setStep = () => { },
+    setReportName = () => { },
+    setShortDescription = () => { },
+    setVisibility = () => { },
+    setDisplayTable = () => { },
+    setInterval = () => { },
+  } = formStates || {};
 
   const convertedNames = (name) => {
-    const nameArr = name.split('_')
-    const convertedName = nameArr.map((item,) => item[0].toUpperCase() + item.slice(1))
-    return (convertedName.join(' '))
-  }
+    const nameArr = name?.toString()?.split('_') || [];
+    const convertedName = nameArr.map((item) => item?.[0]?.toUpperCase() + item?.slice(1));
+    return convertedName.join(' ');
+  };
 
   const animatedComponents = makeAnimated();
 
   const renderselectedGraph = () => {
     switch (graphType) {
       case 'pie-animation':
-        return <PieAnimation demo data={graphData} />
-
+        return <PieAnimation demo data={graphData || []} />;
       case 'pie-sizing':
-        return <PieSizing demo data={graphData} />
-
+        return <PieSizing demo data={graphData || []} />;
       case 'pie-highlights':
-        return <PieHighlights demo data={graphData} />
-
+        return <PieHighlights demo data={graphData || []} />;
       case 'lines-partial':
-        return <LinesPartial demo data={graphData} />
-
+        return <LinesPartial demo data={graphData || []} />;
       case 'lines-interpolation':
-        return <LinesInterpolation demo data={graphData} />
-
+        return <LinesInterpolation demo data={graphData || []} />;
       case 'lines-stacking':
-        return <LinesStacking demo data={graphData} />
-
+        return <LinesStacking demo data={graphData || []} />;
       case 'bar-stacked':
-        return <StackBars demo data={graphData} />
-
+        return <StackBars demo data={graphData || []} />;
       case 'bar-horizontal':
-        return <HorizontalBars demo data={graphData} />
-
+        return <HorizontalBars demo data={graphData || []} />;
       case 'gauge':
-        return <GaugeValueRangeNoSnap demo data={graphData} />
+        return <GaugeValueRangeNoSnap demo data={graphData || []} />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const addNewCondition = (e, currentConditionID, conditionValue) => {
-    e.preventDefault()
+    e?.preventDefault?.();
 
-    if (
-      (currentConditionID !== (null || undefined)) &&
-      (conditionValue !== (null || undefined))
-    ) {
-      const updatedList = filterConditions.map(filter => filter.id === currentConditionID ?
-        { ...filter, condition: conditionValue } :
-        filter
-      )
-      const currentCondition = filterConditions.filter((filter) => filter.id === currentConditionID)[0]
+    // If list not initialized, initialize with a first row
+    if (!Array.isArray(filterConditions) || filterConditions.length === 0) {
+      setFilterConditions([
+        {
+          id: 1,
+          column: null,
+          value: null,
+          operation: null,
+          condition: null,
+        },
+      ]);
+      return;
+    }
 
-      const isPreviousConditionFuflilled = currentCondition.column !== null && currentCondition.value !== null && currentCondition.operation !== null
-      {
-        isPreviousConditionFuflilled &&
-          setFilterConditions([
-            ...updatedList,
-            {
-              id: filterConditions.length + 1,
-              column: null,
-              value: null,
-              operation: null,
-              condition: null
-            }
-          ])
+    if (currentConditionID != null && conditionValue != null) {
+      const updatedList = filterConditions.map((filter) =>
+        filter.id === currentConditionID ? { ...filter, condition: conditionValue } : filter
+      );
+
+      const currentCondition =
+        filterConditions.find((filter) => filter.id === currentConditionID) || {};
+
+      const isPreviousConditionFulfilled =
+        currentCondition.column !== null &&
+        currentCondition.value !== null &&
+        currentCondition.operation !== null;
+
+      if (isPreviousConditionFulfilled) {
+        setFilterConditions([
+          ...updatedList,
+          {
+            id: filterConditions.length + 1,
+            column: null,
+            value: null,
+            operation: null,
+            condition: null,
+          },
+        ]);
+      } else {
+        // Update only the condition if prior fields incomplete
+        setFilterConditions(updatedList);
       }
     } else {
       setFilterConditions([
+        ...filterConditions,
         {
           id: filterConditions.length + 1,
           column: null,
           value: null,
           operation: null,
-          condition: null
-        }
-      ])
+          condition: null,
+        },
+      ]);
     }
-  }
+  };
 
   const removeCondition = (conditionId) => {
-    setFilterConditions(filterConditions.filter(filter => filter.id !== conditionId))
-  }
+    if (!Array.isArray(filterConditions)) return;
+    setFilterConditions(filterConditions.filter((filter) => filter.id !== conditionId));
+  };
 
   const components = {
     DropdownIndicator: null,
-  }
+  };
 
   const switchValueField = (filter, index) => {
-    const TextInputField = <ReportFieldInput
-      type="text"
-      placeholder="--Value--"
-      value={filter.value}
-      onChange={(e) =>
-        setFilterConditions((prevConditions) =>
-          prevConditions.map((cond, i) =>
-            i === index ? { ...cond, value: e.target.value } : cond
+    const TextInputField = (
+      <ReportFieldInput
+        type="text"
+        placeholder="--Value--"
+        value={filter?.value ?? ''}
+        onChange={(e) =>
+          setFilterConditions((prevConditions = []) =>
+            prevConditions.map((cond, i) =>
+              i === index ? { ...cond, value: e.target.value } : cond
+            )
           )
-        )
-      }
-    />
+        }
+      />
+    );
 
-    const NumberInputField = <ReportFieldInput
-      type="number"
-      placeholder="--Value--"
-      value={filter.value}
-      min={0}
-      onChange={(e) =>
-        setFilterConditions((prevConditions) =>
-          prevConditions.map((cond, i) =>
-            i === index ? { ...cond, value: e.target.value } : cond
+    const NumberInputField = (
+      <ReportFieldInput
+        type="number"
+        placeholder="--Value--"
+        value={filter?.value ?? ''}
+        min={0}
+        onChange={(e) =>
+          setFilterConditions((prevConditions = []) =>
+            prevConditions.map((cond, i) =>
+              i === index ? { ...cond, value: e.target.value } : cond
+            )
           )
-        )
-      }
-    />
+        }
+      />
+    );
 
-    const DateInputField = <input type='date' />
+    const DateInputField = <input type="date" onChange={() => { }} />;
 
-    const MultiSelectField = <Select
-      isMulti
-      name="colors"
-      className="basic-multi-select"
-      classNamePrefix="select"
-    />
+    const MultiSelectField = (
+      <Select isMulti name="values" className="basic-multi-select" classNamePrefix="select" />
+    );
 
-    switch (filter?.column?.value?.type) {
+    const colType = filter?.column?.value?.type;
+
+    switch (colType) {
       case 'varchar':
         switch (filter?.operation?.label) {
           case 'Contains':
-            return TextInputField
-
+            return TextInputField;
           case 'Is Any Of':
-            return MultiSelectField
+            return MultiSelectField;
           default:
-            return null
+            return TextInputField;
         }
-
       case 'int':
-        return NumberInputField
-
+        return NumberInputField;
       case 'enum':
-        return TextInputField
-
+        return TextInputField;
       case 'datetime':
-        return DateInputField
-
+        return DateInputField;
       default:
-        return TextInputField
+        return TextInputField;
     }
-  }
+  };
+
+  // In case this comes from elsewhere; keep a safe default
+  const stackbyIcludedchartTypes = Array.isArray(window?.stackbyIcludedchartTypes)
+    ? window.stackbyIcludedchartTypes
+    : ['bar-stacked', 'lines-stacking'];
+
+  const aggregationList = [
+    { key: 'count', label: 'Count', value: 'count' },
+    { key: 'sum', label: 'Sum', value: 'sum' },
+    { key: 'avg', label: 'Average', value: 'avg' },
+    { key: 'min', label: 'Minimum', value: 'min' },
+    { key: 'max', label: 'Maximum', value: 'max' },
+  ];
+
+  // Build safe options
+  const tableOptions = (tablesList || []).map((item) => ({
+    value: item,
+    label: convertedNames(item),
+  }));
+
+  const columnOptions = (tableColumns || [])
+    ?.filter((item) => item?.type !== 'json')
+    ?.map((item) => ({
+      ...item,
+      value: item,
+      label: convertedNames(item?.name),
+    })) || [];
+
+  const intColumnOptions =
+    (tableColumns || [])
+      ?.filter((rec) => rec?.type === 'int')
+      ?.map((item) => ({ ...item, value: item, label: convertedNames(item?.name) })) || [];
+
+  const aggregationOptions =
+    groupBy?.value?.type !== 'int'
+      ? [{ label: 'Count', value: 'count', key: 'count' }]
+      : aggregationList.map((item) => ({
+        ...item,
+        value: item, // keeping your pattern of passing the whole item
+        label: convertedNames(item.label),
+      }));
 
   return (
     <ReportFormContainer>
-      <div
-        className="py-[10px] px-2 flex flex-col md:flex-row h-fit items-center gap-4 overflow-auto"
-      >
-        <span
-          className=" self-start"
-        >
-          <IoIosArrowBack
-            size={25}
-            onClick={() => setStep(2)}
-          />
+      {/* <div className="py-[10px] px-2 flex flex-col md:flex-row h-fit items-center gap-4 overflow-auto">
+        <span className=" self-start">
+          <IoIosArrowBack size={25} onClick={() => setStep(2)} />
         </span>
 
         <Group width={'250px'}>
@@ -347,14 +406,14 @@ export default function GenerateReports({
         </Group>
 
         <Group width={'10rem'}>
-          <Input type="text" required value={convertedNames(view)} />
+          <Input type="text" required value={convertedNames(view)} readOnly />
           <Label>View</Label>
           <Bar />
           <Highlight />
         </Group>
 
         <Group width={'10rem'}>
-          <Input type="text" required value={convertedNames(graphType)} />
+          <Input type="text" required value={convertedNames(graphType)} readOnly />
           <Label>Graph Type</Label>
           <Bar />
           <Highlight />
@@ -377,9 +436,7 @@ export default function GenerateReports({
           <Highlight />
         </Group>
 
-        <div
-          className="flex flex-col items-center gap-[5px]"
-        >
+        <div className="flex flex-col items-center gap-[5px]">
           <label
             style={{
               position: 'absolute',
@@ -388,7 +445,7 @@ export default function GenerateReports({
               background: '#fff',
               color: '#5264ae',
               fontSize: '0.7rem',
-              padding: '0 5px'
+              padding: '0 5px',
             }}
           >
             Visibility
@@ -397,14 +454,13 @@ export default function GenerateReports({
           <Select
             className="basic-single report-form-select w-auto"
             classNamePrefix="select"
-            defaultValue={visibility !== null ? visibility : { label: 'Public', value: 'Public' }}
-
+            value={visibility || { label: 'Public', value: 'Public' }}
             isDisabled={false}
             isLoading={false}
             isClearable={false}
             isRtl={false}
-            isSearchable={true}
-            name="color"
+            isSearchable
+            name="visibility"
             options={[
               { label: 'Public', value: 'Public' },
               { label: 'Private', value: 'Private' },
@@ -413,110 +469,98 @@ export default function GenerateReports({
           />
         </div>
 
-        <CreateBtn type="button" onClick={onCreateReport}>Create
+        <CreateBtn type="button" onClick={onCreateReport}>
+          Create
           <MdDoubleArrow size={25} />
         </CreateBtn>
-      </div>
+      </div> */}
 
       <GenerateReportsBodySection className="flex flex-col !px-2 md:flex-row !gap-4">
         <ReportForm className="w-full md:w-[40%] !h-full">
           <FieldContainer>
-            <ReportFieldLabel><GoDotFill size={10} style={{ color: 'red' }} /> Source</ReportFieldLabel>
+            <ReportFieldLabel>
+              <GoDotFill size={10} style={{ color: 'red' }} /> Source
+            </ReportFieldLabel>
 
             <Select
               className="basic-single report-form-select  flex-grow-1"
               classNamePrefix="select"
-              defaultValue={selectedTable === null ? { label: 'Select Table', value: 'Select Table' } : selectedTable}
-
+              value={selectedTable || null}
               isDisabled={false}
               isLoading={false}
               isClearable={false}
               isRtl={false}
-              isSearchable={true}
-              name="color"
-              options={tablesList.map(item => {
-                return { value: item, label: convertedNames(item) }
-              }
-              )}
+              isSearchable
+              name="source-table"
+              options={tableOptions}
               onChange={getSelectedTableColumns}
             />
           </FieldContainer>
 
           <FieldContainer>
-            <ReportFieldLabel><GoDotFill size={10} style={{ color: 'red' }} />Group By</ReportFieldLabel>
+            <ReportFieldLabel>
+              <GoDotFill size={10} style={{ color: 'red' }} />
+              Group By
+            </ReportFieldLabel>
 
             <Select
               className="basic-single report-form-select flex-grow-1"
               classNamePrefix="select"
-              defaultValue={groupBy === null ? { label: '-- None --', value: 'None' } : groupBy}
-
+              value={groupBy || null}
               isDisabled={false}
               isLoading={false}
               isClearable={false}
               isRtl={false}
-              isSearchable={true}
-              name="color"
-              options={tableColumns.map(item => {
-                return { ...item, value: item, label: convertedNames(item.name), }
-              }
-              )}
+              isSearchable
+              name="group-by"
+              options={columnOptions}
               onChange={setGroupBy}
             />
           </FieldContainer>
 
-          {stackbyIcludedchartTypes.includes(graphType) &&
+          {stackbyIcludedchartTypes.includes(graphType) && (
             <FieldContainer>
-              <ReportFieldLabel><GoDotFill size={10} style={{ color: 'red' }} />Stack By</ReportFieldLabel>
+              <ReportFieldLabel>
+                <GoDotFill size={10} style={{ color: 'red' }} />
+                Stack By
+              </ReportFieldLabel>
 
               <Select
                 className="basic-single report-form-select flex-grow-1"
                 classNamePrefix="select"
-                defaultValue={stackBy === null ? { label: '-- None --', value: 'None' } : stackBy}
-
+                value={stackBy || null}
                 isDisabled={false}
                 isLoading={false}
                 isClearable={false}
                 isRtl={false}
-                isSearchable={true}
-                name="color"
-                options={tableColumns.map(item => {
-                  return { value: item, label: convertedNames(item.name), ...item }
-                }
-                )}
+                isSearchable
+                name="stack-by"
+                options={columnOptions}
                 onChange={setStackBy}
               />
             </FieldContainer>
-          }
+          )}
 
           <FieldContainer>
-            <ReportFieldLabel><GoDotFill size={10} style={{ color: 'red' }} />Aggregation</ReportFieldLabel>
+            <ReportFieldLabel>
+              <GoDotFill size={10} style={{ color: 'red' }} />
+              Aggregation
+            </ReportFieldLabel>
 
             <Select
               className="basic-single report-form-select flex-grow-1"
               classNamePrefix="select"
-              defaultValue={
-                aggregation === null ?
-                  { label: '--Select--', value: 'select' } :
-                  aggregation
+              value={
+                aggregation ||
+                null
               }
-
               isDisabled={false}
               isLoading={false}
               isClearable={false}
               isRtl={false}
-              isSearchable={true}
-              name="color"
-              options={
-                (groupBy?.value?.type !== 'int') ?
-                  { label: 'Count', value: 'count' }
-
-                  :
-                  aggregationList.map(item => {
-                    return { value: item, label: convertedNames(item.label), ...item }
-                  }
-                  )
-              }
-
+              isSearchable
+              name="aggregation"
+              options={aggregationOptions}
               onChange={setAggregation}
             />
           </FieldContainer>
@@ -526,8 +570,8 @@ export default function GenerateReports({
 
             <Checkbox
               variant="outlined"
-              checked={displayTable}
-              onChange={(e) => setDisplayTable(e.target.checked)}
+              checked={!!displayTable}
+              onChange={(e) => setDisplayTable(!!e.target.checked)}
             />
           </FieldContainer>
 
@@ -540,37 +584,35 @@ export default function GenerateReports({
             <Select
               className="basic-single report-form-select flex-grow-1"
               classNamePrefix="select"
-              defaultValue={
-                gaugeReportFields?.length < 0 ?
-                  [{ label: '', value: '' }] :
-                  gaugeReportFields
-              }
+              value={Array.isArray(gaugeReportFields) && gaugeReportFields.length > 0 ? gaugeReportFields : []}
               isMulti
-
               isDisabled={false}
               isLoading={false}
               isClearable={false}
               isRtl={false}
-              isSearchable={true}
-              name="color"
+              isSearchable
+              name="gauge-fields"
               components={animatedComponents}
               closeMenuOnSelect={false}
-              options={gaugeReportFields.length > 3 ? [] :
-                tableColumns.filter(record => record.type === 'int').map(item => (
-                  { ...item, value: item, label: convertedNames(item.name) }
-                ))}
+              options={
+                (Array.isArray(gaugeReportFields) && gaugeReportFields.length > 3)
+                  ? []
+                  : intColumnOptions
+              }
               onChange={updateGaugeReportFields}
             />
           </FieldContainer>
 
-          <span style={{
-            color: '#023e8a',
-            fontSize: '0.7rem',
-            background: '#caf0f8 ',
-            padding: '2px 10px',
-            borderRadius: '5px',
-          }}>
-            !important:  "<GoDotFill size={10} style={{ color: 'red' }} />" Marked are manadatory fields.
+          <span
+            style={{
+              color: '#023e8a',
+              fontSize: '0.7rem',
+              background: '#caf0f8 ',
+              padding: '2px 10px',
+              borderRadius: '5px',
+            }}
+          >
+            !important: "<GoDotFill size={10} style={{ color: 'red' }} />" Marked are manadatory fields.
           </span>
 
           <div
@@ -579,138 +621,125 @@ export default function GenerateReports({
               flexDirection: 'column',
               alignItems: 'center',
               width: '100%',
-              rowGap: '15px,'
+              rowGap: '15px',
             }}
           >
             <h5>Filter Conditions</h5>
 
-            {filterConditions.length > 0 ?
-              filterConditions.map((filter, index) => (
-                <FiltersContainer key={filter.id}>
-                  <FilterFieldContainer>
-                    <Select
-                      className="basic-single report-form-select flex-grow-1"
-                      classNamePrefix="select"
-                      defaultValue={
-                        filter.column === null
-                          ? { label: '--Column--', value: 'Column' }
-                          : filter.column
-                      }
-                      isDisabled={false}
-                      isLoading={false}
-                      isClearable={false}
-                      isRtl={false}
-                      isSearchable={true}
-                      name="column"
-                      options={tableColumns.filter(item => item.type !== 'json').map((item) => ({
-                        value: item,
-                        label: convertedNames(item.name),
-                      }))}
-                      onChange={(e) =>
-                        setFilterConditions((prevConditions) =>
-                          prevConditions.map((cond, i) =>
-                            i === index ? { ...cond, column: e } : cond
+            {/* Uncomment and use when you want the filter UI back */}
+            {/* {Array.isArray(filterConditions) && filterConditions.length > 0
+              ? filterConditions.map((filter, index) => (
+                  <FiltersContainer key={filter.id}>
+                    <FilterFieldContainer>
+                      <Select
+                        className="basic-single report-form-select flex-grow-1"
+                        classNamePrefix="select"
+                        value={
+                          filter.column === null
+                            ? null
+                            : filter.column
+                        }
+                        isDisabled={false}
+                        isLoading={false}
+                        isClearable={false}
+                        isRtl={false}
+                        isSearchable
+                        name="column"
+                        options={columnOptions}
+                        onChange={(e) =>
+                          setFilterConditions((prevConditions = []) =>
+                            prevConditions.map((cond, i) =>
+                              i === index ? { ...cond, column: e } : cond
+                            )
                           )
-                        )
-                      }
-                      components={components}
-                    />
-                  </FilterFieldContainer>
+                        }
+                        components={components}
+                      />
+                    </FilterFieldContainer>
 
-                  <FilterFieldContainer>
-                    <Select
-                      className="basic-single report-form-select flex-grow-1"
-                      classNamePrefix="select"
-                      defaultValue={
-                        filter.operation === null
-                          ? { label: '--Operation--', value: 'Operation' }
-                          : filter.operation
-                      }
-                      isDisabled={false}
-                      isLoading={false}
-                      isClearable={false}
-                      isRtl={false}
-                      isSearchable={true}
-                      name="operation"
-                      options={operationList.map((item) => ({
-                        value: item,
-                        label: convertedNames(item.label),
-                      }))}
-                      onChange={(e) =>
-                        setFilterConditions((prevConditions) =>
-                          prevConditions.map((cond, i) =>
-                            i === index ? { ...cond, operation: e } : cond
+                    <FilterFieldContainer>
+                      <Select
+                        className="basic-single report-form-select flex-grow-1"
+                        classNamePrefix="select"
+                        value={
+                          filter.operation === null
+                            ? null
+                            : filter.operation
+                        }
+                        isDisabled={false}
+                        isLoading={false}
+                        isClearable={false}
+                        isRtl={false}
+                        isSearchable
+                        name="operation"
+                        options={operationList.map((item) => ({
+                          value: item,
+                          label: convertedNames(item.label),
+                        }))}
+                        onChange={(e) =>
+                          setFilterConditions((prevConditions = []) =>
+                            prevConditions.map((cond, i) =>
+                              i === index ? { ...cond, operation: e } : cond
+                            )
                           )
-                        )
-                      }
-                      components={components}
-                    />
-                  </FilterFieldContainer>
+                        }
+                        components={components}
+                      />
+                    </FilterFieldContainer>
 
-                  <FilterFieldContainer>
-                    {switchValueField(filter, index)}
-                  </FilterFieldContainer>
+                    <FilterFieldContainer>{switchValueField(filter, index)}</FilterFieldContainer>
 
-                  <ActionButtonConditions>
-                    <AndBtn
-                      type="button"
-                      onClick={(e) => addNewCondition(e, filter.id, 'and')}
-                      condition={filter.condition}
-                    >
-                      <LuAmpersand size={15} />
-                    </AndBtn>
+                    <ActionButtonConditions>
+                      <AndBtn
+                        type="button"
+                        onClick={(e) => addNewCondition(e, filter.id, 'and')}
+                        condition={filter.condition}
+                      >
+                        <LuAmpersand size={15} />
+                      </AndBtn>
 
-                    <OrBtn
-                      type="button"
-                      onClick={(e) => addNewCondition(e, filter.id, 'or')}
-                      condition={filter.condition}
-                    >
-                      <FaGripLinesVertical size={15} />
-                    </OrBtn>
+                      <OrBtn
+                        type="button"
+                        onClick={(e) => addNewCondition(e, filter.id, 'or')}
+                        condition={filter.condition}
+                      >
+                        <FaGripLinesVertical size={15} />
+                      </OrBtn>
 
-                    <RemoveConditionBtn
-                      type='button'
-                      onClick={() => removeCondition(filter.id)}
-                    >
-                      <MdRemoveCircle size={20} />
-                    </RemoveConditionBtn>
-                  </ActionButtonConditions>
-                </FiltersContainer>
-              ))
-              :
-              <AddConditionBtn
-                type="button"
-                onClick={addNewCondition}
-              >
-                + Add Filter Condition(s)
-              </AddConditionBtn>
-            }
+                      <RemoveConditionBtn type="button" onClick={() => removeCondition(filter.id)}>
+                        <MdRemoveCircle size={20} />
+                      </RemoveConditionBtn>
+                    </ActionButtonConditions>
+                  </FiltersContainer>
+                ))
+              : null} */}
+
+            <AddConditionBtn type="button" onClick={addNewCondition}>
+              + Add Filter Condition(s)
+            </AddConditionBtn>
           </div>
         </ReportForm>
 
         <PreviewContainer className="w-full md:w-[60%] !h-full ">
           <FieldContainer>
-            {selectedTable && groupBy && aggregation &&
-              <UpdatePreviewBtn
-                type="button"
-                isLoading={isLoading}
-                onClick={generateAndGetReportData}
-              >
+            {selectedTable && groupBy && aggregation && (
+              <UpdatePreviewBtn type="button" isLoading={isLoading} onClick={generateAndGetReportData}>
                 <LuRefreshCw size={20} />
                 {isLoading ? <span> Generating...</span> : null}
               </UpdatePreviewBtn>
-            }
+            )}
           </FieldContainer>
 
           <CharContainer>{renderselectedGraph()}</CharContainer>
 
-          {displayTable &&
-            <TableContainer >
-              <DisplayTable tableData={orderByData} />
+          {displayTable && (
+            <TableContainer>
+              <DisplayTable tableData={orderByData || []} />
             </TableContainer>
-          }
+          )}
         </PreviewContainer>
       </GenerateReportsBodySection>
     </ReportFormContainer>
-  )
+  );
 }
+                                                 

@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { IoImageOutline } from "react-icons/io5";
 import QuestionCard from "../../modules/Admin-Portal/Feedback/pages/QuestionCard";
 import "./PreviewEditor.css";
-//component Imports 
+
+// component Imports
 import renderIcons from "../functions/renderIcons";
 import { CreateNotificationFunction } from "../../utils/CheckAndExecuteFlows/CRUDoperations";
 
 const PreviewEditor = (props) => {
-    const location = useLocation();
     const Navigate = useNavigate();
+
     const {
         detailsObject,
         editorContent,
@@ -17,40 +18,58 @@ const PreviewEditor = (props) => {
         isUpdate,
         recordId,
         feedbackImageUrl,
+        tableName
     } = props;
-    const [detailsData, setDetailsData] = useState(detailsObject || {});
+
+    const [detailsData, setDetailsData] = useState({});
     const [showCC, setShowCC] = useState(false);
     const [showFields, setShowFields] = useState(false);
     const [displayContent, setDisplayContent] = useState(editorContent);
-    // console.log(detailsObject,"Here Details Object")
-    // console.log(feedbackImageUrl,"Image Url Hereee")
+    // console.log(path,"path Hereeee")
 
+   
     useEffect(() => {
-        if (!detailsObject || Object.keys(detailsObject).length === 0) {
-            console.log("Triggering Inside")
-            const localData = localStorage.getItem(`${path}Data`);
-            if (localData) {
+        if (!path) return;
+
+        const storageKey = `${path}Data`;
+        const localData = localStorage.getItem(storageKey);
+
+        // 1️⃣ Prefer localStorage data if present & valid
+        if (localData) {
+            try {
+                const parsed = JSON.parse(localData);
+                setDetailsData(parsed || {});
+                return;
+            } catch (err) {
+                console.log("Invalid JSON in localStorage for", storageKey, err);
+            }
+        }
+
+        // 2️⃣ Fallback to detailsObject (from props)
+        if (detailsObject) {
+            let parsedDetails = detailsObject;
+            if (typeof detailsObject === "string") {
                 try {
-                    const parsed = JSON.parse(localData);
-                    setDetailsData(parsed);
-                    // console.log(" Restored details from localStorage:", parsed);
+                    parsedDetails = JSON.parse(detailsObject);
                 } catch (err) {
-                    console.log("❌ Invalid localStorage data:", err);
+                    console.log("detailsObject is string but not valid JSON:", err);
                 }
             }
+            setDetailsData(parsedDetails || {});
         } else {
-            setDetailsData(detailsObject);
+            setDetailsData({});
         }
-    }, [detailsObject, path]);
-
+    }, [path, detailsObject]);
 
     useEffect(() => {
         const contentInLocal = localStorage.getItem("editorContent");
+     
         if (contentInLocal && contentInLocal !== editorContent) {
             setDisplayContent(contentInLocal);
+        } else {
+            setDisplayContent(editorContent || "");
         }
     }, [editorContent]);
-
 
     const getValue = (key) => detailsData?.[key]?.value || "";
 
@@ -59,39 +78,31 @@ const PreviewEditor = (props) => {
             ...detailsData,
             content: editorContent,
         };
+
         const response = await CreateNotificationFunction(
-            path,
+            tableName,
             formData,
             isUpdate,
             recordId
         );
         console.log("Response from preview editor:", response);
 
-        // Cleanup
-        // localStorage.removeItem("editorContent");
-        // localStorage.removeItem("questionsData");
-        // localStorage.removeItem("feedbackData");
-        localStorage.removeItem('ImageUrl')
+        // Cleanup if needed
+        localStorage.removeItem("editorContent");
+        localStorage.removeItem("questionsData");
+        localStorage.removeItem(`${path}Data`)
+        localStorage.removeItem("ImageUrl");
 
         const navigatedPath =
             path === "notifications"
                 ? path.charAt(0).toUpperCase() + path.slice(1)
                 : path.charAt(0).toUpperCase() + path.slice(1) + "s";
+
+        // Uncomment when you want to navigate after save:
         // Navigate(`/All ${navigatedPath}`, { replace: true });
     };
 
-    useEffect(() => {
-        const setLocalData = localStorage.getItem(
-            (`${path}Data`)
-        )
-        
-        if (JSON.parse(setLocalData) !== detailsData) {
-            // console.log(setLocalData, "Set","Triggering inside not ")
-            setDetailsData(setLocalData)
-        }
-    },[detailsData])
-    console.log(detailsObject,"Details Object")
-
+// console.log(tableName,"Path Hereee")
     return (
         <div
             className={`h-[100%] w-[100%] px-2 py-0 ${showCC ? "overflow-y-auto custom-scrollbar" : "overflow-hidden"
@@ -146,7 +157,7 @@ const PreviewEditor = (props) => {
                                 <span className="text-[15px] font-bold mb-1">
                                     {getValue("to") || "to@example.com"}
                                 </span>
-                                <button onClick={() => setShowCC(!showCC)}>
+                                <button onClick={() => setShowCC((prev) => !prev)}>
                                     <span>
                                         {renderIcons("MdOutlineKeyboardArrowDown", 22, "grey")}
                                     </span>
@@ -183,13 +194,13 @@ const PreviewEditor = (props) => {
 
             {/* 🔹 Main Email Content */}
             <div className="flex justify-center items-start bg-transparent h-[72vh] w-full md:w-[100%] mx-auto mt-2 md:h-[77vh]">
-                {path && path.toLowerCase() !== "feedback" && (
+                {/* Non-feedback preview (HTML content) */}
+                {tableName && tableName.toLowerCase() !== "feedback" && (
                     <div className="border-gray-300 m-2 p-5 w-full md:w-[100%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-sm border-2">
                         {(() => {
                             const pages = (displayContent || "").split(
                                 /<div class="page-break"[\s\S]*?<\/div>/g
                             );
-
                             const pageSize = "A4";
 
                             return pages.map((pageHtml, index) => (
@@ -213,7 +224,7 @@ const PreviewEditor = (props) => {
                 )}
 
                 {/* 🔹 Feedback Page */}
-                {path && path.toLowerCase() === "feedback" && (
+                {tableName && tableName.toLowerCase() === "feedback" && (
                     <div className="m-2 w-[100%] h-[100%] overflow-y-auto bg-white custom-scrollbar rounded-md shadow-md flex flex-col gap-2">
                         <div className="w-[80%] mx-auto p-0">
                             <div
@@ -243,3 +254,4 @@ const PreviewEditor = (props) => {
 };
 
 export default PreviewEditor;
+

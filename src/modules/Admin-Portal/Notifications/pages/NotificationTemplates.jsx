@@ -406,8 +406,8 @@ const NotificationTemplates = () => {
           lists={templates}
           configureFields={configureFields}
           title="Create Notification"
-          path='notifications'
-          tablename="notification"
+          path='flowcheck'
+          tablename="notifications"
         />
       )}
     </WonContext.Consumer>

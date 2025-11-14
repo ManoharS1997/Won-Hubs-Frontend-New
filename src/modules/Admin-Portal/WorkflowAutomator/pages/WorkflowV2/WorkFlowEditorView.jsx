@@ -1,12 +1,12 @@
+// This component is created by sandhya to adjust the lay out
 
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import Fields from "../../../../shared/CreationEditor/Fields";
-import GenerateReports from "./GenerateReports";
-import PreviewReport from "./PreviewReport";
+import Fields from '../../../../../shared/CreationEditor/Fields';
+import WorkflowComponent from "./WorkflowV2";
 
 
-const FlowReportComponent = ({ recordId, path }) => {
+const WorkFlowComponent = ({ recordId, path }) => {
     const location = useLocation()
     const [flowStep, setFlowStep] = useState(0)
     const [templates, setTemplates] = useState([]);
@@ -14,7 +14,7 @@ const FlowReportComponent = ({ recordId, path }) => {
     const [data, setData] = useState(
         JSON.parse(localStorage.getItem(`${path}Data`)) || {}
     );
-    const [UrlPath, setPath] = useState("reports")
+    const [UrlPath, setPath] = useState("workFlow")
     const [editorContent, setEditorContent] = useState("")
 
     useEffect(() => {
@@ -74,14 +74,14 @@ const FlowReportComponent = ({ recordId, path }) => {
                 ]);
             }
         };
-        if (location) {
-            // console.log(location,"Location")
-            if (location.state) {
-                const { path } = location.state
-                // console.log(path,"Path in Fields")
-                setPath(path)
-            }
-        }
+        // if (location) {
+        //     // console.log(location,"Location")
+        //     if (location.state) {
+        //         const { path } = location.state
+        //         // console.log(path,"Path in Fields")
+        //         setPath(path)
+        //     }
+        // }
         fetchTemplates();
     }, []);
     // const getRecordData = async () => {
@@ -156,8 +156,7 @@ const FlowReportComponent = ({ recordId, path }) => {
             {/* Dynamic Content Area */}
             <div className="bg-white  max-h-[100%] max-w-[100%] overflow-y-auto px-2">
                 {selectedTab === "Fields" && <Fields data={data} path={UrlPath} />}
-                {selectedTab === 'Editor' && <GenerateReports />}
-                {selectedTab === "Preview" && <PreviewReport />}
+                {selectedTab === 'Editor' && <WorkflowComponent />}
                 {/* {selectedTab === "Preview" && (
                     <PreviewEditor
                         path={UrlPath}
@@ -175,4 +174,4 @@ const FlowReportComponent = ({ recordId, path }) => {
     )
 
 }
-export default FlowReportComponent
+export default WorkFlowComponent

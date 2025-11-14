@@ -46,7 +46,7 @@ const customStyles = {
   singleValue: (base) => ({
     ...base,
     color: "#333",
-    fontWeight: "bold",
+    fontWeight: "normal",
   }),
   placeholder: (base) => ({
     ...base,
@@ -126,7 +126,7 @@ export default function FormDropdown({
         </span>}
       </label>}
 
-      <div className=" group-focus-within:shadow-[0_0_0.5rem_0.1rem_var(--primary-color)] flex items-center gap-2 border focus:shadow-[0_0_0.5rem_0.1rem_var(--primary-color)]">
+      <div className="group-focus-within:shadow-[0_0_0.5rem_0.1rem_var(--primary-color)] flex items-center gap-2 border focus:shadow-[0_0_0.5rem_0.1rem_var(--primary-color)]">
         <Select
           className="basic-single"
           classNamePrefix="select"

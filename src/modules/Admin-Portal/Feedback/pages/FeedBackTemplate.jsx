@@ -414,7 +414,7 @@ const FeedBackTemplateView = () => {
           lists={templates}
           configureFields={configureFields}
           title="Create Feedback"
-          path="feedback"
+          path="flowcheck"
           tablename="feedback"
         />
       )}
