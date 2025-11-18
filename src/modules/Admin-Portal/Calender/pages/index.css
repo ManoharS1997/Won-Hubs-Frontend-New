@@ -1,46 +1,74 @@
-.rbc-btn-group{
-    border-radius: 7px;  
-    background:'#000' ;
+.rbc-btn-group {
+    border-radius: 7px;
+    background: '#000';
     padding: 1px;
 
     border: 1px solid #ccc;
 
 }
+
 .rbc-toolbar button {
     margin: 3px 3px 3px 3px;
     border-radius: 5px !important;
 
-    border:none;
+    border: none;
 }
-.rbc-active{
+
+.rbc-active {
     background-color: #7f7f7f !important;
-    color:#f8f9fa !important;
+    color: #f8f9fa !important;
 }
 
-.rbc-event{
+.rbc-event {
     /* background-color:#00a896; */
-    background-color:red;
+    background-color: red;
 }
 
-.rbc-month-view{
-    border-radius:10px;
+.rbc-month-view {
+    border-radius: 10px;
     overflow: hidden;
 }
 
-.rbc-date-cell{
+.rbc-date-cell {
     height: 100%;
     display: flex;
     justify-content: center;
-    align-items:center;
+    align-items: center;
     font-size: 1.5rem;
 }
 
-.rbc-toolbar-label{
+.rbc-toolbar-label {
     font-size: 2rem;
     font-weight: 500;
-    color:#353535;
+    color: #353535;
 }
 
-.rbc-today{
-    background-color:#80ffdb;
+.rbc-today {
+    background-color: #80ffdb;
+}
+
+.custom-checkbox {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+    border-radius: 4px;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+
+.custom-checkbox:checked {
+    background-color: var(--check-color);
+    border-color: white;
+}
+
+.custom-checkbox:checked::after {
+    content: "✔";
+    color: white;
+    /* White tick */
+    font-size: 12px;
+    position: absolute;
+    top: -1px;
+    left: 2px;
 }

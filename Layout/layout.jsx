@@ -54,7 +54,7 @@ export default function Layout() {
       <Header />
       <div id='body_content'>
         <SideNav />
-        <div id="content_container">
+        <div id="content_container" >
           <Outlet />
         </div>
       </div>

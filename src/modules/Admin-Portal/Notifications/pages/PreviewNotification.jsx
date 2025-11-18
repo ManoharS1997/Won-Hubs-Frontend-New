@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import { updateTableData } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 
 import {
@@ -263,7 +263,9 @@ export default function PreviewNotification({
   notificationItem,
   recordId
 }) {
-  // console.log(notificationItem, "ID here");
+ 
+  // console.log(notificationItem, "Item here");
+
 
   const navigate = useNavigate();
   const renderElement = useCallback((props) => <Element {...props} />, []);
@@ -278,7 +280,7 @@ export default function PreviewNotification({
     type: notificationItem?.type?.value || "global",
     description: notificationItem?.description?.value || "",
   }));
-  const [showDetails,setShowDetails]=useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
@@ -295,50 +297,49 @@ export default function PreviewNotification({
   };
 
   const CreateNotification = async () => {
-  const payload = {
-    emailBody: previewData,
-    toAddress: notificationDetails.to,
-    cc: notificationDetails.cc,
-    subject: notificationDetails.subject,
-    type: notificationDetails.type,
-    name: notificationDetails.name,
-    description: notificationDetails.description,
-  
-  };
+    const payload = {
+      emailBody: previewData,
+      toAddress: notificationDetails.to,
+      cc: notificationDetails.cc,
+      subject: notificationDetails.subject,
+      type: notificationDetails.type,
+      name: notificationDetails.name,
+      description: notificationDetails.description,
 
-  console.log(payload, "payload");
+    };
 
-  const isUpdate = !!recordId; // ✅ Use notificationId to check if this is update
-  const url = isUpdate
-    ? `http://localhost:3001/notifications/update/${recordId}`
-    : `http://localhost:3001/notifications/newNotifications`;
+    console.log(payload, "payload");
 
-  const options = {
-    method: isUpdate ? "PUT" : "POST", // ✅ Switch method dynamically
-    headers: {
-      "Content-Type": "application/json",
-      authorization: `Bearer ${Cookies.get("accessToken")}`,
-    },
-    body: JSON.stringify(payload),
-  };
+    const isUpdate = !!recordId; // ✅ Use notificationId to check if this is update
+    const url = isUpdate
+      ? `http://localhost:3001/notifications/update/${recordId}`
+      : `http://localhost:3001/notifications/newNotifications`;
 
-  try {
-    const response = await fetch(url, options);
-    console.log(response,"notification response");
-    const data=await response.json();
-    console.log(data,"notification data");
-    if (!data.success) {
-      throw new Error(`Failed to ${isUpdate ? "update" : "create"} notification`);
+    const options = {
+      method: isUpdate ? "PUT" : "POST", // ✅ Switch method dynamically
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+      body: JSON.stringify(payload),
+    };
+
+    try {
+      const response = await fetch(url, options);
+      console.log(response, "notification response");
+      const data = await response.json();
+      console.log(data, "notification data");
+      if (!data.success) {
+        throw new Error(`Failed to ${isUpdate ? "update" : "create"} notification`);
+      }
+      // console.log(await response.json(), "response Here");
+      { !isUpdate && localStorage.removeItem("notificationData") }
+      navigate("/All Notifications");
+    } catch (error) {
+      console.log(error);
+      console.error("Error creating/updating notification:", error);
     }
-    // console.log(await response.json(), "response Here");
-   {!isUpdate && localStorage.removeItem("notificationData")}
-    navigate("/All Notifications");
-  } catch (error) {
-    console.log(error);
-    console.error("Error creating/updating notification:", error);
-  }
-};
-
+  };
 
   const editorStyles = {
     width: "100%",
@@ -356,13 +357,13 @@ export default function PreviewNotification({
       <BodyContainer className="flex flex-col">
         <div className="w-[90%] flex justify-between">
           <div className="flex">
-          <BackBtn type="button" onClick={() => setShowPreview(false)}>
-            <IoChevronBackSharp size={25} /> 
-            Edit
-          </BackBtn>
-          <button onClick={()=>setShowDetails(!showDetails)} >
-          {showDetails ? renderIcons('BsFillCaretDownFill', 20, 'black') : renderIcons('BsFillCaretUpFill', 20, 'black')} 
-          </button>
+            <BackBtn type="button" onClick={() => setShowPreview(false)}>
+              <IoChevronBackSharp size={25} />
+              Edit
+            </BackBtn>
+            <button onClick={() => setShowDetails(!showDetails)} >
+              {showDetails ? renderIcons('BsFillCaretDownFill', 20, 'black') : renderIcons('BsFillCaretUpFill', 20, 'black')}
+            </button>
           </div>
           <button
             onClick={CreateNotification}
@@ -373,76 +374,76 @@ export default function PreviewNotification({
         </div>
 
         {showDetails &&
-        <div className="w-full self-center h-[20%] flex flex-col md:flex-row p-2 gap-4">
-          {/* Left Section */}
-          <div className="w-full h-fit flex flex-col gap-4">
-            <div className="flex w-full items-center gap-4">
-              <CustomLabel htmlFor="to">To: </CustomLabel>
-              <CustomInput
-                type="text"
-                id="to"
-                value={notificationDetails.to}
-                onChange={handleInputChange}
-              />
+          <div className="w-full self-center h-[20%] flex flex-col md:flex-row p-2 gap-4">
+            {/* Left Section */}
+            <div className="w-full h-fit flex flex-col gap-4">
+              <div className="flex w-full items-center gap-4">
+                <CustomLabel htmlFor="to">To: </CustomLabel>
+                <CustomInput
+                  type="text"
+                  id="to"
+                  value={notificationDetails.to}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="flex w-full items-center gap-4">
+                <CustomLabel htmlFor="cc">CC: </CustomLabel>
+                <CustomInput
+                  type="text"
+                  id="cc"
+                  value={notificationDetails.cc}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
 
-            <div className="flex w-full items-center gap-4">
-              <CustomLabel htmlFor="cc">CC: </CustomLabel>
-              <CustomInput
-                type="text"
-                id="cc"
-                value={notificationDetails.cc}
-                onChange={handleInputChange}
-              />
+            {/* Middle Section */}
+            <div className="w-full h-fit flex flex-col gap-4">
+              <div className="flex w-full items-center gap-4">
+                <CustomLabel htmlFor="name">Name: </CustomLabel>
+                <CustomInput
+                  type="text"
+                  id="name"
+                  value={notificationDetails.name}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="flex w-full items-center gap-4">
+                <CustomLabel htmlFor="subject">Subject: </CustomLabel>
+                <TextAreaTag
+                  id="subject"
+                  value={notificationDetails.subject}
+                  onChange={handleInputChange}
+                  cols={40}
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            {/* Right Section */}
+            <div className="w-full h-fit flex flex-col gap-4">
+              <div className="flex w-full items-center gap-4">
+                <CustomLabel htmlFor="type">Type: </CustomLabel>
+                <CustomSelect
+                  id="type"
+                  value={notificationDetails.type}
+                  onChange={(e) =>
+                    setNotificationDetails((prev) => ({
+                      ...prev,
+                      type: e.target.value,
+                    }))
+                  }
+                >
+                  <CustomOption value="global">Global</CustomOption>
+                  <CustomOption value="local">Local</CustomOption>
+                </CustomSelect>
+              </div>
+
             </div>
           </div>
-
-          {/* Middle Section */}
-          <div className="w-full h-fit flex flex-col gap-4">
-            <div className="flex w-full items-center gap-4">
-              <CustomLabel htmlFor="name">Name: </CustomLabel>
-              <CustomInput
-                type="text"
-                id="name"
-                value={notificationDetails.name}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="flex w-full items-center gap-4">
-              <CustomLabel htmlFor="subject">Subject: </CustomLabel>
-              <TextAreaTag
-                id="subject"
-                value={notificationDetails.subject}
-                onChange={handleInputChange}
-                cols={40}
-                rows={3}
-              />
-            </div>
-          </div>
-
-          {/* Right Section */}
-          <div className="w-full h-fit flex flex-col gap-4">
-            <div className="flex w-full items-center gap-4">
-              <CustomLabel htmlFor="type">Type: </CustomLabel>
-              <CustomSelect
-                id="type"
-                value={notificationDetails.type}
-                onChange={(e) =>
-                  setNotificationDetails((prev) => ({
-                    ...prev,
-                    type: e.target.value,
-                  }))
-                }
-              >
-                <CustomOption value="global">Global</CustomOption>
-                <CustomOption value="local">Local</CustomOption>
-              </CustomSelect>
-            </div>
-     
-          </div>
-        </div>
-}
+        }
 
         {/* Slate Editor Preview */}
         <div className="w-[90%] h-full flex items-start justify-start">
@@ -452,7 +453,7 @@ export default function PreviewNotification({
               value={previewData ?? initialValue}
               style={{ width: "100%", height: "100%" }}
             >
-              <Editable 
+              <Editable
                 style={editorStyles}
                 renderLeaf={renderLeaf}
                 spellCheck

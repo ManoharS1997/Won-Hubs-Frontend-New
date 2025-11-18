@@ -25,6 +25,7 @@ export default function DetailedView({
   activeTable,
 }) {
   // console.log(tableName, "Here..,")
+  // console.log(formData,"Form Data NO1")
   const [recordData, setRecordData] = useState(null);
   const [recordFields, setRecordFields] = useState([]);
   const [activeTab, setActiveTab] = useState(1);
@@ -91,7 +92,7 @@ export default function DetailedView({
   // 🔹 Render Tab Content (form/table)
   const renderTabContent = (tab) => {
     if (tab.type === "form") {
-      console.log(tab, "ppppp");
+      // console.log(tab, "ppppp");
       return (
         <div>
           {tab.fields?.length > 0 ? (
@@ -121,41 +122,88 @@ export default function DetailedView({
     }
 
     if (tab.type === "table") {
+      const columns = tab.tableCols || [];
+      // Separate data and action columns
+      const dataColumns = columns.filter((col) => col.type !== "action");
+      const actionColumns = columns.filter((col) => col.type === "action");
+      const totalCols = [...dataColumns, ...(actionColumns.length ? [{ label: "Actions" }] : [])];
+      const colWidth = `${100 / totalCols.length}%`; // Equal width percentage
       return (
         <div className="p-4 overflow-auto">
-          {tab.tableCols?.length > 0 ? (
-            <table className="w-full border-collapse border border-gray-300 text-sm">
+          {columns.length > 0 ? (
+            <table className="w-full border-collapse border border-gray-300 text-sm table-fixed">
               <thead className="bg-gray-100">
                 <tr>
-                  {tab.tableCols.map((col) => (
+                  {dataColumns.map((col) => (
                     <th
                       key={col._id}
-                      className="border border-gray-300 p-2 text-left"
+                      className="border border-gray-300 p-2 text-left font-semibold"
+                      style={{ width: colWidth }}
                     >
                       {col.label}
                     </th>
                   ))}
+                  {actionColumns.length > 0 && (
+                    <th
+                      className="border border-gray-300 p-2 text-left font-semibold"
+                      style={{ width: colWidth }}
+                    >
+                      Actions
+                    </th>
+                  )}
                 </tr>
               </thead>
+
               <tbody>
-                {/* Dummy table row — replace with backend data if available */}
                 <tr>
-                  {tab.tableCols.map((col) => (
-                    <td key={col._id} className="border border-gray-300 p-2">
+                  {dataColumns.map((col) => (
+                    <td
+                      key={col._id}
+                      className="border border-gray-300 p-2 text-left"
+                      style={{ width: colWidth }}
+                    >
                       {recordData?.[col.name] ?? "-"}
                     </td>
                   ))}
+                  {actionColumns.length > 0 && (
+                    <td
+                      className=" p-2 flex items-center justify-start gap-2"
+                      style={{ width: colWidth }}
+                    >
+                      {actionColumns.map((action) => {
+                        const { name, label } = action;
+                        let btnColor = "";
+                        if (name === "edit") btnColor = "!bg-blue-600 hover:bg-blue-700";
+                        else if (name === "delete") btnColor = "!bg-red-600 hover:bg-red-700";
+                        else if (name === "view") btnColor = "!bg-yellow-500 hover:bg-yellow-600";
+                        return (
+                          <button
+                            key={action._id}
+                            className={`${btnColor} text-white px-3 py-1 rounded text-xs`}
+                            onClick={() => handleActionClick(action)}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </td>
+                  )}
                 </tr>
               </tbody>
             </table>
           ) : (
-            <div className="text-gray-400 text-center">
-              No table columns defined
-            </div>
+            <div className="text-gray-400 text-center">No table columns defined</div>
           )}
         </div>
       );
     }
+
+    // Example Action Handler
+    const handleActionClick = (action) => {
+      console.log("Clicked:", action.label);
+      console.log("API Config:", action.apiConfig);
+    };
+
 
     return (
       <div className="text-gray-400 text-center p-6">

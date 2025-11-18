@@ -1,6 +1,5 @@
 import WonContext from '../../../../context/WonContext'
 import Chatbot from '../Chat/Chat'
-import LeftNav from '../../LeftNav/pages/LeftNav'
 import { getTableData } from '../../../../utils/CheckAndExecuteFlows/CRUDoperations'
 import { useState, useEffect, useContext } from 'react'
 import { ThreeDots } from 'react-loader-spinner'
@@ -19,12 +18,11 @@ const Articles = () => {
     const { searchInputForArticles } = useContext(WonContext)
     const [firstRender, setFirstRender] = useState(true)
     const [SearchInput, setSearchInput] = useState("")
-    const [LoaderDisplay, setLoaderDisplay] = useState(true)
+    const [LoaderDisplay, setLoaderDisplay] = useState(false)
 
     const getData = async () => {
         const Articles = await getTableData("articles")
-        // console.log(Articles.articles.length)
-
+        console.log(Articles, "Articles Response Hereee")
         if (Articles.articles.length > 0) {
             setArticlesData(Articles.articles)
             setFilteredData(Articles.articles)
@@ -51,8 +49,7 @@ const Articles = () => {
         setFirstRender(false)
     }, [ArticlesData.length > 0]
     )
-
-    console.log(SearchInput)
+    // console.log(SearchInput)
     return (
         <WonContext.Consumer>
             {value => {
@@ -62,19 +59,16 @@ const Articles = () => {
                     setSearchInput(searchInputForArticles)
                     // FilteredArticles()
                 }
-
                 const onInputSearchChange = (e) => {
                     setSearchInputForArticles(e.target.value)
                     setSearchInput(e.target.value)
                     FilteredArticles(e.target.value)
                 }
-
                 return (
                     <MainContainer>
                         <CustomContainer>
                             <ContentContainer1>
                                 <ArticleCon className='articles-container'>
-
                                     <ArticleContentCon>
                                         <InputContainer>
                                             <ArticlesInput
@@ -94,7 +88,7 @@ const Articles = () => {
                                                     <ThreeDots color="black" height={80} width={80} />
                                                 </LoaderContainer>) : FilteredData.map((each) => (
                                                     <Link to={`/user-internal/Articles/${each.id}`} key={each.id}>
-                                                        <EachContentCon >
+                                                        <EachContentCon>
                                                             <FrequentUsedItems>{each.name}</FrequentUsedItems>
                                                             <ContentText>{each.content}</ContentText>
                                                             <DatePublisherCon>
@@ -105,11 +99,7 @@ const Articles = () => {
                                                         </EachContentCon>
                                                     </Link>
                                                 ))
-
-
                                         }
-
-
                                     </ArticleContentCon>
 
                                     {isChatBotOpen && <Chatbot />

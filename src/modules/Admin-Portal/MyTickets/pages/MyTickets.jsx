@@ -64,7 +64,6 @@ const MyTickets = () => {
         view: data.view,
         department: data.department,
       });
-      console.log(result, "result @myItem");
       if (result) {
         setFormData(result.data);
       }

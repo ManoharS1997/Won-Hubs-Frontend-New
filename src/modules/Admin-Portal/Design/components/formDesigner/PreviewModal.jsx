@@ -11,11 +11,13 @@ export default function PreviewModal({
   tabs,
   state,
   recordId,
+  previousFieldsData
 }) {
   const navigation = useNavigate();
   const [values, setValues] = useState({});
   const [saving, setSaving] = useState(false);
   const [twoColumn, setTwoColumn] = useState(true);
+  console.log(previousFieldsData, "previous Data")
 
   console.log(formButtons)
 
@@ -33,7 +35,6 @@ export default function PreviewModal({
       mb-3 w-full 
       ${twoColumn && field.fullWidth ? "md:col-span-2" : ""}
     `;
-
     switch (field.type) {
       case "text":
       case "email":
@@ -187,11 +188,16 @@ export default function PreviewModal({
         formButtons,
         tabs,
         column: twoColumn,
-        departmentName: state?.departmentName,
-        category: state?.category,
-        selectedViews: state?.selectedViews,
-        widgetname: state?.widgetname,
-        selectedDepartments: state?.selectedDepartments,
+        // departmentName: previousFieldsData?.departmentName,
+        // category: previousFieldsData?.category,
+        // selectedViews: previousFieldsData?.selectedViews,
+        // widgetname: previousFieldsData?.widgetname,
+        // selectedDepartments: state?.selectedDepartments,
+        departName: previousFieldsData.department.value,
+        category: previousFieldsData?.category?.value,
+        selectedViews: previousFieldsData?.views?.value,
+        widgetname: previousFieldsData?.widgetname?.value||null,
+        selectedDepartments: state?.selectedDepartments?.value,
       };
 
       const url = recordId
@@ -215,7 +221,8 @@ export default function PreviewModal({
       setSaving(false);
     }
   };
-  console.log(twoColumn);
+
+  // console.log(twoColumn);
   return (
     <div className="bg-white rounded-xl p-2 w-full">
       {/* Header */}
@@ -235,8 +242,8 @@ export default function PreviewModal({
       {/* Form preview */}
       <form
         className={`mx-auto w-full ${twoColumn
-            ? "grid grid-cols-1 md:grid-cols-2 gap-4"
-            : "grid grid-cols-1"
+          ? "grid grid-cols-1 md:grid-cols-2 gap-4"
+          : "grid grid-cols-1"
           }`}
       >
         {formFields.map(renderField)}
@@ -281,8 +288,8 @@ export default function PreviewModal({
               {tab.type === "form" && (
                 <form
                   className={`mx-auto w-full ${twoColumn
-                      ? "grid grid-cols-1 md:grid-cols-2 gap-2"
-                      : "grid grid-cols-1"
+                    ? "grid grid-cols-1 md:grid-cols-2 gap-2"
+                    : "grid grid-cols-1"
                     }`}
                 >
                   {tab.fields.map(renderField)}
@@ -407,8 +414,8 @@ export default function PreviewModal({
           onClick={handleSave}
           disabled={saving}
           className={`px-6 py-2 !rounded-lg shadow text-white transition ${saving
-              ? "!bg-gray-400 cursor-not-allowed"
-              : "!bg-green-600 hover:bg-green-700"
+            ? "!bg-gray-400 cursor-not-allowed"
+            : "!bg-green-600 hover:bg-green-700"
             }`}
         >
           {saving

@@ -5,9 +5,7 @@ export const MainContainer = styled.main`
     width: 100%;
     height: 100%;
     margin: 0;
-    padding: 0%.5rem;
-    padding-top: 8vh;
-    background-color: #ccc;
+    background-color: #fff;
 `
 
 export const ContentContainer = styled.div`

@@ -1,12 +1,34 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import TemplateSelection from "../../../../shared/components/TemplateSelection";
-import WonContext from "../../../../context/WonContext";
+// import TemplateSelection from "../../../../shared/components/TemplateSelection";
+// import WonContext from "../../../../context/WonContext";
+import TemplateSelection from "../../../shared/components/TemplateSelection";
+import WonContext from "../../../context/WonContext";
 
-const AlertTemplateView = () => {
+
+const IntegrationTemplateView = () => {
   // const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
+    const configureFields = [
+    { name: "name", label: "Name", type: "text", isMandatory: true },
+    { name: "from", label: "From", type: "text", isMandatory: true },
+    { name: "to", label: "To", type: "text", isMandatory: true },
+    { name: "cc", label: "CC", type: "text", isMandatory: true },
+    {
+      name: "type",
+      label: "Type",
+      type: "dropdown",
+      options: [
+        { label: "Emergency", value: "emergency" },
+        { label: "Normal", value: "normal" },
+      ],
+      isMandatory: true,
+    },
+    {name: "subject", label: "Subject", type: "text", isMandatory: true },
+    { name: "description", label: "Description", type: "textarea", isMandatory: true }, // Content at the end
+
+    ];
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -69,39 +91,19 @@ const AlertTemplateView = () => {
     fetchTemplates();
   }, []);
 
-  const configureFields = [
-    { name: "name", label: "Name", type: "text", isMandatory: true },
-    { name: "from", label: "From", type: "text", isMandatory: true },
-    { name: "to", label: "To", type: "text", isMandatory: true },
-    { name: "cc", label: "CC", type: "text", isMandatory: true },
-    {
-      name: "type",
-      label: "Type",
-      type: "dropdown",
-      options: [
-        { label: "Emergency", value: "emergency" },
-        { label: "Normal", value: "normal" },
-      ],
-      isMandatory: true,
-    },
-    {name: "subject", label: "Subject", type: "text", isMandatory: true },
-    { name: "description", label: "Description", type: "textarea", isMandatory: true }, // Content at the end
-
-  ];
-
   return (
     <WonContext.Consumer>
       {() => (
         <TemplateSelection
           lists={templates}
-          configureFields={configureFields}
           title="Create Alert"
-          path='flowcheck'
-          tablename="alerts"
+          path={`/integration-editor/${"Desktop"}`}
+          tablename="alert"
+          configureFields={configureFields}
         />
       )}
     </WonContext.Consumer>
   );
 };
 
-export default AlertTemplateView;
+export default IntegrationTemplateView;

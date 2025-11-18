@@ -22,3 +22,4 @@ export const TableContainer = styled.div`
     &::after{}
     &::-webkit-sc */
 `
+

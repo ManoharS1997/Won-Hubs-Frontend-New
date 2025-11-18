@@ -3,7 +3,7 @@ import { HiViewBoards, HiDotsHorizontal } from "react-icons/hi";
 import { HiUserGroup } from "react-icons/hi2";
 import {
   RiSettings5Fill, RiDeleteBinLine, RiBarChartBoxAiLine, RiFeedbackLine, RiAlertFill,
-  RiTeamFill, RiUserCommunityLine
+  RiTeamFill, RiUserCommunityLine, RiDonutChartFill, 
 } from "react-icons/ri";
 import { RxOpenInNewWindow } from "react-icons/rx";
 import { ImFileText2, ImInsertTemplate, ImTable2, ImCalendar } from "react-icons/im";
@@ -13,7 +13,7 @@ import {
   MdAddLink, MdOutlineOpenInNew, MdAccessibilityNew, MdDeleteOutline,
   MdOutlineEditNote, MdOutlineFeedback, MdEventAvailable, MdModeEditOutline,
   MdOutlineDomainAdd, MdOutlineMail, MdPassword, MdBusiness, MdOutlinePhotoCameraFront,
-  MdOutlineDescription, MdDoubleArrow
+  MdOutlineDescription, MdDoubleArrow, MdAreaChart, MdBarChart, MdRadar, MdGridOn
 } from "react-icons/md";
 import { CiUser } from "react-icons/ci";
 import {
@@ -27,16 +27,17 @@ import {
   GrRadialSelected, GrMore, GrResources, GrShieldSecurity, GrIntegration,
   GrAppsRounded, GrDocumentUpdate
 } from "react-icons/gr";
-import { FaStarOfLife, FaMinus, FaUserShield, FaSearch, FaHospitalAlt, FaTools, FaBuilding,FaUserCheck,
- FaTasks,FaPaperclip,FaDollarSign,FaUsersCog,FaBook,FaUser,
-  FaCalendarDay,FaObjectGroup,FaHashtag
+import {
+  FaStarOfLife, FaMinus, FaUserShield, FaSearch, FaHospitalAlt, FaTools, FaBuilding, FaUserCheck,
+  FaTasks, FaPaperclip, FaDollarSign, FaUsersCog, FaBook, FaUser,
+  FaCalendarDay, FaObjectGroup, FaHashtag, FaSitemap, FaBox
 } from "react-icons/fa";
 import {
   TbApi, TbHeartRateMonitor, TbAlertTriangle, TbReportAnalytics, TbReportSearch,
   TbTemplate, TbUsers, TbTransform, TbLayoutDashboardFilled, TbSettingsCog, TbUserCode,
-  TbUserQuestion, TbTimezone, TbNumber123
+  TbUserQuestion, TbTimezone, TbNumber123, TbGauge, TbCircles,TbChartHistogram ,TbChartCandle 
 } from "react-icons/tb";
-import { GiServerRack, GiHamburgerMenu } from "react-icons/gi";
+import { GiServerRack, GiHamburgerMenu, GiFunnel,} from "react-icons/gi";
 import { SiAmazonsimpleemailservice, SiTestcafe, SiDatabricks } from "react-icons/si";
 import {
   PiWebhooksLogoFill, PiPlugsConnected, PiUsersFourFill, PiPasswordBold,
@@ -51,23 +52,24 @@ import { TiFlowMerge } from "react-icons/ti";
 import { FaBuildingShield, FaHandshakeSimple, FaStore, FaRocket, FaUserLarge, FaU } from "react-icons/fa6";
 import { SlLocationPin, SlCloudUpload } from "react-icons/sl";
 import { VscTools } from "react-icons/vsc";
-import { AiOutlineSwap } from "react-icons/ai";
+import { AiOutlineSwap, AiOutlineLineChart } from "react-icons/ai";
 import { CgArrowsExchangeAltV } from "react-icons/cg";
 import { RiKey2Line } from "react-icons/ri";
 import { RiAdminLine } from "react-icons/ri";
-import { FaSitemap ,FaPassport,FaMoneyBills,FaCrosshairs,FaUserTag } from "react-icons/fa6";
-import { BiDetail } from "react-icons/bi";
-import { FaPhoneAlt,FaFax  } from "react-icons/fa";
+import { FaPassport, FaMoneyBills, FaCrosshairs } from "react-icons/fa6";
+import { BiDetail, BiBarChart, BiScatterChart } from "react-icons/bi";
+import { FaPhoneAlt, FaFax } from "react-icons/fa";
 import { RiShieldKeyholeLine } from "react-icons/ri";
 import { TiTabsOutline } from "react-icons/ti";
-import { BsFillCaretDownFill,BsFillCaretUpFill  } from "react-icons/bs";
+import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
 import { GoTriangleDown } from "react-icons/go";
 import { IoNewspaperOutline } from "react-icons/io5";
 import { GrChannel } from "react-icons/gr";
 import { TfiEmail } from "react-icons/tfi";
 import { HiOutlineMailOpen } from "react-icons/hi";
 import { LuMailOpen } from "react-icons/lu";
-import { MdOutgoingMail ,MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { MdOutgoingMail, MdOutlineKeyboardArrowDown, MdPieChart } from "react-icons/md";
+
 
 const iconMap = {
   BsPersonWorkspace, HiViewBoards, HiUserGroup, RiSettings5Fill, HiDotsHorizontal,
@@ -89,10 +91,12 @@ const iconMap = {
   FaStore, FaRocket, GiHamburgerMenu, LuSearch, PiBuildingOfficeLight, LuLink2, TfiTimer, RiTeamFill,
   MdOutlineDescription, FaTools, FaUserLarge, RiUserCommunityLine, TbNumber123, CiUser, VscTools,
   SlCloudUpload, IoGlobe, GoGrabber, IoChevronBackOutline, MdDoubleArrow, AiOutlineSwap, CgArrowsExchangeAltV,
-  RiKey2Line,RiAdminLine ,FaSitemap,FaPassport,BiDetail,FaPhoneAlt,FaFax ,FaMoneyBills ,RiShieldKeyholeLine,
-  FaCrosshairs ,FaUserTag,TiTabsOutline,BsFillCaretDownFill,BsFillCaretUpFill ,GoTriangleDown,IoNewspaperOutline,
-  GrChannel,FaBuilding,FaUserCheck,FaDollarSign,FaTasks,FaHashtag,FaUsersCog,FaBook,FaCalendarDay,FaObjectGroup,FaUser,
-  TfiEmail,HiOutlineMailOpen ,LuMailOpen ,MdOutgoingMail,MdOutlineKeyboardArrowDown 
+  RiKey2Line, RiAdminLine, FaSitemap, FaPassport, BiDetail, FaPhoneAlt, FaFax, FaMoneyBills, RiShieldKeyholeLine,
+  FaCrosshairs, TiTabsOutline, BsFillCaretDownFill, BsFillCaretUpFill, GoTriangleDown, IoNewspaperOutline,
+  GrChannel, FaBuilding, FaUserCheck, FaDollarSign, FaTasks, FaHashtag, FaUsersCog, FaBook, FaCalendarDay, FaObjectGroup, FaUser,
+  TfiEmail, HiOutlineMailOpen, LuMailOpen, MdOutgoingMail, MdOutlineKeyboardArrowDown, MdPieChart, BiBarChart, AiOutlineLineChart,
+  MdAreaChart, FaBox, MdBarChart, GiFunnel, RiDonutChartFill, BiScatterChart, MdRadar, TbGauge, MdGridOn, TbCircles,
+  TbChartHistogram,TbChartCandle 
 
 };
 
