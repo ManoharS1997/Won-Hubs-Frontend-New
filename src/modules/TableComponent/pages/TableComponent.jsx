@@ -595,25 +595,14 @@ export default function TableComponent({
     // console.log(selectedTab, tableName, "###")
     switch (tableName) {
       case "notifications":
-        return <FlowStepComponent recordId={selectedTab} path="notifications" />
-      case 'alerts':
-        return <FlowStepComponent recordId={selectedTab} path='alerts' />
-
-      case 'feedBack':
-        return <FlowStepComponent recordId={selectedTab} path='feedback' />
-
-      case 'templates':
-        return <FlowStepComponent recordId={selectedTab} path='templates' />
-      case 'designs':
-        return <FormDesignerPage recordId={selectedTab} />
-      default:
-        return <DetailedView recordId={selectedTab} tableName={tableName} formData={formData} />
-
+        return <FlowStepComponent recordId={selectedTab} path="notifications" />;
+      case "alerts":
+        return <FlowStepComponent recordId={selectedTab} path="alerts" />;
       case "feedBack":
+        // show feedback detail/editor component
         return <CreateFeedBack2 recordId={selectedTab} />;
-
       case "templates":
-        return <FlowStepComponent recordId={selectedTab} />;
+        return <FlowStepComponent recordId={selectedTab} path="templates" />;
       case "designs":
         return <FormDesignerPage recordId={selectedTab} />;
       default:
