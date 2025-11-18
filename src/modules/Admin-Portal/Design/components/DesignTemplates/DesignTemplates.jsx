@@ -320,7 +320,16 @@ export default function DesignTemplates() {
             ).length > 0 && ( */}
             <li
               onClick={() => {
-                setOpenConfigure(true);
+                // setOpenConfigure(true);
+                 Navigate("/form-designer", {
+                  state: {
+                    widgetname: selectedTab,
+                    selectedDepartments,
+                    selectedViews,
+                    departmentName,
+                    category,
+                  },
+                })
               }}
               className="w-full h-[200px] bg-gray-50 rounded flex items-center justify-center hover:shadow-lg border-2 !border-dashed "
               to={{

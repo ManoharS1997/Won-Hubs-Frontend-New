@@ -374,8 +374,8 @@ const FlowEditor = () => {
   // console.log(nodes)
 
   return (
-    <div className="w-full h-full bg-[var(--background-color)] flex flex-col items-center p-1">
-      <IntegrationEditorheader
+    <div className="w-full !h-[81vh] bg-[var(--background-color)] flex flex-col items-center">
+      {/* <IntegrationEditorheader
         title={title}
         isFlowActive={isFlowActive}
         setFlowActive={setFlowActive}
@@ -385,8 +385,8 @@ const FlowEditor = () => {
         onSave={saveIntegrationHandler}
         onUpdate={updateIntegrationHandler}
         isNewIntegration={isNewIntegration}
-      />
-      <div className="w-full h-[95%] flex border-2 border-gray-300 rounded-lg shadow-lg overflow-hidden">
+      /> */}
+      <div className="w-full h-[98%] flex border-2 border-gray-300 rounded-lg shadow-xl overflow-hidden">
         <ReactFlow
           nodes={nodes.map((node) => ({ ...node, data: { ...node.data, addNode, showPanelHandler } }))}
           edges={edges}

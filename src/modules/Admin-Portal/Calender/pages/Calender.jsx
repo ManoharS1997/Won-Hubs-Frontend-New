@@ -4,7 +4,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoIosArrowBack } from 'react-icons/io';
-import clsx from 'clsx';
+
 
 const localizer = momentLocalizer(moment);
 
@@ -83,58 +83,61 @@ const MyCalendar = () => {
   };
 
   return (
-    <div className="h-full overflow-auto p-4">
-      <div className="w-full bg-white p-6">
+    <div className="h-[98%] overflow-auto border-1 p-0">
+      <div className="w-full bg-white p-6 h-full">
         {/* Header */}
-        <div className="flex items-center mb-6">
-          <button onClick={() => navigate(-1)} className="text-gray-700 hover:text-black mr-4">
-            <IoIosArrowBack size={28} />
-          </button>
-          <h2 className="text-2xl font-bold text-gray-800">My Calendar</h2>
-        </div>
+        <div className='flex  justify-between pt-2'>
 
-        {/* Filter Panel */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              checked={showHolidays}
-              onChange={() => setShowHolidays(!showHolidays)}
-              className="accent-yellow-400"
-            />
-            <span className="text-gray-700">Holidays</span>
-          </label>
-          <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              checked={showCriticalPriority}
-              onChange={() => setCriticalPriority(!showCriticalPriority)}
-              className="accent-red-600"
-            />
-            <span className="text-gray-700">Priority 1 - Critical</span>
-          </label>
-          <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              checked={showHighPriority}
-              onChange={() => setHighPriority(!showHighPriority)}
-              className="accent-orange-500"
-            />
-            <span className="text-gray-700">Priority 2 - High</span>
-          </label>
-          <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              checked={showAnnouncements}
-              onChange={() => setAnnouncements(!showAnnouncements)}
-              className="accent-gray-600"
-            />
-            <span className="text-gray-700">Announcements</span>
-          </label>
+          <div className="flex items-center mb-6">
+            <button onClick={() => navigate(-1)} className="text-gray-700 hover:text-black mr-4">
+              <IoIosArrowBack size={28} />
+            </button>
+            <h2 className="text-2xl font-bold text-gray-800 m-0 p-0">My Calendar</h2>
+          </div>
+
+          {/* Filter Panel */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+            <label className="flex items-center space-x-4">
+              <input
+                type="checkbox"
+                checked={showHolidays}
+                onChange={() => setShowHolidays(!showHolidays)}
+                className="accent-yellow-400 m-2"
+              />
+              <span className="text-gray-700">Holidays</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={showCriticalPriority}
+                onChange={() => setCriticalPriority(!showCriticalPriority)}
+                className="accent-red-600 m-2"
+              />
+              <span className="text-gray-700">Priority 1 - Critical</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={showHighPriority}
+                onChange={() => setHighPriority(!showHighPriority)}
+                className="accent-orange-500 m-2"
+              />
+              <span className="text-gray-700">Priority 2 - High</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={showAnnouncements}
+                onChange={() => setAnnouncements(!showAnnouncements)}
+                className="accent-gray-600 m-2"
+              />
+              <span className="text-gray-700">Announcements</span>
+            </label>
+          </div>
         </div>
 
         {/* Calendar */}
-        <div className="h-[600px]">
+        <div className="h-[520px]">
           <Calendar
             localizer={localizer}
             events={filteredEvents}

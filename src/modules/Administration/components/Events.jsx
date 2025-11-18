@@ -11,6 +11,7 @@ export default function Events() {
         Events are actions or occurrences that happen within a system or application. They can be triggered by user interactions, system changes, or external factors. Events can be used to initiate workflows, send notifications, or update data in real-time.
         Events can be categorized into different types, such as system events, user events, and application events. Each type of event can have its own set of properties and attributes that define its characteristics and behavior.
       </p>
+      <div className="flex items-center justify-center gap-5">
       <button
         type="button"
         onClick={() => navigate("/All Events")}
@@ -19,6 +20,15 @@ export default function Events() {
         Go to Events
         {renderIcons("MdOutlineOpenInNew", 15, "inherit")}
       </button>
+          <button
+                type="button"
+                onClick={() => navigate("/create/event/")}
+                className="shadow w-fit self-center py-2 px-4 !rounded-full flex gap-2 items-center hover:!bg-white text-black hover:!text-gray-900"
+              >
+                Create Event
+                {renderIcons("IoAddOutline", 20, "inherit")}
+              </button>
+              </div>
       <ul className="grid md:grid-cols-2 m-0 p-0 gap-4 justify-center">
         <li className="flex flex-col md:flex-row md:w-[80%] m-auto items-center gap-2 text-left p-4 rounded">
           <span className=" rounded-full p-3">

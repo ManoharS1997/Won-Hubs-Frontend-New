@@ -308,6 +308,7 @@
 // }
 
 // export default NotificationTemplates
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -405,8 +406,8 @@ const NotificationTemplates = () => {
           lists={templates}
           configureFields={configureFields}
           title="Create Notification"
-          path='notifications'
-          tablename="notification"
+          path='flowcheck'
+          tablename="notifications"
         />
       )}
     </WonContext.Consumer>

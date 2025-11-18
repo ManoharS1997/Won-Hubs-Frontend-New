@@ -96,7 +96,7 @@ export default function TableComponent({
   recordsPerPage, allowDeleting, createNewPath,
   id, tableData, TableColumnNames, setTableColumnNames,
   showConfigurefieldsBtn, selectedRows, tableName, title,
-  fetchTableData, rdtColValue, redirectionPath,formData
+  fetchTableData, rdtColValue, redirectionPath, formData
 }) {
 
   const [recievedTableData, setTableData] = useState(tableData)
@@ -514,24 +514,22 @@ export default function TableComponent({
     // console.log(selectedTab, tableName, "###")
     switch (tableName) {
       case "notifications":
-        return <FlowStepComponent recordId={selectedTab} path="notifications"/>
+        return <FlowStepComponent recordId={selectedTab} path="notifications" />
       case 'alerts':
-        return <CreateAlerts recordId={selectedTab} />
-      
+        return <FlowStepComponent recordId={selectedTab} path='alerts' />
+
       case 'feedBack':
-        return <CreateFeedBack2 recordId={selectedTab} />
-      
+        return <FlowStepComponent recordId={selectedTab} path='feedback' />
+
       case 'templates':
-        return <FlowStepComponent recordId={selectedTab} />
+        return <FlowStepComponent recordId={selectedTab} path='templates' />
       case 'designs':
         return <FormDesignerPage recordId={selectedTab} />
       default:
-        return <DetailedView recordId={selectedTab} tableName={tableName} formData={formData}/>
+        return <DetailedView recordId={selectedTab} tableName={tableName} formData={formData} />
 
     }
   };
-
-
   useEffect(() => {
     // Only run if filter is active, optionally
     if (isFilterActive) {
@@ -541,7 +539,6 @@ export default function TableComponent({
     }
   }, [filterConditions, isFilterActive, tableData]);
 
-  
   return (
     <MainContainer>
       <div className='w-full h-fit bg-[var(--bakground-color)] pb-[4px] mb-2 overflow-auto scrollbar-hide '>
@@ -772,7 +769,6 @@ export default function TableComponent({
               setTableColumnNames={setAllTableFields}
             />
           }
-
           <TableContainer>
             {isLoading ?
               <div>Data Lolading...</div> :

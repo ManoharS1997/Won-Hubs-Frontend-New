@@ -613,7 +613,7 @@ const CreateNotification = ({ recordId }) => {
 
   const getNotificationData = async () => {
     try {
-      console.log("Triggering Hereee");
+      // console.log("Triggering Hereee");
 
       const url = `${import.meta.env.VITE_HOSTED_API_URL}/notifications/${recordId}`;
       const options = { method: "GET" };
@@ -648,6 +648,7 @@ const CreateNotification = ({ recordId }) => {
           recordId={recordId}
         />}
     </div>
+
   )
 }
 export default CreateNotification

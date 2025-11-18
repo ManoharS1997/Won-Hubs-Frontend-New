@@ -47,7 +47,6 @@ export const CustomContainer = styled.div`
 export const CustomNotificationContainer = styled.div`
     width: 100%;
     height: 100%;
-    padding: 10px;
     background-color: var(--background-color);
 `;
 
@@ -93,13 +92,14 @@ export const TemplateTile = styled.button`
 `;
 
 export const TemplateTilesContainer = styled.div`
-    height: 90%;
+    height: 100%;
     margin: 0px;
     padding: 10px;
     /* border: 1px solid #ccc; */
     border-radius: 8px;
     overflow-y: auto;
     background-color: var(--background-color);
+    width:100%;
 
     &::-webkit-scrollbar {
         width: 7px;

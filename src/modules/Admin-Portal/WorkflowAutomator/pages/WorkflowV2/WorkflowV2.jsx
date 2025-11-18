@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo, useEffect, Fragment } from "react";
+import { useCallback, useState, useMemo, useEffect, Fragment, useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 import Cookies from 'js-cookie'
 import {
@@ -65,6 +65,7 @@ import {
   NodeRightConfiguration, HideBtn, RightTabsContainer, SubmitBtn, ToggleContainer, FlowActivateLabel,
   SwitchContainer, Knob, SaveBtn
 } from './StyledComponents'
+
 
 const nodeStyles = {
   display: 'flex',
@@ -780,52 +781,51 @@ export default function WorkflowComponent(props) {
   const onIncompleteSubmission = () => Swal.fire("Please Fill All The Required Fields");
 
   // console.log('data :', flowData)
-  return (
-    <WonContext.Consumer>
-      {value => {
-        const { triggerFlows, setactiveFlowData, activeFlowData } = value
-        {/* { nodes.length > 1 ? setactiveFlowData(flowData.data) : null } */ }
-        {/* console.log(activeFlowData) */ }
+  // return (
+  //   <WonContext.Consumer>
+  //     {value => {
+        const { triggerFlows, setactiveFlowData, activeFlowData } = useContext(WonContext)
+  //       {/* { nodes.length > 1 ? setactiveFlowData(flowData.data) : null } */ }
+  //       {/* console.log(activeFlowData) */ }
 
-        const onAddFlow = async (e) => {
-          e.preventDefault()
-          if (flowData.flowName === '' || flowData.category === '' || flowData.subcategory === '' || flowData.description === '') {
-            return onIncompleteSubmission()
-          }
-          console.log(flowData)
+  //       const onAddFlow = async (e) => {
+  //         e.preventDefault()
+  //         if (flowData.flowName === '' || flowData.category === '' || flowData.subcategory === '' || flowData.description === '') {
+  //           return onIncompleteSubmission()
+  //         }
+  //         console.log(flowData)
 
-          const newFlowData = {
-            ...flowData,
-            flowName: flowData.flow_name,
-            subCategory: flowData.sub_category,
-            service: '',
-            createdBy: 'Kartheek',
-            triggerName: 'Email recieved to by the User',
-            created: formatDateToMySQL(new Date()),
-            data: JSON.stringify(flowData.data)
-          }
+  //         const newFlowData = {
+  //           ...flowData,
+  //           flowName: flowData.flow_name,
+  //           subCategory: flowData.sub_category,
+  //           service: '',
+  //           createdBy: 'Kartheek',
+  //           triggerName: 'Email recieved to by the User',
+  //           created: formatDateToMySQL(new Date()),
+  //           data: JSON.stringify(flowData.data)
+  //         }
 
-          const url = 'http://localhost:3001/flows/newFlow'
-          const options = {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(newFlowData)
-          }
+  //         const url = 'http://localhost:3001/flows/newFlow'
+  //         const options = {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json'
+  //           },
+  //           body: JSON.stringify(newFlowData)
+  //         }
 
-          const response = await fetch(url, options)
-          if (response.ok) {
-            onSuccessfulSubmit("Flow Submitted Successfully")
-            navigator('/All Flows')
-          }
-          console.log(response.ok)
-        }
-
+  //         const response = await fetch(url, options)
+  //         if (response.ok) {
+  //           onSuccessfulSubmit("Flow Submitted Successfully")
+  //           navigator('/All Flows')
+  //         }
+  //         console.log(response.ok)
+  //       } 
+        // commented by sandhya for layout purpose Not , by accessing context it should be not taking height 100% so that's why 
         return (
-          <MainContainer>
-            <BodyContainer>
-              <ReactflowHeader>
+          <MainContainer className="!h-[80vh] w-[100%]">
+              {/* <ReactflowHeader>
                 <BackBtn type="button" title="Back" onClick={() => navigator(-1)}> <IoChevronBackOutline size={28} /> </BackBtn>
 
                 <Group>
@@ -929,7 +929,7 @@ export default function WorkflowComponent(props) {
                   </SaveBtn> :
                   <SubmitBtn type="button" onClick={onAddFlow}> Submit <GrDocumentUpdate /></SubmitBtn>
                 }
-              </ReactflowHeader>
+              </ReactflowHeader> */}
 
               <WorkflowContainer>
                 <FieldsAndFlowArea>
@@ -1025,10 +1025,9 @@ export default function WorkflowComponent(props) {
 
                 </FieldDetailsContainer>
               </WorkflowContainer>
-            </BodyContainer>
           </MainContainer>
         )
-      }}
-    </WonContext.Consumer>
-  );
+    //   }}
+    // </WonContext.Consumer>
+  // );
 }

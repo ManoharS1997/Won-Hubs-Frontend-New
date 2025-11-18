@@ -162,6 +162,14 @@ import PreviewEditor from "./shared/CreationEditor/PreviewEditor.jsx";
 import CreateFeedBack2 from "./modules/Admin-Portal/Feedback/pages/CreateFeedBack2.jsx";
 import FlowStepComponent from "./modules/Admin-Portal/Templates/pages/FlowStep.jsx";
 import TestEditor from "./shared/CreationEditor/EditorTest.jsx";
+import FlowReportComponent from "./modules/Admin-Portal/Reports/pages/FlowReport.jsx";
+import TemplateSelectionForReports from "./modules/Admin-Portal/Reports/pages/ReportTemplate.jsx";
+import IntegrationTemplateView from "./modules/Integrations/pages/CreateTemplateViewForIntegration.jsx";
+import WorkFlowTemplateView from "./modules/Admin-Portal/WorkflowAutomator/pages/WorkflowTemplateCards/WorkFlowTemplateView.jsx";
+import WorkFlowComponent from "./modules/Admin-Portal/WorkflowAutomator/pages/WorkflowV2/WorkFlowEditorView.jsx";
+import IntegrationLayOutComponent from "./modules/Integrations/pages/IntegrationLayout.jsx";
+import SelectWithIcon from "./shared/components/SelectWithIcon.jsx";
+import NewCalendar from "./modules/Admin-Portal/Calender/pages/NewCalendar.jsx";
 
 const router = createBrowserRouter([
   // Public routes (no authentication required)
@@ -272,10 +280,7 @@ const router = createBrowserRouter([
     path: "/become-a-partner",
     element: <BecomePartner />,
   },
-  {
-    path: '/testing',
-    element: <EditorRichUI />
-  },
+
 
 
   // MFA authentication routes
@@ -471,13 +476,21 @@ const router = createBrowserRouter([
             path: "/create/department",
             element: <CreateDepartment />,
           },
+          // {
+          // path: "/create/new-integration",
+          // element: <ChooseIntegraionmodes />,
+          // },
           {
             path: "/create/new-integration",
-            element: <ChooseIntegraionmodes />,
+            element: <IntegrationTemplateView />,
           },
+          // {
+          //   path: "/integration-editor/:mode",
+          //   element: <FlowEditor />,
+          // }, commented to adjust the LayOut
           {
-            path: "/integration-editor/:mode/:id",
-            element: <FlowEditor />,
+            path: "/integration-editor/:mode",
+            element: <IntegrationLayOutComponent />,
           },
           {
             path: "/Connections",
@@ -535,9 +548,13 @@ const router = createBrowserRouter([
             path: "/feedback",
             element: <FeedBack />,
           },
+          // {
+          //   path: "/create/report",
+          //   element: <ReportCardSelection />,
+          // }, older code
           {
-            path: "/create/report",
-            element: <ReportCardSelection />,
+            path: '/create/report',
+            element: <TemplateSelectionForReports />
           },
           {
             path: "create/group",
@@ -701,13 +718,21 @@ const router = createBrowserRouter([
             path: "/datetime-picker",
             element: <CustomDateTimePicker />,
           },
+          // {
+          //   path: "/flows/:id",
+          //   element: <WorkflowComponent />,
+          // },
+          // {
+          //   path: "/create/workflows",
+          //   element: <WorkflowTemplateCards />,
+          // }, these 2 are older routes commented  by me to get the layout 
           {
             path: "/flows/:id",
-            element: <WorkflowComponent />,
+            element: <WorkFlowComponent />,
           },
           {
             path: "/create/workflows",
-            element: <WorkflowTemplateCards />,
+            element: <WorkFlowTemplateView />
           },
           {
             path: "/linkedin-signin",
@@ -729,13 +754,28 @@ const router = createBrowserRouter([
             path: "/notifications/preview/testing",
             element: <PreviewEditor />,
           },
+          // created by me to adjust the UI
           {
             path: '/flowCheck/new',
             element: <FlowStepComponent />
           },
-            {
+          // component to for zlerts notification and  alerts 
+          {
             path: '/test',
-            element: <TestEditor />
+            element: <TemplateSelectionForReports />
+          },
+          {
+            path: '/flowreport/new',
+            element: <FlowReportComponent />
+          },
+          // BELOW FOR WorkFlow TESTING
+          {
+            path: '/integration/check',
+            element: <IntegrationLayOutComponent />
+          },
+          {
+            path: "/newCal",
+            element: <NewCalendar />
           }
 
         ],
@@ -807,7 +847,7 @@ const router = createBrowserRouter([
           },
 
         ],
-      },
+      }
     ],
   },
   // Catch-all route for 404 Not Found
