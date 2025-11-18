@@ -39,7 +39,6 @@ const MyTickets = () => {
 
   useEffect(() => {
     if (userData) {
-      
       fetchFormData(JSON.parse(userData));
     }
   }, [userData]);
@@ -56,7 +55,7 @@ const MyTickets = () => {
     }
   };
   const fetchFormData = async (data) => {
-    console.log(data,"data Here")
+    console.log(data, "data Here");
     try {
       const result = await getFormDetails({
         module: "tickets",
@@ -65,7 +64,6 @@ const MyTickets = () => {
         view: data.view,
         department: data.department,
       });
-      // console.log(result,"result @myItem")
       if (result) {
         setFormData(result.data);
       }
@@ -149,6 +147,7 @@ const MyTickets = () => {
                       fetchTableData={fetchTicketsData}
                       rdtColValue={"id"}
                       formData={formData}
+                      activeTable={activeTable}
                       // redirectionPath={`/ticket/`}
                     />
                   </FormContent>

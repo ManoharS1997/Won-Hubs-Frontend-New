@@ -19,6 +19,8 @@ export default function PreviewModal({
   const [twoColumn, setTwoColumn] = useState(true);
   console.log(previousFieldsData, "previous Data")
 
+  console.log(formButtons)
+
   if (!show) return null;
 
   const handleChange = (name, value) => {

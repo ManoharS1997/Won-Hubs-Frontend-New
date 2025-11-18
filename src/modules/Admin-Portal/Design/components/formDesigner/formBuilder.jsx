@@ -17,9 +17,10 @@ const PREDEFINED_FIELDS = [
 ];
 
 const PREDEFINED_BUTTONS = [
-  { type: "submit", label: "Submit" },
+  { type: "save", label: "Save" },
   { type: "update", label: "Update" },
-  { type: "delete", label: "Delete" },
+  { type: "email", label: "Email" },
+  { type: "export", label: "Export" },
 ];
 
 export default function FormBuilder({
@@ -37,14 +38,11 @@ export default function FormBuilder({
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
   const [filteredFields, setFilteredFields] = useState(PREDEFINED_FIELDS);
   const [filteredButtons, setFilteredButtons] = useState(PREDEFINED_BUTTONS);
-  const [showAllFields, setShowAllFiels] = useState(false)
-  const [showButtonFields, setShowButtonFields] = useState(false)
-
-
+  const [showAllFields, setShowAllFiels] = useState(false);
+  const [showButtonFields, setShowButtonFields] = useState(false);
 
   // When user submits Add Field Modal
   const onAddFieldModalSubmit = ({ label, type, options, required }) => {
-    console.log(formFields)
     if (
       formFields.some(
         (field) => field.label.toLowerCase() === label.toLowerCase()
@@ -150,24 +148,27 @@ export default function FormBuilder({
         <div className="flex flex-col gap-3 mb-4">
           {/* Scrollable list area */}
           <div
-            className={`flex flex-wrap items-center gap-3 overflow-y-auto transition-all duration-300 ${showAllFields ? "max-h-[180px]" : "max-h-[140px]"
-              }`}
+            className={`flex flex-wrap items-center gap-3 overflow-y-auto transition-all duration-300 ${
+              showAllFields ? "max-h-[180px]" : "max-h-[140px]"
+            }`}
           >
-            {(showAllFields ? filteredFields : filteredFields.slice(0, 7)).map((f) => (
-              <DraggableButton
-                key={f.label}
-                item={f}
-                category="field"
-                onDragStart={onDragStart}
-                className="bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
+            {(showAllFields ? filteredFields : filteredFields.slice(0, 7)).map(
+              (f) => (
+                <DraggableButton
+                  key={f.label}
+                  item={f}
+                  category="field"
+                  onDragStart={onDragStart}
+                  className="bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
           border border-blue-600/40 text-white font-medium rounded-md 
           px-5 py-2.5 shadow-sm transition-all duration-300
           hover:from-blue-700 hover:via-blue-900 hover:to-blue-500
           hover:shadow-md active:scale-95 whitespace-nowrap"
-              >
-                {f.label}
-              </DraggableButton>
-            ))}
+                >
+                  {f.label}
+                </DraggableButton>
+              )
+            )}
           </div>
 
           {/* Footer actions */}
@@ -185,7 +186,6 @@ export default function FormBuilder({
                 className="bg-transparent m-0 p-0 text-blue-500 hover:underline transition"
                 onClick={() => {
                   setShowAllFiels((prev) => !prev);
-
                 }}
               >
                 {showAllFields ? "Show Less" : "+ More"}
@@ -232,8 +232,9 @@ export default function FormBuilder({
                   <button
                     onClick={() => toggleRequired(i)}
                     title="Toggle required"
-                    className={`text-sm font-semibold ${field.required ? "text-red-500" : "text-gray-400"
-                      } hover:text-red-600 transition`}
+                    className={`text-sm font-semibold ${
+                      field.required ? "text-red-500" : "text-gray-400"
+                    } hover:text-red-600 transition`}
                   >
                     {field.required ? "Req" : "Opt"}
                   </button>
@@ -287,36 +288,38 @@ export default function FormBuilder({
         {/* Buttons List Area */}
         <div className="flex flex-col gap-3 mb-2">
           <div
-            className={`flex flex-wrap items-center gap-3 overflow-y-auto transition-all duration-300 ${showButtonFields ? "max-h-[180px]" : "max-h-[140px]"
-              }`}
+            className={`flex flex-wrap items-center gap-3 overflow-y-auto transition-all duration-300 ${
+              showButtonFields ? "max-h-[180px]" : "max-h-[140px]"
+            }`}
           >
-            {(showButtonFields ? filteredButtons : filteredButtons.slice(0, 7)).map(
-              (b) => (
-                <DraggableButton
-                  key={b.label}
-                  item={b}
-                  category="button"
-                  onDragStart={onDragStart}
-                  className="bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
+            {(showButtonFields
+              ? filteredButtons
+              : filteredButtons.slice(0, 7)
+            ).map((b) => (
+              <DraggableButton
+                key={b.label}
+                item={b}
+                category="button"
+                onDragStart={onDragStart}
+                className="bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
             border border-blue-600/40 text-white font-medium rounded-md
             px-5 py-2.5 shadow-sm transition-all duration-300
             hover:from-blue-700 hover:via-blue-900 hover:to-blue-500
             hover:shadow-md active:scale-95 whitespace-nowrap"
-                >
-                  {b.label}
-                </DraggableButton>
-              )
-            )}
+              >
+                {b.label}
+              </DraggableButton>
+            ))}
           </div>
 
           <div className="flex justify-between items-center w-full mt-2 mb-4">
-            <button
+            {/* <button
               style={{ borderRadius: 8 }}
               onClick={addCustomButton}
               className="!bg-green-500 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-green-600 active:scale-95 transition whitespace-nowrap"
             >
               + Custom
-            </button>
+            </button> */}
 
             {filteredButtons.length > 7 && (
               <button

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { GetAddUserFormFields, getRecordData } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
+import {
+  GetAddUserFormFields,
+  getRecordData,
+} from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 import convertName from "../../../../utils/conevrtName";
 import FormInput from "../../../../shared/UIElements/FormInput";
 import PropTypes from "prop-types";
@@ -15,7 +18,12 @@ DetailedView.propTypes = {
   formData: PropTypes.any.isRequired,
 };
 
-export default function DetailedView({ recordId, tableName, formData }) {
+export default function DetailedView({
+  recordId,
+  tableName,
+  formData,
+  activeTable,
+}) {
   // console.log(tableName, "Here..,")
   // console.log(formData,"Form Data NO1")
   const [recordData, setRecordData] = useState(null);
@@ -40,9 +48,8 @@ export default function DetailedView({ recordId, tableName, formData }) {
     setError(null);
     try {
       const { data } = await getRecordData(tableName, recordId);
-      const recordFieldsResponse = await GetAddUserFormFields(tableName)
+      const recordFieldsResponse = await GetAddUserFormFields(tableName);
       setFormFieldsWithtypes(recordFieldsResponse.data);
-
 
       if (data?.[0]) {
         setRecordData(data[0]);
@@ -63,17 +70,16 @@ export default function DetailedView({ recordId, tableName, formData }) {
     try {
       let endpoint = btn.apiEndpoint?.replace(":id", recordId);
       const method = btn.apiMethod?.toUpperCase() || "GET";
-
       const res =
         method === "GET"
           ? await axios.get(endpoint)
           : method === "POST"
-            ? await axios.post(endpoint, recordData)
-            : method === "PUT"
-              ? await axios.put(endpoint, recordData)
-              : method === "DELETE"
-                ? await axios.delete(endpoint)
-                : null;
+          ? await axios.post(endpoint, recordData)
+          : method === "PUT"
+          ? await axios.put(endpoint, recordData)
+          : method === "DELETE"
+          ? await axios.delete(endpoint)
+          : null;
 
       alert(`${btn.label} successful!`);
       console.log("Response:", res?.data);
@@ -88,7 +94,7 @@ export default function DetailedView({ recordId, tableName, formData }) {
     if (tab.type === "form") {
       // console.log(tab, "ppppp");
       return (
-        <div >
+        <div>
           {tab.fields?.length > 0 ? (
             // tab.fields.map((field) => (
             //   <FormInput
@@ -100,7 +106,12 @@ export default function DetailedView({ recordId, tableName, formData }) {
             //     placeholder={`Enter ${field.label}`}
             //   />
             // ))
-            <SourceForm formFields={tab.fields} formButtons={tab.buttons} />
+            <SourceForm
+              formFields={tab.fields}
+              formButtons={tab.buttons}
+              activeTable={activeTable}
+              tabName={tab?.name?.toLowerCase()}
+            />
           ) : (
             <div className="text-gray-400 col-span-2 text-center">
               No form fields
@@ -239,10 +250,11 @@ export default function DetailedView({ recordId, tableName, formData }) {
             <li
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-1 rounded-t-[0.3rem] cursor-pointer text-nowrap font-semibold transition-all ${activeTab === tab.id
-                ? "bg-white text-[var(--primary-color)]"
-                : "text-white hover:bg-[#ccc] hover:text-black"
-                }`}
+              className={`px-4 py-1 rounded-t-[0.3rem] cursor-pointer text-nowrap font-semibold transition-all ${
+                activeTab === tab.id
+                  ? "bg-white text-[var(--primary-color)]"
+                  : "text-white hover:bg-[#ccc] hover:text-black"
+              }`}
             >
               {tab.name}
             </li>
@@ -294,11 +306,11 @@ export default function DetailedView({ recordId, tableName, formData }) {
                 />
               </li>
             ))} */}
-            {formFieldsWithtypes.length > 0 && formFieldsWithtypes.map((field) => (
-              <li key={field} className="flex items-center gap-4">
-
-                <>
-                  {/* <div className="w-full md:w-1/2 h-fit gap-4 flex flex-col p-2">
+            {formFieldsWithtypes.length > 0 &&
+              formFieldsWithtypes.map((field) => (
+                <li key={field} className="flex items-center gap-4">
+                  <>
+                    {/* <div className="w-full md:w-1/2 h-fit gap-4 flex flex-col p-2">
                   {formFieldsWithtypes
                     .filter((_, index) => index % 2 === 0) // Even index items
                     .map((field) =>
@@ -309,17 +321,15 @@ export default function DetailedView({ recordId, tableName, formData }) {
                     )}
                 </div> */}
 
-
-                  {RenderFields({
-                    ...field,
-                    // value: formFields[field.name]?.value,
-                    value: recordData?.[field.name]
-                  })}
-                  {/* </div> */}
-                </>
-
-              </li>
-            ))}
+                    {RenderFields({
+                      ...field,
+                      // value: formFields[field.name]?.value,
+                      value: recordData?.[field.name],
+                    })}
+                    {/* </div> */}
+                  </>
+                </li>
+              ))}
           </ul>
         ) : (
           combinedTabs

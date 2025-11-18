@@ -21,9 +21,10 @@ const PREDEFINED_FIELDS = [
 ];
 
 const PREDEFINED_BUTTONS = [
-  { type: "submit", label: "Submit" },
+  { type: "save", label: "Save" },
   { type: "update", label: "Update" },
-  { type: "delete", label: "Delete" },
+  { type: "email", label: "Email" },
+  { type: "export", label: "Export" },
 ];
 
 const TABLE_ACTIONS = [
@@ -155,10 +156,11 @@ function Tab({
             <button
               onClick={() => setTabType(tabIdx, "form")}
               className={`px-5 py-2 text-sm font-medium transition-all duration-200
-      ${tab.type === "form"
-                  ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
-                  : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
-                }
+      ${
+        tab.type === "form"
+          ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
+          : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
+      }
       rounded-l-md
     `}
             >
@@ -167,10 +169,11 @@ function Tab({
             <button
               onClick={() => setTabType(tabIdx, "table")}
               className={`px-5 py-2 text-sm font-medium transition-all duration-200
-      ${tab.type === "table"
-                  ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
-                  : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
-                }
+      ${
+        tab.type === "table"
+          ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
+          : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
+      }
       rounded-r-md
     `}
             >
@@ -237,8 +240,9 @@ function Tab({
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => toggleRequired(tabIdx, idx)}
-                        className={`text-sm font-semibold ${field.required ? "text-red-500" : "text-gray-400"
-                          } hover:text-red-600 transition`}
+                        className={`text-sm font-semibold ${
+                          field.required ? "text-red-500" : "text-gray-400"
+                        } hover:text-red-600 transition`}
                         title="Toggle required"
                       >
                         {field.required ? "Req" : "Opt"}
@@ -280,14 +284,14 @@ function Tab({
                   {button.label}
                 </DraggableButton>
               ))}
-              <button
+              {/* <button
                 onClick={() => {
                   addCustomButton(tabIdx);
                 }}
                 className="px-3 py-1 !bg-green-600 text-white rounded cursor-pointer hover:bg-green-700"
               >
                 + Custom Button
-              </button>
+              </button> */}
             </div>
 
             {/* Responsive grid layout for dropped buttons */}
@@ -339,7 +343,7 @@ function Tab({
                 </DraggableButton>
               ))}
 
-              {TABLE_ACTIONS.map((action) => (
+              {/* {TABLE_ACTIONS.map((action) => (
                 <DraggableButton
                   key={action.type}
                   item={action}
@@ -349,7 +353,7 @@ function Tab({
                 >
                   {action.label}
                 </DraggableButton>
-              ))}
+              ))} */}
 
               <button
                 onClick={() => {
@@ -402,7 +406,12 @@ function Tab({
                       key={col.name}
                       className="border border-gray-300 px-4 py-2"
                       style={{
-                        width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                        width: `${
+                          100 /
+                          (tab.tableCols.filter((c) => c.type !== "action")
+                            .length +
+                            1)
+                        }%`,
                       }}
                     >
                       {col.label}
@@ -414,7 +423,12 @@ function Tab({
                   <th
                     className="border border-gray-300 px-4 py-2"
                     style={{
-                      width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                      width: `${
+                        100 /
+                        (tab.tableCols.filter((c) => c.type !== "action")
+                          .length +
+                          1)
+                      }%`,
                     }}
                   >
                     Actions
@@ -433,7 +447,12 @@ function Tab({
                       key={col.name}
                       className="border border-gray-300 px-4 py-2 truncate"
                       style={{
-                        width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                        width: `${
+                          100 /
+                          (tab.tableCols.filter((c) => c.type !== "action")
+                            .length +
+                            1)
+                        }%`,
                       }}
                     >
                       {fieldSupportsOptions(col.type)
@@ -447,7 +466,12 @@ function Tab({
                   <td
                     className="border border-gray-300 px-4 py-2"
                     style={{
-                      width: `${100 / (tab.tableCols.filter((c) => c.type !== "action").length + 1)}%`,
+                      width: `${
+                        100 /
+                        (tab.tableCols.filter((c) => c.type !== "action")
+                          .length +
+                          1)
+                      }%`,
                     }}
                   >
                     <div className="flex justify-center gap-2">
@@ -458,10 +482,10 @@ function Tab({
                             actionCol.label.toLowerCase() === "edit"
                               ? "!bg-indigo-600 hover:bg-indigo-700"
                               : actionCol.label.toLowerCase() === "delete"
-                                ? "!bg-red-600 hover:bg-red-700"
-                                : actionCol.label.toLowerCase() === "view"
-                                  ? "!bg-yellow-500 hover:bg-yellow-600"
-                                  : "!bg-gray-500 hover:bg-gray-600";
+                              ? "!bg-red-600 hover:bg-red-700"
+                              : actionCol.label.toLowerCase() === "view"
+                              ? "!bg-yellow-500 hover:bg-yellow-600"
+                              : "!bg-gray-500 hover:bg-gray-600";
 
                           return (
                             <button
@@ -483,7 +507,6 @@ function Tab({
               </tr>
             </tbody>
           </table>
-
         </>
       )}
     </section>
@@ -536,8 +559,8 @@ function TabsDesigner({
   toggleRequired,
 }) {
   const [showAllButtonFields, setShowAllButtonFields] = useState(false);
-  const [updatedTabsList, setUpdatedTabsList] = useState(tabsList)
-  console.log(updatedTabsList, "updatedList hereee")
+  const [updatedTabsList, setUpdatedTabsList] = useState(tabsList);
+
   return (
     <section className="bg-white rounded-lg  mx-auto mt-2 min-h-full">
       <div className="flex justify-between mt-0 mb-2">
@@ -570,8 +593,7 @@ function TabsDesigner({
               const filteredTabs = tabsList.filter((item) =>
                 item.toLowerCase().includes(query)
               );
-              setUpdatedTabsList(filteredTabs)
-
+              setUpdatedTabsList(filteredTabs);
             }}
           />
 
@@ -580,7 +602,10 @@ function TabsDesigner({
       </div>
       {/* Tabs Rendering */}
       <div className="flex flex-wrap gap-3 mb-6">
-        {(showAllButtonFields ? updatedTabsList : updatedTabsList.slice(0, 4)).map((t) => (
+        {(showAllButtonFields
+          ? updatedTabsList
+          : updatedTabsList.slice(0, 4)
+        ).map((t) => (
           <DraggableButton
             key={t}
             item={t}
@@ -620,7 +645,7 @@ function TabsDesigner({
           className="bg-transparent p-0 m-0 text-blue-600 font-medium hover:underline"
           onClick={() => setShowAllButtonFields((prev) => !prev)}
         >
-          {showAllButtonFields ? 'Show Less' : '+ More'}
+          {showAllButtonFields ? "Show Less" : "+ More"}
         </button>
       </div>
 
@@ -815,12 +840,12 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === selectedTabIndex
           ? {
-            ...tab,
-            apiConfig: {
-              apiUrl: apiCallData.endpoint,
-              method: apiCallData.method,
-            },
-          }
+              ...tab,
+              apiConfig: {
+                apiUrl: apiCallData.endpoint,
+                method: apiCallData.method,
+              },
+            }
           : tab
       )
     );
@@ -837,21 +862,21 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === selectedTabIndex
           ? {
-            ...tab,
-            tableCols: [
-              ...tab.tableCols,
-              {
-                type: "action",
-                label: actionLabel,
-                name: actionLabel.toLowerCase(),
-                apiConfig: {
-                  apiUrl: apiCallData.endpoint,
-                  method: apiCallData.method,
-                  description: apiCallData.description,
+              ...tab,
+              tableCols: [
+                ...tab.tableCols,
+                {
+                  type: "action",
+                  label: actionLabel,
+                  name: actionLabel.toLowerCase(),
+                  apiConfig: {
+                    apiUrl: apiCallData.endpoint,
+                    method: apiCallData.method,
+                    description: apiCallData.description,
+                  },
                 },
-              },
-            ],
-          }
+              ],
+            }
           : tab
       )
     );
@@ -894,16 +919,16 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === idx
           ? {
-            ...tab,
-            fields: [
-              ...tab.fields,
-              {
-                ...field,
-                required: !!field.required,
-                name: fieldName,
-              },
-            ],
-          }
+              ...tab,
+              fields: [
+                ...tab.fields,
+                {
+                  ...field,
+                  required: !!field.required,
+                  name: fieldName,
+                },
+              ],
+            }
           : tab
       )
     );
@@ -914,11 +939,11 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-            ...tab,
-            fields: tab.fields.map((field, j) =>
-              j === fieldIdx ? { ...field, required: !field.required } : field
-            ),
-          }
+              ...tab,
+              fields: tab.fields.map((field, j) =>
+                j === fieldIdx ? { ...field, required: !field.required } : field
+              ),
+            }
           : tab
       )
     );
@@ -952,9 +977,9 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-            ...tab,
-            buttons: tab.buttons.filter((_, idx) => idx !== buttonIdx),
-          }
+              ...tab,
+              buttons: tab.buttons.filter((_, idx) => idx !== buttonIdx),
+            }
           : tab
       )
     );
@@ -984,12 +1009,12 @@ export default function TabDesigner({ tabs, setTabs, module }) {
         prev.map((tab, i) =>
           i === idx
             ? {
-              ...tab,
-              tableCols: [
-                ...tab.tableCols,
-                { ...column, name: `${column.label}` },
-              ],
-            }
+                ...tab,
+                tableCols: [
+                  ...tab.tableCols,
+                  { ...column, name: `${column.label}` },
+                ],
+              }
             : tab
         )
       );
@@ -1001,9 +1026,9 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-            ...tab,
-            tableCols: tab.tableCols.filter((_, idx) => idx !== colIdx),
-          }
+              ...tab,
+              tableCols: tab.tableCols.filter((_, idx) => idx !== colIdx),
+            }
           : tab
       )
     );
@@ -1023,41 +1048,116 @@ export default function TabDesigner({ tabs, setTabs, module }) {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
 
+    // ----------------------------
+    // 1️⃣ FIELD DROP
+    // ----------------------------
     if (type === "field" && data.category === "field") {
       addTabField(idx, data.item);
+      return;
     }
 
+    // ----------------------------
+    // 2️⃣ BUTTON DROP
+    // ----------------------------
     if (type === "button" && data.category === "button") {
       const currentTab = tabs[idx];
       if (!currentTab) return;
 
-      const existingButton = currentTab.buttons?.find(
-        (btn) =>
-          btn?.label?.toLowerCase().trim() ===
-          data.item?.label?.toLowerCase().trim()
-      );
+      const droppedButton = data.item;
+      const label = droppedButton.label || "";
+      const labelLower = label.toLowerCase().trim();
 
-      if (existingButton) {
-        alert(
-          `Button "${data.item?.label}" already exists in ${currentTab?.name}.`
-        );
+      // 2.1 Prevent duplicates
+      if (
+        currentTab.buttons?.some(
+          (btn) => btn.label.toLowerCase().trim() === labelLower
+        )
+      ) {
+        alert(`Button "${label}" already exists in ${currentTab.name}.`);
         return;
       }
 
+      // ----------------------------
+      // 2.2 SAVE / UPDATE BUTTON → DIRECT INSERT (NO MODAL)
+      // ----------------------------
+      if (labelLower === "save" || labelLower === "update") {
+        const newButton = {
+          label,
+          type: "button",
+          actionType: "API Call",
+          apiEndpoint: "/api/form-designer/dynamic/save",
+          apiMethod: "POST",
+        };
+
+        setTabs((prev) =>
+          prev.map((tab, i) =>
+            i === idx ? { ...tab, buttons: [...tab.buttons, newButton] } : tab
+          )
+        );
+
+        return;
+      }
+
+      // ----------------------------
+      // 2.3 EMAIL BUTTON → DIRECT INSERT
+      // ----------------------------
+      if (labelLower === "email") {
+        const newButton = {
+          label,
+          type: "button",
+          actionType: "email",
+        };
+
+        setTabs((prev) =>
+          prev.map((tab, i) =>
+            i === idx ? { ...tab, buttons: [...tab.buttons, newButton] } : tab
+          )
+        );
+
+        return;
+      }
+
+      // ----------------------------
+      // 2.4 EXPORT BUTTON → DIRECT INSERT
+      // ----------------------------
+      if (labelLower === "export") {
+        const newButton = {
+          label,
+          type: "button",
+          actionType: "export",
+        };
+
+        setTabs((prev) =>
+          prev.map((tab, i) =>
+            i === idx ? { ...tab, buttons: [...tab.buttons, newButton] } : tab
+          )
+        );
+
+        return;
+      }
+
+      // ----------------------------
+      // 2.5 OTHER BUTTONS → OPEN MODAL
+      // ----------------------------
       setAddingButton({
         open: true,
         tabIndex: null,
-        buttonData: data.item,
+        buttonData: droppedButton,
         tabIdx: idx,
       });
+
       return;
     }
 
+    // ----------------------------
+    // 3️⃣ COLUMN DROP (FIELD or ACTION)
+    // ----------------------------
     if (
       type === "column" &&
       (data.category === "field" || data.category === "action")
     ) {
       addTabColumn(idx, data.item);
+      return;
     }
   };
 
