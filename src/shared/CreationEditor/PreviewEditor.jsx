@@ -10,7 +10,6 @@ import { CreateNotificationFunction } from "../../utils/CheckAndExecuteFlows/CRU
 
 const PreviewEditor = (props) => {
     const Navigate = useNavigate();
-
     const {
         detailsObject,
         editorContent,
@@ -27,7 +26,7 @@ const PreviewEditor = (props) => {
     const [displayContent, setDisplayContent] = useState(editorContent);
     // console.log(path,"path Hereeee")
 
-   
+
     useEffect(() => {
         if (!path) return;
 
@@ -63,7 +62,7 @@ const PreviewEditor = (props) => {
 
     useEffect(() => {
         const contentInLocal = localStorage.getItem("editorContent");
-     
+
         if (contentInLocal && contentInLocal !== editorContent) {
             setDisplayContent(contentInLocal);
         } else {
@@ -99,10 +98,10 @@ const PreviewEditor = (props) => {
                 : path.charAt(0).toUpperCase() + path.slice(1) + "s";
 
         // Uncomment when you want to navigate after save:
-        // Navigate(`/All ${navigatedPath}`, { replace: true });
+        Navigate(`/All ${navigatedPath}`, { replace: true });
     };
 
-// console.log(tableName,"Path Hereee")
+    // console.log(tableName,"Path Hereee")
     return (
         <div
             className={`h-[100%] w-[100%] px-2 py-0 ${showCC ? "overflow-y-auto custom-scrollbar" : "overflow-hidden"

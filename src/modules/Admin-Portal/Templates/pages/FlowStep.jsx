@@ -19,8 +19,8 @@ const FlowStepComponent = ({ recordId, path, }) => {
     const [UrlPath, setPath] = useState(path)
     const [editorContent, setEditorContent] = useState("")
     const [FeedBackImageURl, setFeedBackImageURl] = useState(localStorage.getItem("ImageUrl"))
-    const [Questions,setQuestions]=useState("")
-    console.log(path,"IN flowCheckFor feedBacks")
+    const [Questions, setQuestions] = useState("")
+    // console.log(path,"IN flowCheckFor feedBacks")
 
     useEffect(() => {
         const fetchTemplates = async () => {
@@ -94,8 +94,8 @@ const FlowStepComponent = ({ recordId, path, }) => {
     const getRecordData = async () => {
         console.log(recordId, "recordId Here")
         const response = await GetAnyRecordFromAnyTable(path, recordId)
-        console.log(response, "Response Here @template")
-        const { cc, subject, to_address, from_address, name, short_description, content } = response.data[0]
+        console.log(response, "Response Here @alert")
+        const { cc, subject, to_address, from_address, name, short_description, content, description } = response.data[0]
         const obj = {
             cc: { value: cc },
             subject: { value: subject },
@@ -106,17 +106,21 @@ const FlowStepComponent = ({ recordId, path, }) => {
         }
         setData(obj)
         setTableName(path)
-        // setEditorContent(content)
+        // console.log(path, "Here..,@get")
+        if (path === "alerts") {
+            setEditorContent(content)
 
+        }
         if (path === 'notifications') {
             const { email_body } = response.data[0]
             setEditorContent(email_body)
         }
-        if (path=== 'feedback'){
-            const {questions,image_file}=response.data[0]
+        if (path === 'feedback') {
+            const { questions, image_file } = response.data[0]
             setQuestions(questions)
-            localStorage.setItem("ImageUrl",JSON.stringify(image_file))
+            localStorage.setItem("ImageUrl", JSON.stringify(image_file))
         }
+
     }
 
     useEffect(() => {
@@ -154,10 +158,9 @@ const FlowStepComponent = ({ recordId, path, }) => {
         // Type of notification
         { name: "description", label: "Description", type: "textarea", isMandatory: true } // Content at the end
     ];
-    
     //    console.log(tableName,"TableName Herre")
     //    console.log(UrlPath,"path")
-
+    // console.log(editorContent, "EditorContent HEree..,")
     return (
         // <div className={` ${recordId?`w-[83vw]`:`w-[95vw]`}  flex flex-col
         //  ${recordId?`max-h-[83vh]`:`max-h-[90vh]`} border-2 ${recordId?`max-w-[100%]`:`max-w-[100%]`} flex-shrink-0`}>

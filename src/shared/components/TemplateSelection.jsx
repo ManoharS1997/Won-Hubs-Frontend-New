@@ -6,6 +6,7 @@ import { IoIosArrowBack, IoIosClose } from "react-icons/io";
 import Swal from "sweetalert2";
 
 import WonContext from "../../context/WonContext";
+
 import {
     BackBtn,
     CustomNotificationContainer,
@@ -100,7 +101,7 @@ const TemplateSelection = ({ lists, configureFields, title, path, tablename }) =
         // Navigate(`/${path}${path.includes("integration") ? "" : "/new"}`, { state: { path }, replace: true });
         // Navigate(`${Path}`)
     };
-    console.log(lists, "lists hereee")
+    // console.log(lists, "lists hereee")
     return (
 
         <div className="h-[92%] w-[100%]">

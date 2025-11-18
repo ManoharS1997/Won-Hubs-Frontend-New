@@ -97,7 +97,7 @@ const AlertTemplateView = () => {
           configureFields={configureFields}
           title="Create Alert"
           path='flowcheck'
-          tablename="alert"
+          tablename="alerts"
         />
       )}
     </WonContext.Consumer>

@@ -7,6 +7,7 @@ import { Loader2, Check, BarChart2, PieChart, Circle } from "lucide-react";
 import FormInput from '../../shared/UIElements/FormInput';
 import FormDropdown from '../../shared/UIElements/FormDropdown';
 import FormTextarea from "../UIElements/FormTextarea";
+import SelectWithIcon from "../components/SelectWithIcon";
 
 const templateFields = {
   name: { value: "", isMandatory: true, type: "text", label: "ReportName" },
@@ -104,8 +105,8 @@ const FormDesignerFields = {
   },
 };
 
-const WorkFlowFields={
-   name: { value: "", isMandatory: true, type: "text", label: "Name" },
+const WorkFlowFields = {
+  name: { value: "", isMandatory: true, type: "text", label: "Name" },
 
   department: {
     value: "",
@@ -146,9 +147,9 @@ const WorkFlowFields={
       { label: "Offline", value: "offline" },
     ],
   },
-   description: { value: "", isMandatory: true, type: "text", label: "Description" },
+  description: { value: "", isMandatory: true, type: "text", label: "Description" },
 
-  
+
 }
 
 export default function Fields({ title, data, path }) {
@@ -171,7 +172,7 @@ export default function Fields({ title, data, path }) {
     let baseFields = defaultFields;
     if (path === "flowreport") baseFields = templateFields;
     else if (path === "formDesigner") baseFields = FormDesignerFields;
-    else if(path === 'workFlow') baseFields= WorkFlowFields;
+    else if (path === 'workFlow') baseFields = WorkFlowFields;
 
     // 2️⃣ Load from localStorage if present
     const saved = localStorage.getItem(`${path}Data`);
@@ -226,48 +227,11 @@ export default function Fields({ title, data, path }) {
     const value = field?.value || "";
 
     if (field.type === "dropdown") {
-      if (key.toLowerCase() === "graphtype" || field.label?.toLowerCase() === "graphtype") {
-        return (
-          <div key={key} className="flex flex-col gap-1 w-full">
-            <label className="text-sm font-medium text-gray-800 flex items-center gap-1">
-              {capitalize(field.label || key)}
-              {field.isMandatory && <span className="text-red-500">*</span>}
-            </label>
+      
+      if (field.label === "GraphType") {
+       return ( <SelectWithIcon />)
 
-            <Select
-              options={field.options}
-              placeholder="Select..."
-              value={field.options.find((opt) => opt.value === value) || null}
-              onChange={(opt) => onChangeDropdown({ target: { value: opt.value } }, key)}
-              className="w-full border border-gray-300 focus-within:border-blue-600"
-              classNamePrefix="select"
-              formatOptionLabel={(option) => (
-                <div className="flex items-center gap-2">
-                  {option.icon}
-                  <span>{option.label}</span>
-                </div>
-              )}
-              styles={{
-                control: (provided, state) => ({
-                  ...provided,
-                  borderRadius: "0px",
-                  borderColor: state.isFocused ? "#2563eb" : "#d1d5db",
-                  minHeight: "38px",
-                  boxShadow: state.isFocused ? "0 0 0 1.5px #2563eb" : "none",
-                  "&:hover": { borderColor: "#5f6368" },
-                }),
-                menu: (provided) => ({
-                  ...provided,
-                  borderRadius: "0px",
-                  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                  zIndex: 20,
-                }),
-              }}
-            />
-          </div>
-        );
       }
-
       return (
         <FormDropdown
           key={key}
@@ -311,7 +275,6 @@ export default function Fields({ title, data, path }) {
   };
   const entries = Object.entries(FieldsState);
   // console.log(FieldsState,path)
- 
 
   return (
     <div className="w-full h-[80vh] flex justify-center items-start px-4 py-6">

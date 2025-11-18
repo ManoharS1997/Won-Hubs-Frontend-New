@@ -168,6 +168,9 @@ import IntegrationTemplateView from "./modules/Integrations/pages/CreateTemplate
 import WorkFlowTemplateView from "./modules/Admin-Portal/WorkflowAutomator/pages/WorkflowTemplateCards/WorkFlowTemplateView.jsx";
 import WorkFlowComponent from "./modules/Admin-Portal/WorkflowAutomator/pages/WorkflowV2/WorkFlowEditorView.jsx";
 import IntegrationLayOutComponent from "./modules/Integrations/pages/IntegrationLayout.jsx";
+import SelectWithIcon from "./shared/components/SelectWithIcon.jsx";
+import NewCalendar from "./modules/Admin-Portal/Calender/pages/NewCalendar.jsx";
+
 const router = createBrowserRouter([
   // Public routes (no authentication required)
   {
@@ -726,10 +729,10 @@ const router = createBrowserRouter([
           {
             path: "/flows/:id",
             element: <WorkFlowComponent />,
-          }, 
+          },
           {
             path: "/create/workflows",
-            element:<WorkFlowTemplateView />
+            element: <WorkFlowTemplateView />
           },
           {
             path: "/linkedin-signin",
@@ -770,6 +773,10 @@ const router = createBrowserRouter([
             path: '/integration/check',
             element: <IntegrationLayOutComponent />
           },
+          {
+            path: "/newCal",
+            element: <NewCalendar />
+          }
 
         ],
       },

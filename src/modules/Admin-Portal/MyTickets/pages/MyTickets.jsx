@@ -59,13 +59,13 @@ const MyTickets = () => {
     console.log(data,"data Here")
     try {
       const result = await getFormDetails({
-        module: "Tickets",
+        module: "tickets",
         category: data.category,
         subcategory: data.subcategory,
         view: data.view,
         department: data.department,
       });
-      console.log(result,"result @myItem")
+      // console.log(result,"result @myItem")
       if (result) {
         setFormData(result.data);
       }

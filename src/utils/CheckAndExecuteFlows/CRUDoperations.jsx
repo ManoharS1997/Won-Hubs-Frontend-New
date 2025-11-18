@@ -3144,7 +3144,7 @@ export const deleteTask = async (recordId) => {
 
 export const getFormDetails = async (formData) => {
   try {
-    const url = `${apiUrl}/form-designer/getModuleByFields`;
+    const url = `${apiUrl}/api/form-designer/getModuleByFields`;
     const options = {
       method: "POST",
       headers: {
@@ -3156,6 +3156,7 @@ export const getFormDetails = async (formData) => {
     console.log(response,"response Here")
     if (response.ok) {
       const data = await response.json();
+      // console.log(data,"Data Hereeee")
       return data;
     }
   } catch (err) {
