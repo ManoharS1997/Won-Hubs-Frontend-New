@@ -17,6 +17,8 @@ export default function PreviewModal({
   const [saving, setSaving] = useState(false);
   const [twoColumn, setTwoColumn] = useState(true);
 
+  console.log(formButtons)
+
   if (!show) return null;
 
   const handleChange = (name, value) => {

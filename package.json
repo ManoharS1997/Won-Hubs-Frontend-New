@@ -46,6 +46,8 @@
     "init": "^0.1.2",
     "is-url": "^1.2.4",
     "js-cookie": "^3.0.5",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
     "jszip": "^3.10.1",
     "jwt-decode": "^4.0.0",
     "libphonenumber-js": "^1.11.11",

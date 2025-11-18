@@ -28,50 +28,49 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     hovered: "",
     open: false,
   });
-  const Navigate=useNavigate()
+  const Navigate = useNavigate();
 
   // const [recordId,setRecordId]=useState(recordId)
 
   const titleOptions = [
     {
-      name: 'My Items',
-      subModules: ['Tickets', 'Tasks', 'Approvals']
+      name: "My Items",
+      subModules: ["Tickets", "Tasks", "Approvals"],
     },
     {
-      name: 'Users',
-      subModules: []
+      name: "Users",
+      subModules: [],
     },
     {
-      name: 'Groups',
-      subModules: []
+      name: "Groups",
+      subModules: [],
     },
     {
-      name: 'Locations',
-      subModules: []
+      name: "Locations",
+      subModules: [],
     },
 
     {
-      name: 'Departments',
-      subModules: []
+      name: "Departments",
+      subModules: [],
     },
     {
-      name: 'Companies',
-      subModules: []
+      name: "Companies",
+      subModules: [],
     },
     {
-      name: 'Notifications',
-      subModules: []
+      name: "Notifications",
+      subModules: [],
     },
     {
-      name: 'Feedbacks',
-      subModules: []
+      name: "Feedbacks",
+      subModules: [],
     },
     {
-      name: 'Alerts',
-      subModules: []
+      name: "Alerts",
+      subModules: [],
     },
-
-  ]
+  ];
   const [addingButton, setAddingButton] = useState({
     open: false,
     tabIndex: null,
@@ -106,26 +105,74 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     }
   };
 
-  // IMPORTANT: open modal on button drop
   const onDropButton = (e) => {
     e.preventDefault();
-    if (module?.length > 0) {
-      const data = JSON.parse(e.dataTransfer.getData("application/json"));
-      if (data.category === "button") {
-        if (
-          formButtons.some(
-            (btn) => btn.label.toLowerCase() === data.item.label.toLowerCase()
-          )
-        ) {
-          alert(`Field "${data.item.label}" already added.`);
-          return;
-        }
-        console.log(addingButton);
-        setAddingButton({ open: true, tabIndex: null, buttonData: data.item });
-      }
-    } else {
+
+    if (!module || module.length === 0) {
       alert("Select module");
+      return;
     }
+
+    const data = JSON.parse(e.dataTransfer.getData("application/json"));
+    if (data.category !== "button") return;
+
+    const button = data.item;
+    const label = button.label;
+    const labelLower = label.toLowerCase();
+
+    // 1️⃣ Prevent duplicates
+    if (formButtons.some((btn) => btn.label.toLowerCase() === labelLower)) {
+      alert(`Button "${label}" already added.`);
+      return;
+    }
+
+    // 2️⃣ SAVE / UPDATE → direct assign API endpoint
+    if (labelLower === "save" || labelLower === "update") {
+      setFormButtons((prev) => [
+        ...prev,
+        {
+          label,
+          type: "button",
+          actionType: "API Call",
+          apiEndpoint: "/api/form-designer/dynamic/save",
+          apiMethod: "POST",
+        },
+      ]);
+      return;
+    }
+
+    // 3️⃣ EMAIL → actionType: "email"
+    if (labelLower === "email") {
+      setFormButtons((prev) => [
+        ...prev,
+        {
+          label,
+          type: "button",
+          actionType: "email",
+        },
+      ]);
+      return;
+    }
+
+    // 4️⃣ EXPORT → actionType: "export"
+    if (labelLower === "export") {
+      setFormButtons((prev) => [
+        ...prev,
+        {
+          label,
+          type: "button",
+          actionType: "export",
+        },
+      ]);
+      return;
+    }
+
+    // 5️⃣ Other buttons → OPEN MODAL
+    setAddingButton({
+      open: true,
+      tabIndex: null,
+      buttonData: button,
+    });
   };
 
   // Open modal on custom button add
@@ -162,8 +209,6 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     setAddingButton({ open: false, tabIndex: null, buttonData: null });
   };
 
-  console.log(formButtons, "===");
-
   const removeField = (i) =>
     setFormFields((prev) => prev.filter((_, idx) => idx !== i));
   const removeButton = (i) =>
@@ -171,8 +216,9 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
 
   const getRecordDetails = async () => {
     if (!recordId) return;
-    const url = `${import.meta.env.VITE_HOSTED_API_URL
-      }/api/form-designer/${recordId}`;
+    const url = `${
+      import.meta.env.VITE_HOSTED_API_URL
+    }/api/form-designer/${recordId}`;
     const response = await fetch(url);
     // console.log(response,"Record Response");
     const dbResponse = await response.json();
@@ -200,8 +246,13 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
           <div>
             <div className="flex items-center w-full justify-between mb-2">
               <h3 className="font-semibold !text-blue-800 !text-[22px] flex items-center gap-2">
-                <button className="m-0 p-0 bg-transparent flex items-center justify-center" onClick={()=>{Navigate('/create/new/design')}}>
-                  {renderIcons('IoIosArrowBack', 30, '#08107D')}
+                <button
+                  className="m-0 p-0 bg-transparent flex items-center justify-center"
+                  onClick={() => {
+                    Navigate("/create/new/design");
+                  }}
+                >
+                  {renderIcons("IoIosArrowBack", 30, "#08107D")}
                 </button>
                 <span>Form Designer</span>
               </h3>
@@ -281,10 +332,10 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                           className="flex justify-between items-center"
                           onClick={() => {
                             if (!option.subModules.length) {
-                              setTitleObj(prev => ({
+                              setTitleObj((prev) => ({
                                 ...prev,
                                 title: option.name,
-                                open: false
+                                open: false,
                               }));
                               setModule(option.name);
                             }
@@ -297,40 +348,46 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                         </div>
 
                         {/* Submodules - now shown to the LEFT */}
-                        {option.subModules.length > 0 && titleObj.hovered === option.name && (
-                          <div
-                            className="absolute right-full top-0 mr-1 w-40 bg-white border rounded shadow-md z-20"
-                            onMouseEnter={() =>
-                              setTitleObj(prev => ({ ...prev, hovered: option.name }))
-                            }
-                            onMouseLeave={() =>
-                              setTitleObj(prev => ({ ...prev, hovered: "" }))
-                            }
-                          >
-                            {option.subModules.map((sub) => (
-                              <div
-                                key={sub}
-                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                                onClick={() => {
-                                  setTitleObj(prev => ({
-                                    ...prev,
-                                    title: sub,
-                                    open: false
-                                  }));
-                                  setModule(sub);
-                                }}
-                              >
-                                {sub}
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        {option.subModules.length > 0 &&
+                          titleObj.hovered === option.name && (
+                            <div
+                              className="absolute right-full top-0 mr-1 w-40 bg-white border rounded shadow-md z-20"
+                              onMouseEnter={() =>
+                                setTitleObj((prev) => ({
+                                  ...prev,
+                                  hovered: option.name,
+                                }))
+                              }
+                              onMouseLeave={() =>
+                                setTitleObj((prev) => ({
+                                  ...prev,
+                                  hovered: "",
+                                }))
+                              }
+                            >
+                              {option.subModules.map((sub) => (
+                                <div
+                                  key={sub}
+                                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                                  onClick={() => {
+                                    setTitleObj((prev) => ({
+                                      ...prev,
+                                      title: sub,
+                                      open: false,
+                                    }));
+                                    setModule(sub);
+                                  }}
+                                >
+                                  {sub}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-
             </div>
           </div>
           {/* Conditional Screens */}

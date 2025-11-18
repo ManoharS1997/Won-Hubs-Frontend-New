@@ -1,29 +1,25 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import FormInput from "../../../../../shared/UIElements/FormInput";
+import * as XLSX from "xlsx";
+import ExportModal from "./ExportModal";
 
-// ✅ Simplified field renderer using only built-in HTML elements
 function ItemCheck({ field, formValues, handleChange }) {
-
   const handleButtonClick = async () => {
-    console.log(field,"Inside Handle Button Click")
     if (field?.actionType === "API Call" && field?.apiEndpoint) {
       try {
         const method = (field?.apiMethod || "POST").toUpperCase();
-        const response = await axios({
+        await axios({
           method,
           url: field.apiEndpoint,
           data: formValues,
         });
-        console.log("✅ API Response:", response.data);
         alert(`${field?.label || "API"} call successful!`);
       } catch (error) {
         console.error("❌ API call failed:", error);
         alert("API call failed! Check console for details.");
       }
-    } else {
-      console.log("Button clicked:", field?.label);
     }
   };
 
@@ -41,20 +37,11 @@ function ItemCheck({ field, formValues, handleChange }) {
     case "week":
     case "color":
       return (
-      
-        // <div className="flex  flex-col items-center gap-1 border group-focus-within:shadow-[0_0_0.5rem_0.1rem_var(--primary-color)] focus-within:shadow-[0_0_0.5rem_0.1rem_var(--primary-color)]">
-
-        //   <label className="font-medium">{field?.label}</label>
-        //   <input
-        //     type={field?.type}
-        //     name={field?.name}
-        //     value={formValues?.[field?.name] || ""}
-        //     onChange={(e) => handleChange(field?.name, e.target.value)}
-        //     className="border border-gray-300 rounded-md px-3 py-2 focus:outline-blue-500"
-        //   />
-        // </div>
-        <FormInput type={field.type} label={field.label}  value={formValues?.[field?.name] || ""}
-                    onChangeHandler={(e) => handleChange(field?.name, e.target.value)}
+        <FormInput
+          type={field.type}
+          label={field.label}
+          value={formValues?.[field?.name] || ""}
+          onChangeHandler={(e) => handleChange(field?.name, e.target.value)}
         />
       );
 
@@ -104,7 +91,10 @@ function ItemCheck({ field, formValues, handleChange }) {
               const val = typeof option === "string" ? option : option.value;
               const label = typeof option === "string" ? option : option.label;
               return (
-                <label key={idx} className="flex items-center gap-2 cursor-pointer">
+                <label
+                  key={idx}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
                   <input
                     type="radio"
                     name={field?.name}
@@ -128,10 +118,14 @@ function ItemCheck({ field, formValues, handleChange }) {
             {field?.options?.length > 0 ? (
               field.options.map((option, idx) => {
                 const val = typeof option === "string" ? option : option.value;
-                const label = typeof option === "string" ? option : option.label;
+                const label =
+                  typeof option === "string" ? option : option.label;
                 const checked = formValues?.[field?.name]?.includes(val);
                 return (
-                  <label key={idx} className="flex items-center gap-2 cursor-pointer">
+                  <label
+                    key={idx}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
                     <input
                       type="checkbox"
                       name={field?.name}
@@ -196,35 +190,237 @@ function ItemCheck({ field, formValues, handleChange }) {
 }
 
 // ✅ Parent form with all logic intact
-export default function SourceForm({ formFields = [], formButtons = [] }) {
+export default function SourceForm({
+  formFields = [],
+  formButtons = [],
+  activeTable,
+  tabName,
+}) {
   const [formValues, setFormValues] = useState({});
-  const [loadingBtn, setLoadingBtn] = useState(null);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
+  const [loadingBtn, setLoadingBtn] = useState(null);
   const handleChange = (name, value) => {
-    setFormValues((prev) => ({ ...prev, [name]: value }));
+    setFormValues((prev) => ({
+      ...prev,
+      [name]: value,
+      activeTable,
+      tabName,
+      activeNav: localStorage.getItem("activeNav"),
+      activeUserData: localStorage.getItem("activeUserData"),
+    }));
   };
 
-  const handleButtonClick = async (btn) => {
-    if (btn.actionType !== "API Call" || !btn.apiEndpoint) return;
+  const handleExport = (exportType) => {
+    try {
+      if (!formValues || Object.keys(formValues).length === 0) {
+        alert("No data to export!");
+        return;
+      }
+
+      const cleaned = { ...formValues };
+      delete cleaned.record_id;
+      delete cleaned.activeUserData;
+
+      const systemFields = {
+        activeTable,
+        tabName,
+        activeNav: localStorage.getItem("activeNav") || "",
+      };
+
+      const allowedFormKeys = formFields.map((f) => f.name);
+
+      const filtered = Object.keys(cleaned)
+        .filter((key) => allowedFormKeys.includes(key))
+        .reduce((obj, key) => {
+          obj[key] = cleaned[key];
+          return obj;
+        }, {});
+
+      const finalData = {
+        "ACTIVE TABLE": systemFields.activeTable,
+        "TAB NAME": systemFields.tabName,
+        "ACTIVE NAV": systemFields.activeNav,
+        ...filtered,
+      };
+
+      const convertLabel = (key) =>
+        key
+          .replace(/([A-Z])/g, " $1")
+          .trim()
+          .toUpperCase();
+
+      const formattedData = {};
+      Object.keys(finalData).forEach((key) => {
+        formattedData[convertLabel(key)] = finalData[key];
+      });
+
+      const exportArray = [formattedData];
+
+      if (exportType === "excel") {
+        const worksheet = XLSX.utils.aoa_to_sheet([]);
+
+        const headers = Object.keys(formattedData);
+        const values = Object.values(formattedData);
+
+        // Row 1 → Headers
+        headers.forEach((header, colIndex) => {
+          const cellRef = XLSX.utils.encode_cell({ r: 0, c: colIndex });
+
+          worksheet[cellRef] = {
+            t: "s",
+            v: header,
+            s: {
+              fill: { fgColor: { rgb: "DDEBF7" } },
+              font: { bold: true, color: { rgb: "000000" } },
+              alignment: { horizontal: "center" },
+            },
+          };
+        });
+
+        // Row 2 → Values (all text)
+        values.forEach((cellObj, colIndex) => {
+          const cellRef = XLSX.utils.encode_cell({ r: 1, c: colIndex });
+
+          worksheet[cellRef] = {
+            t: "s",
+            v: String(cellObj.v),
+          };
+        });
+
+        worksheet["!ref"] = XLSX.utils.encode_range({
+          s: { r: 0, c: 0 },
+          e: { r: 1, c: headers.length - 1 },
+        });
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+        XLSX.writeFile(
+          workbook,
+          `${systemFields.activeTable}_${systemFields.tabName}_export.xlsx`
+        );
+        return;
+      }
+
+      if (exportType === "csv") {
+        const worksheet = XLSX.utils.json_to_sheet(exportArray);
+        const csvOutput = XLSX.utils.sheet_to_csv(worksheet);
+
+        const blob = new Blob([csvOutput], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${activeTable}_${tabName}_export.csv`;
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+        return;
+      }
+    } catch (err) {
+      alert("Export failed. Check console.");
+    }
+  };
+
+  useEffect(() => {
+    const fetchExistingData = async () => {
+      try {
+        const endpoint = `${
+          import.meta.env.VITE_HOSTED_API_URL
+        }/api/form-designer/dynamic/get`;
+
+        const params = {
+          activeTable,
+          tabName,
+          activeNav: localStorage.getItem("activeNav"),
+        };
+
+        const user = localStorage.getItem("activeUserData");
+        if (user) {
+          const parsedUser = JSON.parse(user);
+          if (parsedUser?.id) params.userId = parsedUser.id;
+        }
+
+        const response = await axios.get(endpoint, { params });
+
+        if (response.data?.success && response.data.data.length > 0) {
+          const saved = response.data.data[0];
+
+          // convert JSON-like columns
+          const cleaned = {};
+          Object.entries(saved).forEach(([key, value]) => {
+            try {
+              cleaned[key] = JSON.parse(value);
+            } catch {
+              cleaned[key] = value;
+            }
+          });
+
+          // 🔥 FILTER USING formFields list
+          const allowedKeys = formFields.map((f) => f.name);
+
+          const filteredSavedValues = Object.keys(cleaned)
+            .filter((key) => allowedKeys.includes(key))
+            .reduce((obj, key) => {
+              obj[key] = cleaned[key];
+              return obj;
+            }, {});
+
+          setFormValues({
+            ...filteredSavedValues,
+            activeTable,
+            tabName,
+            activeNav: localStorage.getItem("activeNav"),
+            activeUserData: localStorage.getItem("activeUserData"),
+          });
+        }
+      } catch (error) {
+        console.error("❌ Error fetching saved data:", error);
+      }
+    };
+
+    fetchExistingData();
+  }, [activeTable, tabName]);
+
+  const handleButtonClick = (btn) => {
+    if (btn.label?.toLowerCase() === "export") {
+      setExportModalOpen(true); // Open modal
+      return;
+    }
+
+    if (btn.label?.toLowerCase() === "email") {
+      alert("Email functionality will be added later.");
+      return;
+    }
+
+    if (!btn.apiEndpoint) return;
+
     try {
       setLoadingBtn(btn._id);
       const method = btn.apiMethod?.toUpperCase() || "POST";
-      const endpoint = btn.apiEndpoint;
-      let response;
+      const endpoint = `${import.meta.env.VITE_HOSTED_API_URL}${
+        btn.apiEndpoint
+      }`;
 
-      if (method === "GET") response = await axios.get(endpoint);
-      else if (method === "POST") response = await axios.post(endpoint, formValues);
-      else if (method === "PUT") response = await axios.put(endpoint, formValues);
-      else if (method === "DELETE") response = await axios.delete(endpoint);
+      let response;
+      if (method === "GET") response = axios.get(endpoint);
+      if (method === "POST") response = axios.post(endpoint, formValues);
+      if (method === "PUT") response = axios.put(endpoint, formValues);
+      if (method === "DELETE") response = axios.delete(endpoint);
 
       alert(`${btn.label} successful!`);
-      console.log("✅ API Response:", response?.data);
-    } catch (error) {
-      console.error("❌ API Error:", error);
-      alert("API call failed. Check console for details.");
+    } catch (err) {
+      console.error(err);
+      alert("API call failed.");
     } finally {
       setLoadingBtn(null);
     }
+  };
+
+  const handleExportSelect = (type) => {
+    handleExport(type); // Export as excel/csv/pdf
+    setExportModalOpen(false); // Close modal
   };
 
   return (
@@ -233,11 +429,19 @@ export default function SourceForm({ formFields = [], formButtons = [] }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full !min-w-[100%]">
         {formFields.map((field, idx) => (
           <div key={field?.name || idx}>
-            <ItemCheck field={field} formValues={formValues} handleChange={handleChange} />
+            <ItemCheck
+              field={field}
+              formValues={formValues}
+              handleChange={handleChange}
+            />
           </div>
         ))}
       </div>
-
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        onSelect={handleExportSelect}
+      />
       {/* Form Buttons */}
       {formButtons.length > 0 && (
         <div className="w-full flex mt-8 gap-4 flex-wrap justify-end">
@@ -265,6 +469,8 @@ export default function SourceForm({ formFields = [], formButtons = [] }) {
 SourceForm.propTypes = {
   formFields: PropTypes.array.isRequired,
   formButtons: PropTypes.array.isRequired,
+  activeTable: PropTypes.string.isRequired,
+  tabName: PropTypes.string.isRequired,
 };
 
 ItemCheck.propTypes = {
