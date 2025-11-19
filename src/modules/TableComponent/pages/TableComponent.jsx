@@ -610,10 +610,10 @@ export default function TableComponent({
       //   return <DetailedView recordId={selectedTab} tableName={tableName} formData={formData} />
 
       case "feedBack":
+        // show feedback detail/editor component
         return <CreateFeedBack2 recordId={selectedTab} />;
-
       case "templates":
-        return <FlowStepComponent recordId={selectedTab} />;
+        return <FlowStepComponent recordId={selectedTab} path="templates" />;
       case "designs":
         return <FormDesignerPage recordId={selectedTab} />;
       default:
