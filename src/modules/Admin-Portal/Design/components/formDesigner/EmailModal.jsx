@@ -1,15 +1,19 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-const EmailModel = ({ open, onClose,onSelect }) => {
+const EmailModel = ({ open, onClose, onSelect }) => {
     const [email, setEmail] = useState("");
 
     if (!open) return null;
 
     const handleSend = () => {
         console.log("User entered email:", email);
-        onSelect(email);
-        // onClose();
+        if (onSelect) {
+            onSelect(email);  // <-- return email to parent
+        }
+
+        onClose(); // <-- close modal after sending email
+
     };
 
     return (

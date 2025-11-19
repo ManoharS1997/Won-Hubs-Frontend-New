@@ -429,6 +429,7 @@ export default function SourceForm({
 
   // Hereee
   const sendEmailExport = async (userEmail) => {
+    console.log("Email to send export to:", userEmail);
     const cleaned = { ...formValues };
     delete cleaned.record_id;
     delete cleaned.activeUserData;

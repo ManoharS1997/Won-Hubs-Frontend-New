@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import EventModal from "./EventModal";
 
 const dummyEvents = [
     {
@@ -58,6 +59,7 @@ const weekDaysShort = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const NewCalendar = () => {
     // shared month/year for both calendars
     const [currentDate, setCurrentDate] = useState(new Date(2020, 7, 1)); // Aug 2020
+    const [showEventModal,setShowEventModal] = useState(false); 
 
     const year = currentDate.getFullYear();
     const monthIndex = currentDate.getMonth();
@@ -75,11 +77,10 @@ const NewCalendar = () => {
     const monthEnd = new Date(year, monthIndex + 1, 0);
     const daysInMonth = monthEnd.getDate();
 
-    const startDay = monthStart.getDay(); // 0 = Sun
+    const startDay = monthStart.getDay(); 
     const paddedStart = (startDay + 6) % 7; // convert to Mon-start
     const totalCells = paddedStart + daysInMonth;
     const rows = Math.ceil(totalCells / 7);
-
     const grid = [];
     let currentDay = 1;
     for (let r = 0; r < rows; r++) {
@@ -112,7 +113,7 @@ const NewCalendar = () => {
                             <button className="px-4 py-2 border-r">Week</button>
                             <button className="px-4 py-2 bg-black text-white">Month</button>
                         </div>
-                        <button className="!bg-red-400 text-white px-4 py-2 !rounded-xl">
+                        <button className="!bg-red-400 text-white px-4 py-2 !rounded-xl" onClick={()=>setShowEventModal(prev=>!prev)}>
                             + Add Event
                         </button>
                     </div>
@@ -120,7 +121,6 @@ const NewCalendar = () => {
 
                 {/* MAIN GRID: Filters + Calendar */}
                 <div className="grid grid-cols-[280px_1fr] gap-6 h-full">
-
                     {/* LEFT FILTER PANEL */}
                     <div className="border rounded-xl p-4 flex flex-col custom-scroll overflow-y-auto max-h-[80vh] !shadow-xl w-[100%] justify-between">
 
@@ -142,7 +142,6 @@ const NewCalendar = () => {
                             onNext={handleNextMonth}
                         />
                     </div>
-
                     {/* MAIN CALENDAR */}
                     <div className="border rounded-xl p-4 custom-scroll overflow-y-auto max-h-[78vh] !shadow-xl">
 
@@ -208,6 +207,9 @@ const NewCalendar = () => {
                     </div>
                 </div>
             </div>
+            {
+                showEventModal && <EventModal onClose={()=>setShowEventModal(false)}/>
+            }
         </div>
     );
 
