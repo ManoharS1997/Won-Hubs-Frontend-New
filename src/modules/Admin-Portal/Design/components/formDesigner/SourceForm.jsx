@@ -465,25 +465,31 @@ export default function SourceForm({
     Object.keys(finalData).forEach((key) => {
       formattedData[convertLabel(key)] = finalData[key];
     });
+    try{
 
     const payload = {
       email: userEmail,
       rows: Object.entries(formattedData).map(([k, v]) => ({ column1: k, column2: v }))
     };
-
-    const res = await fetch("/sendemails/export", {
+const url=`${import.meta.env.VITE_HOSTED_API_URL}/sendemails/export`;
+    const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json",
                  "Authorization": `Bearer ${Cookies.get("AccessToken")}` },
 
       body: JSON.stringify(payload)
     });
-
-    const data = await res.json();
-    console.log("Email send response:", data);
-    // if (data.success) alert("Email sent successfully!");
-    // else alert("Email failed!");
-    console.log("Email payload:", payload);
+    console.log(res,
+      "response"
+    )
+    // const data = await res.json();
+    // console.log("Email send response:", data);
+    // // if (data.success) alert("Email sent successfully!");
+    // // else alert("Email failed!");
+    // console.log("Email payload:", payload);
+  }catch(e){
+    console.log(e,"error in email export")
+  }
   };
 
 
