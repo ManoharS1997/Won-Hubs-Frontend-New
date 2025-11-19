@@ -19,7 +19,6 @@ const FIELD_TYPES = [
   { value: "switch", label: "Toggle Switch" },
   { value: "multi-select", label: "Multi-Select" },
   { value: "file", label: "File Upload" },
-  { value: "image", label: "Image Upload" },
   { value: "signature", label: "Signature Pad" },
   { value: "color", label: "Color Picker" },
 ];
