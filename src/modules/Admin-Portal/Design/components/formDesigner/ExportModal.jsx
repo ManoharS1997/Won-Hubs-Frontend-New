@@ -10,14 +10,14 @@ export default function ExportModal({ open, onClose, onSelect }) {
 
         <div className="flex flex-col gap-3">
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-md"
+            className="!bg-blue-600 text-white px-4 py-2 rounded-md"
             onClick={() => onSelect("excel")}
           >
             Export as Excel
           </button>
 
           <button
-            className="bg-green-600 text-white px-4 py-2 rounded-md"
+            className="!bg-green-600 text-white px-4 py-2 rounded-md"
             onClick={() => onSelect("csv")}
           >
             Export as CSV

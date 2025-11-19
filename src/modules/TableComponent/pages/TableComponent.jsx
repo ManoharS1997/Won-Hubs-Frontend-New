@@ -606,8 +606,8 @@ export default function TableComponent({
         return <FlowStepComponent recordId={selectedTab} path='templates' />
       case 'designs':
         return <FormDesignerPage recordId={selectedTab} />
-      default:
-        return <DetailedView recordId={selectedTab} tableName={tableName} formData={formData} />
+      // default:
+      //   return <DetailedView recordId={selectedTab} tableName={tableName} formData={formData} />
 
       case "feedBack":
         return <CreateFeedBack2 recordId={selectedTab} />;

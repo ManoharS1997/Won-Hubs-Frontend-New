@@ -4,6 +4,11 @@ import PropTypes from "prop-types";
 import FormInput from "../../../../../shared/UIElements/FormInput";
 import * as XLSX from "xlsx";
 import ExportModal from "./ExportModal";
+import ExcelJS from "exceljs/dist/exceljs.min.js";
+import EmailModel from "./EmailModal";
+import Cookies from "js-cookie";
+
+import { saveAs } from "file-saver";
 
 function ItemCheck({ field, formValues, handleChange }) {
   const handleButtonClick = async () => {
@@ -198,8 +203,9 @@ export default function SourceForm({
 }) {
   const [formValues, setFormValues] = useState({});
   const [exportModalOpen, setExportModalOpen] = useState(false);
-
   const [loadingBtn, setLoadingBtn] = useState(null);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+
   const handleChange = (name, value) => {
     setFormValues((prev) => ({
       ...prev,
@@ -257,52 +263,150 @@ export default function SourceForm({
 
       const exportArray = [formattedData];
 
+      // if (exportType === "excel") {
+      //   const worksheet = XLSX.utils.aoa_to_sheet([]);
+
+      //   const headers = Object.keys(formattedData);
+      //   const values = Object.values(formattedData);
+
+      //   // Row 1 → Headers
+      //   headers.forEach((header, colIndex) => {
+      //     const cellRef = XLSX.utils.encode_cell({ r: 0, c: colIndex });
+
+      //     worksheet[cellRef] = {
+      //       t: "s",
+      //       v: header,
+      //       s: {
+      //         fill: { fgColor: { rgb: "DDEBF7" } },
+      //         font: { bold: true, color: { rgb: "000000" } },
+      //         alignment: { horizontal: "center" },
+      //       },
+      //     };
+      //   });
+
+      //   // Row 2 → Values (all text)
+      //   values.forEach((cellObj, colIndex) => {
+      //     const cellRef = XLSX.utils.encode_cell({ r: 1, c: colIndex });
+
+      //     worksheet[cellRef] = {
+      //       t: "s",
+      //       v: String(cellObj.v),
+      //     };
+      //   });
+
+      //   worksheet["!ref"] = XLSX.utils.encode_range({
+      //     s: { r: 0, c: 0 },
+      //     e: { r: 1, c: headers.length - 1 },
+      //   });
+
+      //   const workbook = XLSX.utils.book_new();
+      //   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+      //   XLSX.writeFile(
+      //     workbook,
+      //     `${systemFields.activeTable}_${systemFields.tabName}_export.xlsx`
+      //   );
+      //   return;
+      // }
       if (exportType === "excel") {
-        const worksheet = XLSX.utils.aoa_to_sheet([]);
+        try {
+          console.group("🔍 Excel Export Debugging");
 
-        const headers = Object.keys(formattedData);
-        const values = Object.values(formattedData);
+          // STEP 1 — Log formattedData
+          // console.log("formattedData =", formattedData);
 
-        // Row 1 → Headers
-        headers.forEach((header, colIndex) => {
-          const cellRef = XLSX.utils.encode_cell({ r: 0, c: colIndex });
+          const rawKeys = Object.keys(formattedData);
+          const rawValues = Object.values(formattedData);
 
-          worksheet[cellRef] = {
-            t: "s",
-            v: header,
-            s: {
-              fill: { fgColor: { rgb: "DDEBF7" } },
-              font: { bold: true, color: { rgb: "000000" } },
-              alignment: { horizontal: "center" },
-            },
+          // console.log("Headers =", rawKeys);
+          // console.log("Raw Values =", rawValues);
+
+          // STEP 2 — Safe extractor (to avoid undefined values)
+          const extractValue = (item) => {
+            if (item == null) return "";
+            if (typeof item === "string" || typeof item === "number") return String(item);
+            if (item.v !== undefined) return String(item.v);
+            if (item.value !== undefined) return String(item.value);
+            return JSON.stringify(item); // fallback for objects
           };
-        });
 
-        // Row 2 → Values (all text)
-        values.forEach((cellObj, colIndex) => {
-          const cellRef = XLSX.utils.encode_cell({ r: 1, c: colIndex });
+          const headers = rawKeys;
+          const values = rawValues.map(extractValue);
 
-          worksheet[cellRef] = {
-            t: "s",
-            v: String(cellObj.v),
-          };
-        });
+          console.log("Extracted Values =", values);
 
-        worksheet["!ref"] = XLSX.utils.encode_range({
-          s: { r: 0, c: 0 },
-          e: { r: 1, c: headers.length - 1 },
-        });
+          // STEP 3 — Create workbook
+          const workbook = new ExcelJS.Workbook();
+          const worksheet = workbook.addWorksheet("Sheet1");
 
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+          // STEP 4 — Add rows
+          worksheet.addRow(headers);
+          worksheet.addRow(values);
 
-        XLSX.writeFile(
-          workbook,
-          `${systemFields.activeTable}_${systemFields.tabName}_export.xlsx`
-        );
-        return;
+          // STEP 5 — Style header row
+          const headerRow = worksheet.getRow(1);
+          headerRow.height = 20;
+
+          headerRow.eachCell((cell) => {
+            cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 11 };
+            cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FF00215B" }
+            };
+            cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+            cell.border = {
+              top: { style: "thin" }, left: { style: "thin" },
+              bottom: { style: "thin" }, right: { style: "thin" }
+            };
+          });
+
+          // STEP 6 — Style data rows
+          worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+            if (rowNumber === 1) return;
+            row.eachCell((cell) => {
+              cell.border = {
+                top: { style: "thin" }, left: { style: "thin" },
+                bottom: { style: "thin" }, right: { style: "thin" }
+              };
+              cell.alignment = {
+                horizontal: "center",   // <-- ADD THIS
+                vertical: "middle",     // <-- better than "top" for neat look
+                wrapText: true
+              };
+            });
+          });
+
+          // STEP 7 — Auto column widths
+          worksheet.columns = headers.map((h, i) => ({
+            width: Math.max(h.length, (values[i] || "").length, 10) + 5
+          }));
+
+          console.log("Column Widths =", worksheet.columns);
+
+          // STEP 8 — Freeze header
+          worksheet.views = [{ state: "frozen", ySplit: 1 }];
+
+          // STEP 9 — Write file
+          workbook.xlsx.writeBuffer()
+            .then((buffer) => {
+              console.log("Excel file buffer created successfully.");
+              saveAs(new Blob([buffer]), `${systemFields.activeTable}_${systemFields.tabName}_export.xlsx`);
+              console.groupEnd();
+            })
+            .catch((err) => {
+              console.error("❌ Excel writeBuffer error:", err);
+              console.groupEnd();
+              alert("Export failed. Check console.");
+            });
+
+          return;
+
+        } catch (err) {
+          console.error("❌ Excel Export Critical Error:", err);
+          alert("Export failed. Check console.");
+        }
       }
-
       if (exportType === "csv") {
         const worksheet = XLSX.utils.json_to_sheet(exportArray);
         const csvOutput = XLSX.utils.sheet_to_csv(worksheet);
@@ -323,12 +427,71 @@ export default function SourceForm({
     }
   };
 
+  // Hereee
+  const sendEmailExport = async (userEmail) => {
+    const cleaned = { ...formValues };
+    delete cleaned.record_id;
+    delete cleaned.activeUserData;
+
+    const systemFields = {
+      activeTable,
+      tabName,
+      activeNav: localStorage.getItem("activeNav") || "",
+    };
+
+    const allowedFormKeys = formFields.map((f) => f.name);
+
+    const filtered = Object.keys(cleaned)
+      .filter((key) => allowedFormKeys.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = cleaned[key];
+        return obj;
+      }, {});
+
+    const finalData = {
+      "ACTIVE TABLE": systemFields.activeTable,
+      "TAB NAME": systemFields.tabName,
+      "ACTIVE NAV": systemFields.activeNav,
+      ...filtered,
+    };
+
+    const convertLabel = (key) =>
+      key
+        .replace(/([A-Z])/g, " $1")
+        .trim()
+        .toUpperCase();
+
+    const formattedData = {};
+    Object.keys(finalData).forEach((key) => {
+      formattedData[convertLabel(key)] = finalData[key];
+    });
+
+    const payload = {
+      email: userEmail,
+      rows: Object.entries(formattedData).map(([k, v]) => ({ column1: k, column2: v }))
+    };
+
+    const res = await fetch("/sendemails/export", {
+      method: "POST",
+      headers: { "Content-Type": "application/json",
+                 "Authorization": `Bearer ${Cookies.get("AccessToken")}` },
+
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    console.log("Email send response:", data);
+    // if (data.success) alert("Email sent successfully!");
+    // else alert("Email failed!");
+    console.log("Email payload:", payload);
+  };
+
+
   useEffect(() => {
     const fetchExistingData = async () => {
       try {
-        const endpoint = `${
-          import.meta.env.VITE_HOSTED_API_URL
-        }/api/form-designer/dynamic/get`;
+        const endpoint = `${import.meta.env.VITE_HOSTED_API_URL
+          }/api/form-designer/dynamic/get`;
 
         const params = {
           activeTable,
@@ -383,25 +546,25 @@ export default function SourceForm({
     fetchExistingData();
   }, [activeTable, tabName]);
 
+
   const handleButtonClick = (btn) => {
     if (btn.label?.toLowerCase() === "export") {
       setExportModalOpen(true); // Open modal
       return;
     }
-
     if (btn.label?.toLowerCase() === "email") {
-      alert("Email functionality will be added later.");
+      setEmailModalOpen(true);
       return;
     }
+
 
     if (!btn.apiEndpoint) return;
 
     try {
       setLoadingBtn(btn._id);
       const method = btn.apiMethod?.toUpperCase() || "POST";
-      const endpoint = `${import.meta.env.VITE_HOSTED_API_URL}${
-        btn.apiEndpoint
-      }`;
+      const endpoint = `${import.meta.env.VITE_HOSTED_API_URL}${btn.apiEndpoint
+        }`;
 
       let response;
       if (method === "GET") response = axios.get(endpoint);
@@ -442,6 +605,12 @@ export default function SourceForm({
         onClose={() => setExportModalOpen(false)}
         onSelect={handleExportSelect}
       />
+      <EmailModel
+        open={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        onSelect={sendEmailExport}
+      />
+
       {/* Form Buttons */}
       {formButtons.length > 0 && (
         <div className="w-full flex mt-8 gap-4 flex-wrap justify-end">
@@ -451,11 +620,10 @@ export default function SourceForm({
               type={btn.type || "button"}
               onClick={() => handleButtonClick(btn)}
               disabled={loadingBtn === btn._id}
-              className={`px-6 py-2 text-white rounded transition-all ${
-                loadingBtn === btn._id
-                  ? "!bg-gray-400 cursor-not-allowed"
-                  : "!bg-blue-600 hover:bg-blue-700"
-              }`}
+              className={`px-6 py-2 text-white rounded transition-all ${loadingBtn === btn._id
+                ? "!bg-gray-400 cursor-not-allowed"
+                : "!bg-blue-600 hover:!bg-blue-700"
+                }`}
             >
               {loadingBtn === btn._id ? "Processing..." : btn.label}
             </button>
