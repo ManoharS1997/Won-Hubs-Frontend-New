@@ -27,11 +27,11 @@ const PREDEFINED_BUTTONS = [
   { type: "export", label: "Export" },
 ];
 
-const TABLE_ACTIONS = [
-  { type: "edit", label: "Edit" },
-  { type: "delete", label: "Delete" },
-  { type: "view", label: "View" },
-];
+// const TABLE_ACTIONS = [
+//   { type: "edit", label: "Edit" },
+//   { type: "delete", label: "Delete" },
+//   { type: "view", label: "View" },
+// ];
 
 const fieldTypesWithOptions = ["dropdown", "radio", "checkbox"];
 function fieldSupportsOptions(type) {
@@ -142,7 +142,7 @@ function Tab({
   openAddFieldModal,
   addTabColumn,
   removeTab,
-  addCustomButton,
+  // addCustomButton,
   toggleRequired,
 }) {
   return (
@@ -554,7 +554,7 @@ function TabsDesigner({
   onDrop,
   allowDrop,
   removeTab,
-  updateTabFilters,
+  // updateTabFilters,
   addCustomButton,
   toggleRequired,
 }) {
