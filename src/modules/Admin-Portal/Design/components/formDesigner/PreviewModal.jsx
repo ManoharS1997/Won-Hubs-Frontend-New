@@ -193,10 +193,10 @@ export default function PreviewModal({
         // selectedViews: previousFieldsData?.selectedViews,
         // widgetname: previousFieldsData?.widgetname,
         // selectedDepartments: state?.selectedDepartments,
-        departName: previousFieldsData.department.value,
+        departName: previousFieldsData?.department.value,
         category: previousFieldsData?.category?.value,
         selectedViews: previousFieldsData?.views?.value,
-        widgetname: previousFieldsData?.widgetname?.value||null,
+        widgetname: previousFieldsData?.widgetname?.value || null,
         selectedDepartments: state?.selectedDepartments?.value,
       };
 
@@ -209,6 +209,7 @@ export default function PreviewModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      console.log(res, "Response Here");
 
       if (!res.ok) throw new Error("Failed to save form");
       await res.json();
