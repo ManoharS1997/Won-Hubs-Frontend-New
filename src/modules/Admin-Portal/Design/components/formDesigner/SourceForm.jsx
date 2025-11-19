@@ -203,6 +203,7 @@ export default function SourceForm({
 }) {
   const [formValues, setFormValues] = useState({});
   const [exportModalOpen, setExportModalOpen] = useState(false);
+
   const [loadingBtn, setLoadingBtn] = useState(null);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
 
@@ -214,6 +215,7 @@ export default function SourceForm({
       tabName,
       activeNav: localStorage.getItem("activeNav"),
       activeUserData: localStorage.getItem("activeUserData"),
+      userId: JSON.parse(localStorage.getItem("activeUserData"))?.id,
     }));
   };
 
@@ -500,24 +502,21 @@ const url=`${import.meta.env.VITE_HOSTED_API_URL}/sendemails/export`;
         const endpoint = `${import.meta.env.VITE_HOSTED_API_URL
           }/api/form-designer/dynamic/get`;
 
+        const activeUser = JSON.parse(localStorage.getItem("activeUserData"));
+        const userId = activeUser?.id;
+
         const params = {
           activeTable,
           tabName,
           activeNav: localStorage.getItem("activeNav"),
+          userId,
         };
-
-        const user = localStorage.getItem("activeUserData");
-        if (user) {
-          const parsedUser = JSON.parse(user);
-          if (parsedUser?.id) params.userId = parsedUser.id;
-        }
 
         const response = await axios.get(endpoint, { params });
 
-        if (response.data?.success && response.data.data.length > 0) {
-          const saved = response.data.data[0];
+        if (response.data?.success && response.data.data) {
+          const saved = response.data.data;
 
-          // convert JSON-like columns
           const cleaned = {};
           Object.entries(saved).forEach(([key, value]) => {
             try {
@@ -527,10 +526,9 @@ const url=`${import.meta.env.VITE_HOSTED_API_URL}/sendemails/export`;
             }
           });
 
-          // 🔥 FILTER USING formFields list
           const allowedKeys = formFields.map((f) => f.name);
 
-          const filteredSavedValues = Object.keys(cleaned)
+          const filtered = Object.keys(cleaned)
             .filter((key) => allowedKeys.includes(key))
             .reduce((obj, key) => {
               obj[key] = cleaned[key];
@@ -538,11 +536,12 @@ const url=`${import.meta.env.VITE_HOSTED_API_URL}/sendemails/export`;
             }, {});
 
           setFormValues({
-            ...filteredSavedValues,
+            ...filtered,
             activeTable,
             tabName,
-            activeNav: localStorage.getItem("activeNav"),
+            activeNav: params.activeNav,
             activeUserData: localStorage.getItem("activeUserData"),
+            record_id: saved.record_id,
           });
         }
       } catch (error) {
@@ -552,37 +551,126 @@ const url=`${import.meta.env.VITE_HOSTED_API_URL}/sendemails/export`;
 
     fetchExistingData();
   }, [activeTable, tabName]);
+console.log(formValues,"formvalues")
 
+  const handleButtonClick = async (btn) => {
+    const label = btn.label?.toLowerCase?.().trim();
 
-  const handleButtonClick = (btn) => {
-    if (btn.label?.toLowerCase() === "export") {
-      setExportModalOpen(true); // Open modal
+    // Export modal / Email handling unchanged
+    if (label === "export") {
+      setExportModalOpen(true);
       return;
     }
-    if (btn.label?.toLowerCase() === "email") {
-      setEmailModalOpen(true);
+    if (label === "email") {
+      alert("Email will be added later");
       return;
     }
 
-
-    if (!btn.apiEndpoint) return;
+    if (!btn.apiEndpoint) {
+      console.warn("No API endpoint on button", btn);
+      return;
+    }
 
     try {
       setLoadingBtn(btn._id);
-      const method = btn.apiMethod?.toUpperCase() || "POST";
-      const endpoint = `${import.meta.env.VITE_HOSTED_API_URL}${btn.apiEndpoint
-        }`;
 
-      let response;
-      if (method === "GET") response = axios.get(endpoint);
-      if (method === "POST") response = axios.post(endpoint, formValues);
-      if (method === "PUT") response = axios.put(endpoint, formValues);
-      if (method === "DELETE") response = axios.delete(endpoint);
+      // Build base payload from current form values
+      // (make a shallow clone to avoid mutating original)
+      const payload = { ...(formValues || {}) };
 
-      alert(`${btn.label} successful!`);
+      console.log(payload, "ninounounbuo")
+
+      // Ensure system fields exist — get from local state / localStorage
+      payload.activeTable = activeTable; // from props/state
+      payload.tabName = tabName; // from props/state
+      payload.activeNav =
+        localStorage.getItem("activeNav") || payload.activeNav || ""; // best-effort
+      payload.activeUserData =
+        localStorage.getItem("activeUserData") || payload.activeUserData || "";
+      try {
+        payload.userId =
+          JSON.parse(payload.activeUserData || "{}")?.id ||
+          payload.userId ||
+          null;
+      } catch {
+        payload.userId = payload.userId || null;
+      }
+
+      // If record_id exists in formValues (from edit), keep it
+      if (formValues?.record_id) payload.record_id = formValues.record_id;
+
+      // LOG payload so you can inspect what's actually being sent
+      console.log("Submitting payload:", payload);
+
+      const method = (btn.apiMethod || "POST").toUpperCase();
+      const endpoint = `${import.meta.env.VITE_HOSTED_API_URL}${
+        btn.apiEndpoint
+      }`;
+
+      console.log(payload,"pppppiiiii")
+
+      // Detect files/blobs in payload -> if any, use FormData
+      const hasFile = Object.values(payload).some(
+        (v) =>
+          (typeof File !== "undefined" && v instanceof File) ||
+          (typeof Blob !== "undefined" && v instanceof Blob)
+      );
+
+      console.log(hasFile,"pppppppppppppppppppp")
+
+      let axiosConfig = { method, url: endpoint, timeout: 120000 };
+
+      if (hasFile) {
+        // Build FormData, append files and other fields
+        const fd = new FormData();
+        Object.entries(payload).forEach(([k, v]) => {
+          if (
+            (typeof File !== "undefined" && v instanceof File) ||
+            (typeof Blob !== "undefined" && v instanceof Blob)
+          ) {
+            fd.append(k, v);
+          } else {
+            // append non-file as string
+            // IMPORTANT: for arrays/objects it's safer to stringify so backend can detect JSON
+            if (typeof v === "object") fd.append(k, JSON.stringify(v));
+            else if (v !== undefined && v !== null) fd.append(k, String(v));
+            else fd.append(k, ""); // keep the column present
+          }
+        });
+
+        axiosConfig.data = fd;
+        axiosConfig.headers = { "Content-Type": "multipart/form-data" };
+      } else {
+        // No files -> send JSON body for POST/PUT/DELETE; GET uses params
+        if (method === "GET") {
+          axiosConfig.params = payload;
+        } else if (method === "DELETE") {
+          // axios.delete takes data via config.data
+          axiosConfig.data = payload;
+        } else {
+          axiosConfig.data = payload;
+        }
+      }
+
+      // Perform request
+      const resp = await axios(axiosConfig);
+
+      console.log("API response:", resp?.data);
+
+      if (resp?.data?.success) {
+        alert(`${btn.label} successful`);
+        // optionally update form state with returned data
+        // e.g. if API returns record_id you can set it: setFormValues(prev=>({...prev, record_id: resp.data.record_id}))
+      } else {
+        const msg = resp?.data?.message || "Unknown response from server";
+        alert(`${btn.label} responded: ${msg}`);
+      }
     } catch (err) {
-      console.error(err);
-      alert("API call failed.");
+      console.error("API error:", err);
+      // if server returned body, show that, else generic message
+      const serverMsg =
+        err?.response?.data?.message || err?.message || "API call failed";
+      alert(serverMsg);
     } finally {
       setLoadingBtn(null);
     }
