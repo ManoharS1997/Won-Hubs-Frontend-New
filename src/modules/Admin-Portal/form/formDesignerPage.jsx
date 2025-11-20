@@ -219,19 +219,27 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
 
   const getRecordDetails = async () => {
     if (!recordId) return;
-    const url = `${
-      import.meta.env.VITE_HOSTED_API_URL
-    }/api/form-designer/${recordId}`;
+    const url = `${import.meta.env.VITE_HOSTED_API_URL
+      }/api/form-designer/${recordId}`;
     const response = await fetch(url);
     // console.log(response,"Record Response");
     const dbResponse = await response.json();
     console.log(dbResponse, "DbResponse Hereee");
     if (dbResponse.data) {
-      const { formFields, formButtons, tabs, module } = dbResponse.data;
+      const { formFields, formButtons, tabs, module, category, subCategory, widgetname, views, departName,designName} = dbResponse.data;
       setFormFields(formFields);
       setFormButtons(formButtons);
       setTabs(tabs);
       setModule(module);
+      const previousData = {
+        category: category || null,
+        subCategory: subCategory || null,
+        widgetname: widgetname || null,
+        views: views || null,
+        department: departName || null,
+        name:designName||null
+      }
+      setPreviousFieldsData(previousData)
     }
   };
 
@@ -271,6 +279,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                       setShowTabs(false);
                       setShowPreview(false);
                     }}
+
                   >
                     Create
                   </TabItem>
@@ -449,11 +458,12 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                   state={state}
                   recordId={recordId}
                   previousFieldsData={previousFieldsData}
+                  widgetName="Desktop"
                 />
               </section>
             )}
 
-            {showCreate && (<Fields path="formDesigner" />)}
+            {showCreate && (<Fields path="formDesigner" data={previousFieldsData} />)}
           </div>
         </div>
       </div>
