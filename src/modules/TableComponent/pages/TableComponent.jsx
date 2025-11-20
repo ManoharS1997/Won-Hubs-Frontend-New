@@ -8,6 +8,7 @@ import {
   DeleteRecord,
 } from "../../../utils/CheckAndExecuteFlows/CRUDoperations";
 // import { Tooltip } from 'react-tooltip';
+import PropTypes from "prop-types";
 
 import Checkbox from "@mui/material/Checkbox";
 
@@ -36,8 +37,8 @@ import ConfigureFields from "../../Admin-Portal/ConfigureFields/pages/ConfigureF
 import DetailedView from "../../Admin-Portal/DetailedView/pages/DetailedView";
 import ExportData from "../../../shared/components/ExportTableData";
 import MoreOptions from "../components/MoreOptions";
-import CreateNotification from "../../Admin-Portal/Notifications/pages/CreateNotification";
-import CreateTemplate from "../../Admin-Portal/Templates/pages/CreateTemplate";
+// import CreateNotification from "../../Admin-Portal/Notifications/pages/CreateNotification";
+// import CreateTemplate from "../../Admin-Portal/Templates/pages/CreateTemplate";
 import {
   TableContainer,
   CustomTable,
@@ -46,43 +47,43 @@ import {
   CustomTr,
   CustomTbody,
   CustomTd,
-  CheckBoxTag,
+  // CheckBoxTag,
   MainContainer,
   ConfigureButton,
   BackBtn,
   HeaderContainer,
   TitleContainer,
   FilterBtn,
-  MultiLevelDropdownContainer,
+  // MultiLevelDropdownContainer,
   DropdownToggle,
-  DropdownMenu,
-  MenuItem,
-  SubMenu,
-  SubMenuItem,
+  // DropdownMenu,
+  // MenuItem,
+  // SubMenu,
+  // SubMenuItem,
   ActionsContainer,
   SearchInput,
   FilterContainer,
-  FiltersContainer,
-  SearchContainer,
+  // FiltersContainer,
+  // SearchContainer,
   OrBtn,
   AndBtn,
   AndOrBtnClose,
-  ReloadBtn,
+  // ReloadBtn,
   TableFooter,
   PaginationBtnsContainer,
   PaginationArrBtn,
   ColumnOptions,
-  HeadTr,
+  // HeadTr,
   ThContent,
-  ColumnOptionsPopup,
+  // ColumnOptionsPopup,
   SortOptBtn,
   ClearSortingsBtn,
   RowActionsContainer,
   RowActionBtn,
 } from "./StyledComponents";
-import CreateAlerts from "../../Admin-Portal/Alerts/pages/CreateAlerts";
-import CreateFeedback from "../../Admin-Portal/Feedback/pages/CreateFeedback";
-import { selectedGridRowsCountSelector } from "@mui/x-data-grid";
+// import CreateAlerts from "../../Admin-Portal/Alerts/pages/CreateAlerts";
+// import CreateFeedback from "../../Admin-Portal/Feedback/pages/CreateFeedback";
+// import { selectedGridRowsCountSelector } from "@mui/x-data-grid";
 import FormDesignerPage from "../../Admin-Portal/form/formDesignerPage";
 import CreateFeedBack2 from "../../Admin-Portal/Feedback/pages/CreateFeedBack2";
 import FlowStepComponent from "../../Admin-Portal/Templates/pages/FlowStep";
@@ -131,6 +132,25 @@ const selectCustomStyles = {
   }),
 };
 
+TableComponent.propTypes = {
+  recordsPerPage: PropTypes.any.isRequired,
+  allowDeleting: PropTypes.any.isRequired,
+  activeTable: PropTypes.any.isRequired,
+  createNewPath: PropTypes.any.isRequired,
+  id: PropTypes.any.isRequired,
+  tableData: PropTypes.any.isRequired,
+  TableColumnNames: PropTypes.any.isRequired,
+  setTableColumnNames: PropTypes.any.isRequired,
+  showConfigurefieldsBtn: PropTypes.any.isRequired,
+  selectedRows: PropTypes.any.isRequired,
+  tableName: PropTypes.any.isRequired,
+  title: PropTypes.any.isRequired,
+  fetchTableData: PropTypes.any.isRequired,
+  rdtColValue: PropTypes.any.isRequired,
+  redirectionPath: PropTypes.any.isRequired,
+  formData: PropTypes.any.isRequired,
+};
+
 export default function TableComponent({
   // selectedColumns,
   // filteredData,
@@ -140,9 +160,9 @@ export default function TableComponent({
   id,
   tableData,
   TableColumnNames,
-  setTableColumnNames,
+  // setTableColumnNames,
   showConfigurefieldsBtn,
-  selectedRows,
+  // selectedRows,
   tableName,
   title,
   fetchTableData,
@@ -200,7 +220,7 @@ export default function TableComponent({
 
   console.log(formData, "====");
 
-  const SelectedRowActionsList = ["Delete", "Mark As Favorite", "Move", "Copy"];
+  // const SelectedRowActionsList = ["Delete", "Mark As Favorite", "Move", "Copy"];
 
   const convertName = (name) => {
     const nameArr = name.split("_");
@@ -210,15 +230,15 @@ export default function TableComponent({
     return convertedName.join(" ");
   };
 
-  const OnSelectedRowActions = (action) => {
-    if (action === "Delete") {
-      const x = recievedTableData.filter(
-        (item) => !selectedRows.includes(item.ticket_id)
-      );
-      setTableData(x);
-    }
-    // setIsAllCheckBoxActive(false);
-  };
+  // const OnSelectedRowActions = (action) => {
+  //   if (action === "Delete") {
+  //     const x = recievedTableData.filter(
+  //       (item) => !selectedRows.includes(item.ticket_id)
+  //     );
+  //     setTableData(x);
+  //   }
+  //   // setIsAllCheckBoxActive(false);
+  // };
 
   const updateSelectedColumns = async () => {
     if (selectedColumns.length > 0) {
@@ -590,32 +610,26 @@ export default function TableComponent({
         return true;
     }
   }
+
   const renderTabView = (tableName) => {
-    // console.log(tableName,"@@@")
-    // console.log(selectedTab, tableName, "###")
     switch (tableName) {
       case "notifications":
-        return <FlowStepComponent recordId={selectedTab} path="notifications" />
-      case 'alerts':
-        return <FlowStepComponent recordId={selectedTab} path='alerts' />
+        return (
+          <FlowStepComponent recordId={selectedTab} path="notifications" />
+        );
 
-      case 'feedBack':
-        return <FlowStepComponent recordId={selectedTab} path='feedback' />
-
-      case 'templates':
-        return <FlowStepComponent recordId={selectedTab} path='templates' />
-      case 'designs':
-        return <FormDesignerPage recordId={selectedTab} />
-      // default:
-      //   return <DetailedView recordId={selectedTab} tableName={tableName} formData={formData} />
+      case "alerts":
+        return <FlowStepComponent recordId={selectedTab} path="alerts" />;
 
       case "feedBack":
-        // show feedback detail/editor component
         return <CreateFeedBack2 recordId={selectedTab} />;
+
       case "templates":
         return <FlowStepComponent recordId={selectedTab} path="templates" />;
+
       case "designs":
         return <FormDesignerPage recordId={selectedTab} />;
+
       default:
         return (
           <DetailedView

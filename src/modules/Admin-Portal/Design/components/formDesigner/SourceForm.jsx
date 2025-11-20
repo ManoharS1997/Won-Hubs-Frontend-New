@@ -29,7 +29,6 @@ function ItemCheck({ field, formValues, handleChange }) {
   };
 
   switch (field?.type) {
-    // 📘 Standard Input Fields
     case "text":
     case "email":
     case "password":
@@ -162,9 +161,7 @@ function ItemCheck({ field, formValues, handleChange }) {
           </div>
         </fieldset>
       );
-
     case "file":
-    case "image":
       return (
         <div className="flex flex-col gap-1">
           <label className="font-medium">{field?.label}</label>
@@ -194,7 +191,6 @@ function ItemCheck({ field, formValues, handleChange }) {
   }
 }
 
-// ✅ Parent form with all logic intact
 export default function SourceForm({
   formFields = [],
   formButtons = [],
@@ -211,11 +207,6 @@ export default function SourceForm({
     setFormValues((prev) => ({
       ...prev,
       [name]: value,
-      activeTable,
-      tabName,
-      activeNav: localStorage.getItem("activeNav"),
-      activeUserData: localStorage.getItem("activeUserData"),
-      userId: JSON.parse(localStorage.getItem("activeUserData"))?.id,
     }));
   };
 
@@ -265,68 +256,14 @@ export default function SourceForm({
 
       const exportArray = [formattedData];
 
-      // if (exportType === "excel") {
-      //   const worksheet = XLSX.utils.aoa_to_sheet([]);
-
-      //   const headers = Object.keys(formattedData);
-      //   const values = Object.values(formattedData);
-
-      //   // Row 1 → Headers
-      //   headers.forEach((header, colIndex) => {
-      //     const cellRef = XLSX.utils.encode_cell({ r: 0, c: colIndex });
-
-      //     worksheet[cellRef] = {
-      //       t: "s",
-      //       v: header,
-      //       s: {
-      //         fill: { fgColor: { rgb: "DDEBF7" } },
-      //         font: { bold: true, color: { rgb: "000000" } },
-      //         alignment: { horizontal: "center" },
-      //       },
-      //     };
-      //   });
-
-      //   // Row 2 → Values (all text)
-      //   values.forEach((cellObj, colIndex) => {
-      //     const cellRef = XLSX.utils.encode_cell({ r: 1, c: colIndex });
-
-      //     worksheet[cellRef] = {
-      //       t: "s",
-      //       v: String(cellObj.v),
-      //     };
-      //   });
-
-      //   worksheet["!ref"] = XLSX.utils.encode_range({
-      //     s: { r: 0, c: 0 },
-      //     e: { r: 1, c: headers.length - 1 },
-      //   });
-
-      //   const workbook = XLSX.utils.book_new();
-      //   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
-      //   XLSX.writeFile(
-      //     workbook,
-      //     `${systemFields.activeTable}_${systemFields.tabName}_export.xlsx`
-      //   );
-      //   return;
-      // }
       if (exportType === "excel") {
         try {
-          console.group("🔍 Excel Export Debugging");
-
-          // STEP 1 — Log formattedData
-          // console.log("formattedData =", formattedData);
-
           const rawKeys = Object.keys(formattedData);
           const rawValues = Object.values(formattedData);
-
-          // console.log("Headers =", rawKeys);
-          // console.log("Raw Values =", rawValues);
-
-          // STEP 2 — Safe extractor (to avoid undefined values)
           const extractValue = (item) => {
             if (item == null) return "";
-            if (typeof item === "string" || typeof item === "number") return String(item);
+            if (typeof item === "string" || typeof item === "number")
+              return String(item);
             if (item.v !== undefined) return String(item.v);
             if (item.value !== undefined) return String(item.value);
             return JSON.stringify(item); // fallback for objects
@@ -334,18 +271,12 @@ export default function SourceForm({
 
           const headers = rawKeys;
           const values = rawValues.map(extractValue);
-
-          console.log("Extracted Values =", values);
-
-          // STEP 3 — Create workbook
           const workbook = new ExcelJS.Workbook();
           const worksheet = workbook.addWorksheet("Sheet1");
 
-          // STEP 4 — Add rows
           worksheet.addRow(headers);
           worksheet.addRow(values);
 
-          // STEP 5 — Style header row
           const headerRow = worksheet.getRow(1);
           headerRow.height = 20;
 
@@ -354,58 +285,60 @@ export default function SourceForm({
             cell.fill = {
               type: "pattern",
               pattern: "solid",
-              fgColor: { argb: "FF00215B" }
+              fgColor: { argb: "FF00215B" },
             };
-            cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+            cell.alignment = {
+              horizontal: "center",
+              vertical: "middle",
+              wrapText: true,
+            };
             cell.border = {
-              top: { style: "thin" }, left: { style: "thin" },
-              bottom: { style: "thin" }, right: { style: "thin" }
+              top: { style: "thin" },
+              left: { style: "thin" },
+              bottom: { style: "thin" },
+              right: { style: "thin" },
             };
           });
 
-          // STEP 6 — Style data rows
           worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
             if (rowNumber === 1) return;
             row.eachCell((cell) => {
               cell.border = {
-                top: { style: "thin" }, left: { style: "thin" },
-                bottom: { style: "thin" }, right: { style: "thin" }
+                top: { style: "thin" },
+                left: { style: "thin" },
+                bottom: { style: "thin" },
+                right: { style: "thin" },
               };
               cell.alignment = {
-                horizontal: "center",   // <-- ADD THIS
-                vertical: "middle",     // <-- better than "top" for neat look
-                wrapText: true
+                horizontal: "center", // <-- ADD THIS
+                vertical: "middle", // <-- better than "top" for neat look
+                wrapText: true,
               };
             });
           });
 
-          // STEP 7 — Auto column widths
           worksheet.columns = headers.map((h, i) => ({
-            width: Math.max(h.length, (values[i] || "").length, 10) + 5
+            width: Math.max(h.length, (values[i] || "").length, 10) + 5,
           }));
 
-          console.log("Column Widths =", worksheet.columns);
-
-          // STEP 8 — Freeze header
           worksheet.views = [{ state: "frozen", ySplit: 1 }];
 
-          // STEP 9 — Write file
-          workbook.xlsx.writeBuffer()
+          workbook.xlsx
+            .writeBuffer()
             .then((buffer) => {
-              console.log("Excel file buffer created successfully.");
-              saveAs(new Blob([buffer]), `${systemFields.activeTable}_${systemFields.tabName}_export.xlsx`);
+              saveAs(
+                new Blob([buffer]),
+                `${systemFields.activeTable}_${systemFields.tabName}_export.xlsx`
+              );
               console.groupEnd();
             })
-            .catch((err) => {
-              console.error("❌ Excel writeBuffer error:", err);
+            .catch(() => {
               console.groupEnd();
               alert("Export failed. Check console.");
             });
 
           return;
-
         } catch (err) {
-          console.error("❌ Excel Export Critical Error:", err);
           alert("Export failed. Check console.");
         }
       }
@@ -429,9 +362,7 @@ export default function SourceForm({
     }
   };
 
-  // Hereee
   const sendEmailExport = async (userEmail) => {
-    console.log("Email to send export to:", userEmail);
     const cleaned = { ...formValues };
     delete cleaned.record_id;
     delete cleaned.activeUserData;
@@ -468,39 +399,35 @@ export default function SourceForm({
     Object.keys(finalData).forEach((key) => {
       formattedData[convertLabel(key)] = finalData[key];
     });
-    try{
+    try {
+      const payload = {
+        email: userEmail,
+        rows: Object.entries(formattedData).map(([k, v]) => ({
+          column1: k,
+          column2: v,
+        })),
+      };
+      const url = `${import.meta.env.VITE_HOSTED_API_URL}/sendemails/export`;
+      await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("AccessToken")}`,
+        },
 
-    const payload = {
-      email: userEmail,
-      rows: Object.entries(formattedData).map(([k, v]) => ({ column1: k, column2: v }))
-    };
-const url=`${import.meta.env.VITE_HOSTED_API_URL}/sendemails/export`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json",
-                 "Authorization": `Bearer ${Cookies.get("AccessToken")}` },
-
-      body: JSON.stringify(payload)
-    });
-    console.log(res,
-      "response"
-    )
-    // const data = await res.json();
-    // console.log("Email send response:", data);
-    // // if (data.success) alert("Email sent successfully!");
-    // // else alert("Email failed!");
-    // console.log("Email payload:", payload);
-  }catch(e){
-    console.log(e,"error in email export")
-  }
+        body: JSON.stringify(payload),
+      });
+    } catch (e) {
+      console.log(e, "error in email export");
+    }
   };
-
 
   useEffect(() => {
     const fetchExistingData = async () => {
       try {
-        const endpoint = `${import.meta.env.VITE_HOSTED_API_URL
-          }/api/form-designer/dynamic/get`;
+        const endpoint = `${
+          import.meta.env.VITE_HOSTED_API_URL
+        }/api/form-designer/dynamic/get`;
 
         const activeUser = JSON.parse(localStorage.getItem("activeUserData"));
         const userId = activeUser?.id;
@@ -551,126 +478,92 @@ const url=`${import.meta.env.VITE_HOSTED_API_URL}/sendemails/export`;
 
     fetchExistingData();
   }, [activeTable, tabName]);
-console.log(formValues,"formvalues")
 
   const handleButtonClick = async (btn) => {
-    const label = btn.label?.toLowerCase?.().trim();
+    const label = btn.label?.toLowerCase();
 
-    // Export modal / Email handling unchanged
     if (label === "export") {
       setExportModalOpen(true);
       return;
     }
+
     if (label === "email") {
-      alert("Email will be added later");
+      alert("Email coming soon.");
       return;
     }
 
     if (!btn.apiEndpoint) {
-      console.warn("No API endpoint on button", btn);
+      alert("Button has no API endpoint.");
       return;
     }
 
     try {
       setLoadingBtn(btn._id);
 
-      // Build base payload from current form values
-      // (make a shallow clone to avoid mutating original)
-      const payload = { ...(formValues || {}) };
+      const payload = {
+        ...formValues,
+        activeTable,
+        tabName,
+        activeNav: localStorage.getItem("activeNav"),
+        userId: JSON.parse(localStorage.getItem("activeUserData"))?.id,
+        activeUserData: localStorage.getItem("activeUserData"),
+      };
 
-      console.log(payload, "ninounounbuo")
-
-      // Ensure system fields exist — get from local state / localStorage
-      payload.activeTable = activeTable; // from props/state
-      payload.tabName = tabName; // from props/state
-      payload.activeNav =
-        localStorage.getItem("activeNav") || payload.activeNav || ""; // best-effort
-      payload.activeUserData =
-        localStorage.getItem("activeUserData") || payload.activeUserData || "";
-      try {
-        payload.userId =
-          JSON.parse(payload.activeUserData || "{}")?.id ||
-          payload.userId ||
-          null;
-      } catch {
-        payload.userId = payload.userId || null;
-      }
-
-      // If record_id exists in formValues (from edit), keep it
-      if (formValues?.record_id) payload.record_id = formValues.record_id;
-
-      // LOG payload so you can inspect what's actually being sent
-      console.log("Submitting payload:", payload);
+      const hasFile = Object.values(payload).some(
+        (v) => v instanceof File || v instanceof Blob
+      );
 
       const method = (btn.apiMethod || "POST").toUpperCase();
       const endpoint = `${import.meta.env.VITE_HOSTED_API_URL}${
         btn.apiEndpoint
       }`;
 
-      console.log(payload,"pppppiiiii")
-
-      // Detect files/blobs in payload -> if any, use FormData
-      const hasFile = Object.values(payload).some(
-        (v) =>
-          (typeof File !== "undefined" && v instanceof File) ||
-          (typeof Blob !== "undefined" && v instanceof Blob)
-      );
-
-      console.log(hasFile,"pppppppppppppppppppp")
-
-      let axiosConfig = { method, url: endpoint, timeout: 120000 };
+      let config = { url: endpoint, method };
 
       if (hasFile) {
-        // Build FormData, append files and other fields
-        const fd = new FormData();
-        Object.entries(payload).forEach(([k, v]) => {
-          if (
-            (typeof File !== "undefined" && v instanceof File) ||
-            (typeof Blob !== "undefined" && v instanceof Blob)
-          ) {
-            fd.append(k, v);
-          } else {
-            // append non-file as string
-            // IMPORTANT: for arrays/objects it's safer to stringify so backend can detect JSON
-            if (typeof v === "object") fd.append(k, JSON.stringify(v));
-            else if (v !== undefined && v !== null) fd.append(k, String(v));
-            else fd.append(k, ""); // keep the column present
-          }
-        });
+        // const fd = new FormData();
+console.log(payload)
+        // Object.entries(payload).forEach(([key, value]) => {
+        //   if (value === undefined || value === null) {
+        //     fd.append(key, "");
+        //     return;
+        //   }
 
-        axiosConfig.data = fd;
-        axiosConfig.headers = { "Content-Type": "multipart/form-data" };
+        //   if (value instanceof File || value instanceof Blob) {
+        //     fd.append(key, value);
+        //     return;
+        //   }
+
+        //   if (typeof value === "object") {
+        //     if (Array.isArray(value)) {
+        //       fd.append(key, JSON.stringify(value));
+        //     } else if (Object.keys(value).length === 0) {
+        //       return;
+        //     } else {
+        //       fd.append(key, JSON.stringify(value));
+        //     }
+        //     return;
+        //   }
+
+        //   // 4) Everything else → string
+        //   fd.append(key, String(value));
+        // });
+
+        config.data = payload;
+        config.headers = {
+          "Content-Type": "multipart/form-data",
+        };
       } else {
-        // No files -> send JSON body for POST/PUT/DELETE; GET uses params
-        if (method === "GET") {
-          axiosConfig.params = payload;
-        } else if (method === "DELETE") {
-          // axios.delete takes data via config.data
-          axiosConfig.data = payload;
-        } else {
-          axiosConfig.data = payload;
-        }
+        config.data = payload;
       }
 
-      // Perform request
-      const resp = await axios(axiosConfig);
+      console.log(config)
+      const resp = await axios(config);
 
-      console.log("API response:", resp?.data);
-
-      if (resp?.data?.success) {
-        alert(`${btn.label} successful`);
-        // optionally update form state with returned data
-        // e.g. if API returns record_id you can set it: setFormValues(prev=>({...prev, record_id: resp.data.record_id}))
-      } else {
-        const msg = resp?.data?.message || "Unknown response from server";
-        alert(`${btn.label} responded: ${msg}`);
-      }
+      if (resp?.data?.success) alert(`${btn.label} successful!`);
+      else alert(resp?.data?.message || "API Unknown Error");
     } catch (err) {
-      console.error("API error:", err);
-      // if server returned body, show that, else generic message
-      const serverMsg =
-        err?.response?.data?.message || err?.message || "API call failed";
-      alert(serverMsg);
+      alert(err?.response?.data?.message || err.message);
     } finally {
       setLoadingBtn(null);
     }
@@ -715,10 +608,11 @@ console.log(formValues,"formvalues")
               type={btn.type || "button"}
               onClick={() => handleButtonClick(btn)}
               disabled={loadingBtn === btn._id}
-              className={`px-6 py-2 text-white rounded transition-all ${loadingBtn === btn._id
-                ? "!bg-gray-400 cursor-not-allowed"
-                : "!bg-blue-600 hover:!bg-blue-700"
-                }`}
+              className={`px-6 py-2 text-white rounded transition-all ${
+                loadingBtn === btn._id
+                  ? "!bg-gray-400 cursor-not-allowed"
+                  : "!bg-blue-600 hover:!bg-blue-700"
+              }`}
             >
               {loadingBtn === btn._id ? "Processing..." : btn.label}
             </button>
