@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineSwap } from "react-icons/ai"; // or MdSwapHoriz / HiOutlineSwitchHorizontal
 import { useNavigate } from "react-router-dom";
 
@@ -11,17 +11,33 @@ export default function PreviewModal({
   tabs,
   state,
   recordId,
-  previousFieldsData
+  previousFieldsData,
+  widgetname,
 }) {
   const navigation = useNavigate();
   const [values, setValues] = useState({});
   const [saving, setSaving] = useState(false);
   const [twoColumn, setTwoColumn] = useState(true);
-  console.log(previousFieldsData, "previous Data")
+  // console.log(previousFieldsData, "previous Data")
+  const [FieldData, setFieldData] = useState(previousFieldsData);
 
-  console.log(formButtons)
+
+  // console.log(formButtons)
 
   if (!show) return null;
+
+
+  useEffect(() => {
+    console.log("Triggering in UseEffect of Preview Modal");
+    if (previousFieldsData == null) {
+      const data = localStorage.getItem("formDesignerData");
+      if (data) {
+        const parsedData = JSON.parse(data);
+        console.log(parsedData, "Parsed Data in Preview Modal");
+        setFieldData(parsedData);
+      }
+    }
+  }, [])
 
   const handleChange = (name, value) => {
     setValues((prev) => ({ ...prev, [name]: value }));
@@ -188,17 +204,17 @@ export default function PreviewModal({
         formButtons,
         tabs,
         column: twoColumn,
-        // departmentName: previousFieldsData?.departmentName,
-        // category: previousFieldsData?.category,
-        // selectedViews: previousFieldsData?.selectedViews,
-        // widgetname: previousFieldsData?.widgetname,
-        // selectedDepartments: state?.selectedDepartments,
-        departName: previousFieldsData.department.value,
-        category: previousFieldsData?.category?.value,
-        selectedViews: previousFieldsData?.views?.value,
-        widgetname: previousFieldsData?.widgetname?.value||null,
+        departmentName: FieldData?.department.value,
+        category: FieldData?.category?.value,
+        selectedViews: [FieldData?.views?.value],
         selectedDepartments: state?.selectedDepartments?.value,
+        widgetname: "Desktop",
+        subCategory: FieldData?.subCategory?.value,
+        designName: FieldData?.name?.value
+
       };
+      console.log(payload, "Payload Here");
+      // console.log(previousFieldsData, "Previous Field Data")
 
       const url = recordId
         ? `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`
@@ -209,11 +225,14 @@ export default function PreviewModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      console.log(res, "Response Here");
 
       if (!res.ok) throw new Error("Failed to save form");
       await res.json();
       alert("Form saved successfully!");
+      localStorage.removeItem("formDesignerData");
       navigation("/create/new/design");
+
     } catch (err) {
       console.log(err, "Error Heree");
       alert("Error saving form");
@@ -221,8 +240,6 @@ export default function PreviewModal({
       setSaving(false);
     }
   };
-
-  // console.log(twoColumn);
   return (
     <div className="bg-white rounded-xl p-2 w-full">
       {/* Header */}
