@@ -5,6 +5,7 @@ import WonContext from "../../../../context/WonContext";
 import TableComponent from "../../../TableComponent/pages/TableComponent";
 // import { UsersDummyData as Data } from "../../../../DataFile/DefaultDataFile";
 import { getTableColumnNames, getTableData } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
+import { getFormDetails } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 
 import {
   CustomViewContainer, FormContent,
@@ -13,16 +14,19 @@ import {
 
 const defaultColumnsInTable = ['first_name', 'last_name', 'user_id', 'title', 'department', 'active', 'email', 'phone_no',];
 
-const hostedUrl = import.meta.env.VITE_HOSTED_API_URL
+
 
 const UsersTable = () => {
   const [usersData, setUsersData] = useState([]) //state for table data 
   const [TableColumnNames, setTableColumnNames] = useState([])
   const [selectedColumns, setSelectedColumns] = useState(defaultColumnsInTable)
+  const [formData, setFormData] = useState(null);
+  const userData = localStorage.getItem("userObj") || null;
 
   // <<<<API CALL
   useEffect(() => {
     fetchUsersData();
+    fetchFormData(JSON.parse(userData));
   }, []);
 
   const fetchUsersData = async () => {
@@ -40,6 +44,24 @@ const UsersTable = () => {
       console.log('Error fetching Users Data')
     }
   }
+
+  const fetchFormData = async (data) => {
+    // console.log(data, "data Here");
+    try {
+      const result = await getFormDetails({
+        module: "Users",
+        category: data.category,
+        subcategory: data.subcategory,
+        view: data.view,
+        department: data.department,
+      });
+      if (result) {
+        setFormData(result.data);
+      }
+    } catch {
+      console.log("Error fetching Tickets Data");
+    }
+  };
 
   return (
     <WonContext.Consumer>
@@ -63,6 +85,7 @@ const UsersTable = () => {
                   rdtColValue={'id'}
                   redirectionPath={`/user/`}
                   createNewPath={`new-user`}
+                  formData={formData}
                 />
               </FormContent>
             </SideNavNContentContainer>

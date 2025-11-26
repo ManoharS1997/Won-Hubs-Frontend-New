@@ -354,9 +354,7 @@ import FormDropdown from '../../shared/UIElements/FormDropdown';
 import FormTextarea from "../UIElements/FormTextarea";
 import SelectWithIcon from "../components/SelectWithIcon";
 
-/* ------------------------------------------------
-   STATIC FIELD DEFINITIONS
---------------------------------------------------*/
+
 const templateFields = {
   name: { value: "", isMandatory: true, type: "text", label: "ReportName" },
   view: { value: "", isMandatory: true, type: "text", label: "View" },
@@ -502,9 +500,6 @@ const WorkFlowFields = {
 };
 
 
-/* ------------------------------------------------
-   MAIN COMPONENT
---------------------------------------------------*/
 export default function Fields({ title, data, path }) {
   const defaultFields = {
     name: { value: "", isMandatory: false, type: "text", label: "Name" },
@@ -514,11 +509,9 @@ export default function Fields({ title, data, path }) {
     subject: { value: "", isMandatory: true, type: "text", label: "Subject" },
     description: { value: "", isMandatory: true, type: "textarea", label: "Description" },
   };
-
   const [FieldsState, setFieldsState] = useState(defaultFields);
   const [isLoading, setIsLoading] = useState(true);
-
-
+  
   useEffect(() => {
     let baseFields = defaultFields;
     if (path === "flowreport") baseFields = templateFields;
@@ -527,34 +520,55 @@ export default function Fields({ title, data, path }) {
 
     const saved = JSON.parse(localStorage.getItem(`${path}Data`));
 
-    if (saved) {
-      // Merge saved values with original schema
+    // CASE 1: If data is passed (EDIT mode)
+    if (data) {
+      const extractValue = (item) => {
+        if (item && typeof item === "object" && "value" in item) {
+          return item.value;
+        }
+        return item;
+      };
+
       const merged = {};
       Object.keys(baseFields).forEach((key) => {
         merged[key] = {
-          ...baseFields[key],   // preserve dropdown options
-          value: saved[key]?.value || "",
+          ...baseFields[key],
+          value:
+            data[key] !== undefined && data[key] !== null
+              ? extractValue(data[key])
+              : baseFields[key].value
         };
       });
+
       setFieldsState(merged);
-    } else {
-      setFieldsState(baseFields);
+      setIsLoading(false);
+      return;
     }
 
-    setTimeout(() => setIsLoading(false), 200);
-  }, [path]);
 
+    // CASE 2: If localStorage exists
+    if (saved) {
+      const merged = {};
+      Object.keys(baseFields).forEach((key) => {
+        merged[key] = {
+          ...baseFields[key],
+          value: saved[key]?.value ?? "",
+        };
+      });
 
-  /* ------------------------------------------------
-     SAVE BUTTON HANDLER
-  --------------------------------------------------*/
-  const saveToLocalStorage = () => {
+      setFieldsState(merged);
+      setIsLoading(false);
+      return;
+    }
+
+    // CASE 3: Default schema
+    setFieldsState(baseFields);
+    setIsLoading(false);
+  }, [path, data]);
+
+    const saveToLocalStorage = () => {
     localStorage.setItem(`${path}Data`, JSON.stringify(FieldsState));
   };
-
-  /* ------------------------------------------------
-     Input Handlers
-  --------------------------------------------------*/
   const onChangeInput = (e) => {
     const { id, value } = e.target;
     setFieldsState((prev) => ({
@@ -562,24 +576,26 @@ export default function Fields({ title, data, path }) {
       [id]: { ...prev[id], value },
     }));
   };
-
   const onChangeDropdown = (e, id) => {
     setFieldsState((prev) => ({
       ...prev,
       [id]: { ...prev[id], value: e.value },
     }));
   };
-
   const capitalize = (str = "") =>
     str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
   const renderField = (key, field) => {
     const value = field?.value || "";
+   
 
     if (field.type === "dropdown") {
+      // console.log(field.options,"Field Options Here....")
+      // console.log(value,"value")  
       if (field.label === "GraphType") {
         return <SelectWithIcon />;
       }
+      // console.log(value,"value")
       return (
         <FormDropdown
           key={key}
@@ -589,6 +605,7 @@ export default function Fields({ title, data, path }) {
           isMandatory={field.isMandatory}
           value={value}
           onChangeHandler={(e) => onChangeDropdown(e, key)}
+          defaultValue={field.value}
         />
       );
     }
@@ -620,11 +637,11 @@ export default function Fields({ title, data, path }) {
       />
     );
   };
-
   const entries = Object.entries(FieldsState);
 
-console.log(data,"Data Here....")
-console.log(FieldsState,"FieldsState Here....")
+  // console.log(data, "Data Here....")
+  console.log(FieldsState, "FieldsState Here....")
+
   return (
     <div className="w-full h-[100vh] flex justify-center items-start px-4 py-6">
       <div className="w-full bg-white rounded-xl shadow overflow-auto flex flex-col p-4">

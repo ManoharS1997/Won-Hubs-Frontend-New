@@ -383,7 +383,7 @@ button:focus-visible {
   background: grey;
   border-radius: 50px;
 } */
- ::-webkit-scrollbar-button {
+::-webkit-scrollbar-button {
   display: none;
   height: 0;
   width: 0;
@@ -557,6 +557,7 @@ button:focus-visible {
   overflow: visible !important;
   position: relative;
 }
+
 /* Add this CSS to your styles (ideally globally) */
 .wrapperClassName {
   min-height: 300px;
@@ -582,7 +583,7 @@ button:focus-visible {
   position: absolute !important;
   background: #fff !important;
   border: 1px solid #ccc !important;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
   z-index: 99999 !important;
 }
 
@@ -595,31 +596,40 @@ button:focus-visible {
   position: fixed !important;
   background: #fff !important;
   border: 1px solid #ccc !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
   z-index: 100000 !important;
   padding: 10px;
   border-radius: 8px;
 }
 
 /* Prevent clipping from parent containers */
-body, html, #root, .App {
+body,
+html,
+#root,
+.App {
   overflow: visible !important;
 }
+
 /* For Chrome, Edge, Safari */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 4px;      /* scrollbar width */
-  height: 4px;     /* scrollbar height for horizontal scrolling */
+  width: 4px;
+  /* scrollbar width */
+  height: 4px;
+  /* scrollbar height for horizontal scrolling */
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent; /* track background */
+  background: transparent;
+  /* track background */
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.4); /* scrollbar color */
-  border-radius: 9999px; /* rounded thumb */
-  border: none;   
-      /* removes default border */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* scrollbar color */
+  border-radius: 9999px;
+  /* rounded thumb */
+  border: none;
+  /* removes default border */
 }
 
 /* Remove arrows (stepper buttons) in Webkit */
@@ -629,8 +639,10 @@ body, html, #root, .App {
 
 /* For Firefox */
 .custom-scrollbar {
-  scrollbar-width: thin;          /* makes scrollbar thin */
-  scrollbar-color: rgba(0,0,0,0.4) transparent; /* thumb and track */
+  scrollbar-width: thin;
+  /* makes scrollbar thin */
+  scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
+  /* thumb and track */
 }
 
 /* global.css */
@@ -640,9 +652,23 @@ body, html, #root, .App {
   padding: 0.25rem 0.5rem;
   overflow-y: hidden;
 }
+
 .page-break:hover {
   border-top: 2px dashed #555;
   background: #f7f7f7;
+}
+
+/* hide scrollbars */
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE / Edge */
 }
 
 

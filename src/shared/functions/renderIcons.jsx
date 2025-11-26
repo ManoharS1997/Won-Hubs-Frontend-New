@@ -3,7 +3,7 @@ import { HiViewBoards, HiDotsHorizontal } from "react-icons/hi";
 import { HiUserGroup } from "react-icons/hi2";
 import {
   RiSettings5Fill, RiDeleteBinLine, RiBarChartBoxAiLine, RiFeedbackLine, RiAlertFill,
-  RiTeamFill, RiUserCommunityLine, RiDonutChartFill, 
+  RiTeamFill, RiUserCommunityLine, RiDonutChartFill,
 } from "react-icons/ri";
 import { RxOpenInNewWindow } from "react-icons/rx";
 import { ImFileText2, ImInsertTemplate, ImTable2, ImCalendar } from "react-icons/im";
@@ -35,9 +35,9 @@ import {
 import {
   TbApi, TbHeartRateMonitor, TbAlertTriangle, TbReportAnalytics, TbReportSearch,
   TbTemplate, TbUsers, TbTransform, TbLayoutDashboardFilled, TbSettingsCog, TbUserCode,
-  TbUserQuestion, TbTimezone, TbNumber123, TbGauge, TbCircles,TbChartHistogram ,TbChartCandle 
+  TbUserQuestion, TbTimezone, TbNumber123, TbGauge, TbCircles, TbChartHistogram, TbChartCandle
 } from "react-icons/tb";
-import { GiServerRack, GiHamburgerMenu, GiFunnel,} from "react-icons/gi";
+import { GiServerRack, GiHamburgerMenu, GiFunnel, } from "react-icons/gi";
 import { SiAmazonsimpleemailservice, SiTestcafe, SiDatabricks } from "react-icons/si";
 import {
   PiWebhooksLogoFill, PiPlugsConnected, PiUsersFourFill, PiPasswordBold,
@@ -69,6 +69,10 @@ import { TfiEmail } from "react-icons/tfi";
 import { HiOutlineMailOpen } from "react-icons/hi";
 import { LuMailOpen } from "react-icons/lu";
 import { MdOutgoingMail, MdOutlineKeyboardArrowDown, MdPieChart } from "react-icons/md";
+import { FaClockRotateLeft } from "react-icons/fa6";
+import { MdFreeCancellation } from "react-icons/md";
+
+
 
 
 const iconMap = {
@@ -96,7 +100,7 @@ const iconMap = {
   GrChannel, FaBuilding, FaUserCheck, FaDollarSign, FaTasks, FaHashtag, FaUsersCog, FaBook, FaCalendarDay, FaObjectGroup, FaUser,
   TfiEmail, HiOutlineMailOpen, LuMailOpen, MdOutgoingMail, MdOutlineKeyboardArrowDown, MdPieChart, BiBarChart, AiOutlineLineChart,
   MdAreaChart, FaBox, MdBarChart, GiFunnel, RiDonutChartFill, BiScatterChart, MdRadar, TbGauge, MdGridOn, TbCircles,
-  TbChartHistogram,TbChartCandle 
+  TbChartHistogram, TbChartCandle, FaClockRotateLeft, MdFreeCancellation
 
 };
 

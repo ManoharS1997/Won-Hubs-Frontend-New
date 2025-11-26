@@ -356,7 +356,6 @@ export default function TableComponent({
       setFilterConditions(Filters);
     }
   };
-
   // Toggling Filter container visibility
   const OnFilter = () => {
     setFilterStatus(!isFilterActive);
@@ -372,7 +371,6 @@ export default function TableComponent({
   const onChangeSearchText = (e) => {
     const newText = e.target.value;
     setSearchingText(newText);
-
     const filteredData = tableData.filter((row) => {
       return Object.keys(row).some((key) => {
         // console.log(key, row[key])
@@ -402,7 +400,6 @@ export default function TableComponent({
 
       return camelCaseColumns;
     };
-
     const sortedData = [...tableData].sort((a, b) => {
       let valueA = a[readableToCamelCase(fieldName)];
       let valueB = b[readableToCamelCase(fieldName)];
@@ -428,7 +425,6 @@ export default function TableComponent({
       return 0; // In case of unknown type, don't change order
     });
     // console.log(sortedData)
-
     setTableData(sortedData); // Update the state with the sorted data
     setSortingsApplied(true);
   };
@@ -534,7 +530,6 @@ export default function TableComponent({
       setSelectedTab(id);
     }
   };
-
   // sandhya
   const applyFilters = (data, filterConditions) => {
     return data.filter((row) => {
@@ -562,7 +557,6 @@ export default function TableComponent({
       return result;
     });
   };
-
   // Example testCondition helper:
   function testCondition(row, cond) {
     if (!cond.filter || !cond.condition || !cond.searchText) return true;
@@ -622,12 +616,11 @@ export default function TableComponent({
             recordId={selectedTab}
             tableName={tableName}
             formData={formData}
-            activeTable={activeTable}
+            activeTable={activeTable || tableName}
           />
         );
     }
   };
-
   useEffect(() => {
     // Only run if filter is active, optionally
     if (isFilterActive) {
@@ -657,11 +650,10 @@ export default function TableComponent({
               onClick={(e) => onTabClickHandler(record.id, e)}
               className={`w-fit min-w-[8rem] h-full flex items-center justify-between 
                                         py-[2px] pl-[0.5rem] pr-[0.2rem] rounded-[0.3rem] cursor-pointer shadow-lg
-                                        ${
-                                          selectedTab === record.id
-                                            ? "text-white"
-                                            : "bg-white"
-                                        }
+                                        ${selectedTab === record.id
+                  ? "text-white"
+                  : "bg-white"
+                }
                                     `}
               style={{
                 backgroundColor:
@@ -815,9 +807,9 @@ export default function TableComponent({
                   defaultvalue={
                     eachArray.filterDisplayText
                       ? {
-                          label: convertName(eachArray.filterDisplayText),
-                          value: eachArray.filterDisplayText,
-                        }
+                        label: convertName(eachArray.filterDisplayText),
+                        value: eachArray.filterDisplayText,
+                      }
                       : { label: "Select Filter", value: "--" }
                   }
                   onChange={(event) => OnSetFilter(index, event)}
@@ -834,9 +826,9 @@ export default function TableComponent({
                   defaultvalue={
                     eachArray.condition
                       ? {
-                          label: convertName(eachArray.condition),
-                          value: eachArray.condition,
-                        }
+                        label: convertName(eachArray.condition),
+                        value: eachArray.condition,
+                      }
                       : { label: "Select Condition", value: "--" }
                   }
                   onChange={(e) => OnsetCondition(index, e)}
@@ -971,9 +963,9 @@ export default function TableComponent({
 
                     (recordsPerPage
                       ? recievedTableData.slice(
-                          (currPage - 1) * recordsPerPage,
-                          currPage * recordsPerPage
-                        )
+                        (currPage - 1) * recordsPerPage,
+                        currPage * recordsPerPage
+                      )
                       : recievedTableData
                     ).map((row, index) => {
                       {
@@ -993,10 +985,9 @@ export default function TableComponent({
                               checked={selectedRowIds.includes(row[`${id}`])}
                               onChange={() => CheckboxChange(row[`${id}`])}
                               className={`
-                                ${
-                                  selectedRowIds.includes(row[`${id}`])
-                                    ? "!text-inherit"
-                                    : "!text-[var(--text-color)]"
+                                ${selectedRowIds.includes(row[`${id}`])
+                                  ? "!text-inherit"
+                                  : "!text-[var(--text-color)]"
                                 }
                               `}
                             />
@@ -1048,20 +1039,20 @@ export default function TableComponent({
                                 {column.type === "object"
                                   ? `Object Data`
                                   : column.type === "timestamp"
-                                  ? formatDateForMySQL(row[column.name])
-                                  : column.type === "json"
-                                  ? "json data"
-                                  : row[column.name]}
+                                    ? formatDateForMySQL(row[column.name])
+                                    : column.type === "json"
+                                      ? "json data"
+                                      : row[column.name]}
                               </CustomTd>
                             ) : (
                               <CustomTd key={column.name}>
                                 {column.type === "object"
                                   ? `Object Data`
                                   : column.type === "timestamp"
-                                  ? formatDateForMySQL(row[column.name])
-                                  : column.type === "json"
-                                  ? "json data"
-                                  : row[column.name]}
+                                    ? formatDateForMySQL(row[column.name])
+                                    : column.type === "json"
+                                      ? "json data"
+                                      : row[column.name]}
                               </CustomTd>
                             );
                           })}
