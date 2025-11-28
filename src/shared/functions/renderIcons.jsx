@@ -71,6 +71,7 @@ import { LuMailOpen } from "react-icons/lu";
 import { MdOutgoingMail, MdOutlineKeyboardArrowDown, MdPieChart } from "react-icons/md";
 import { FaClockRotateLeft } from "react-icons/fa6";
 import { MdFreeCancellation } from "react-icons/md";
+import { IoChevronForward } from "react-icons/io5";
 
 
 
@@ -100,7 +101,7 @@ const iconMap = {
   GrChannel, FaBuilding, FaUserCheck, FaDollarSign, FaTasks, FaHashtag, FaUsersCog, FaBook, FaCalendarDay, FaObjectGroup, FaUser,
   TfiEmail, HiOutlineMailOpen, LuMailOpen, MdOutgoingMail, MdOutlineKeyboardArrowDown, MdPieChart, BiBarChart, AiOutlineLineChart,
   MdAreaChart, FaBox, MdBarChart, GiFunnel, RiDonutChartFill, BiScatterChart, MdRadar, TbGauge, MdGridOn, TbCircles,
-  TbChartHistogram, TbChartCandle, FaClockRotateLeft, MdFreeCancellation
+  TbChartHistogram, TbChartCandle, FaClockRotateLeft, MdFreeCancellation, IoChevronForward
 
 };
 

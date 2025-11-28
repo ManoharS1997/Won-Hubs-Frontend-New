@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
-import EventModal from "./EventModal";
 import { useRef } from "react";
 import renderIcons from "../../../../shared/functions/renderIcons";
-import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import WeekView from "./WeekCalendar";
+import DayView from "./DayCalendar";
 const dummyEvents = [
     {
         date: "2020-08-09",
@@ -56,21 +57,60 @@ const weekDaysShort = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const NewCalendar = () => {
     const [currentDate, setCurrentDate] = useState(new Date(2025, 10, 1)); // Nov 2025
-    const [showEventModal, setShowEventModal] = useState(false);
-    const [calendarEvents, setCalendarEvents] = useState(dummyEvents); // fetched events
+    // const [showEventModal, setShowEventModal] = useState(false);
+    const [calendarEvents, setCalendarEvents] = useState(dummyEvents);
+    const [calenderType, setCalenderType] = useState('month')// fetched events
     const year = currentDate.getFullYear();
     const monthIndex = currentDate.getMonth();
     //hovering states in the calendar
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [popupPos, setPopupPos] = useState({ x: 0, y: 0 });
     const popupRef = useRef(null);// to popup
-    const calendarRef = useRef(null);// to diaplay events
+    const Navigate = useNavigate();
+    const calendarRef = useRef(null);
+
+    // to diaplay events
     const handlePrevMonth = () => {
         setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
     };
     const handleNextMonth = () => {
         setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
     };
+    const handlePrevWeek = () => {
+        setCurrentDate(prev => {
+            const d = new Date(prev);
+            d.setDate(d.getDate() - 7);
+            return d;
+        });
+    };
+
+    const handleNextWeek = () => {
+        setCurrentDate(prev => {
+            const d = new Date(prev);
+            d.setDate(d.getDate() + 7);
+            return d;
+        });
+    };
+
+    const handleToday = () => {
+        setCurrentDate(new Date());
+    };
+    const handlePrevDay = () => {
+        setCurrentDate(prev => {
+            const d = new Date(prev);
+            d.setDate(d.getDate() - 1);
+            return d;
+        });
+    };
+
+    const handleNextDay = () => {
+        setCurrentDate(prev => {
+            const d = new Date(prev);
+            d.setDate(d.getDate() + 1);
+            return d;
+        });
+    };
+
     // build main calendar grid
     const monthStart = new Date(year, monthIndex, 1);
     const monthEnd = new Date(year, monthIndex + 1, 0);
@@ -158,8 +198,7 @@ const NewCalendar = () => {
     }, []);
 
     const onAddEventClick = () => {
-        localStorage.setItem("open_event_modal_after_google", "true");
-        window.location.href = `${import.meta.env.VITE_HOSTED_API_URL}/auth/google`;
+        Navigate('/eventUpdate', { replace: true });
     };
     const DeleteEvent = async (id) => {
         // Implement delete functionality here
@@ -172,15 +211,15 @@ const NewCalendar = () => {
             },
         };
         const response = await fetch(url, options);
-        console.log(response,"response For cancelling event");
+        console.log(response, "response For cancelling event");
 
         if (response.status !== 200) {
             console.log("Error in deleting event");
             return;
         }
-        getEventsForDisplayingMonth();  
+        getEventsForDisplayingMonth();
     }
-    const RescheduleEvent=async(id)=>{
+    const RescheduleEvent = async (id) => {
         console.log(id, "Reschedule event...");
         const url = `${import.meta.env.VITE_HOSTED_API_URL}/calendar/reschedule-event/${id}`;
         const options = {
@@ -191,30 +230,44 @@ const NewCalendar = () => {
             },
         };
         const response = await fetch(url, options);
-        console.log(response,"response For cancelling event");
+        console.log(response, "response For cancelling event");
 
         if (response.status !== 200) {
             console.log("Error in deleting event");
             return;
         }
-        getEventsForDisplayingMonth();  
+        getEventsForDisplayingMonth();
     }
 
     return (
-        <div className="h-[100%] w-full p-3 bg-white font-sans border-2 overflow-hidden">
+        <div className="h-[100%] w-full p-3 bg-white font-sans  overflow-hidden">
             {/* TOP HEADER */}
             <div className="h-full w-[100%] border-amber-400 border-2 p-0 m-0">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-4xl font-bold p-0 m-0">Calendar</h1>
-
                     <div className="flex items-center gap-3">
                         <div className="flex border rounded-xl overflow-hidden">
-                            <button className="px-4 py-2 border-r">Day</button>
-                            <button className="px-4 py-2 border-r">Week</button>
-                            <button className="px-4 py-2 bg-black text-white">Month</button>
+                            <button
+                                className={`px-4 py-2 border-r ${calenderType === 'day' ? "bg-black text-white" : "bg-white"}`}
+                                onClick={() => setCalenderType('day')}
+                            >
+                                Day
+                            </button>
+                            <button
+                                className={`px-4 py-2 border-r ${calenderType === 'week' ? "bg-black text-white" : "bg-white"}`}
+                                onClick={() => setCalenderType('week')}
+                            >
+                                Week
+                            </button>
+                            <button
+                                className={`px-4 py-2 ${calenderType === 'month' ? "bg-black text-white" : "bg-white"}`}
+                                onClick={() => setCalenderType('month')}
+                            >
+                                Month
+                            </button>
                         </div>
 
-                        {/* <button className="!bg-blue-900 text-white px-4 py-2 !rounded-xl" onClick={() => setShowEventModal(prev => !prev)}> */}
+
                         <button
                             onClick={onAddEventClick}
                             className="!bg-blue-900 text-white px-4 py-2 !rounded-xl"
@@ -247,147 +300,168 @@ const NewCalendar = () => {
                     </div>
                     {/* MAIN CALENDAR */}
                     <div className="border rounded-xl p-4 custom-scroll overflow-y-auto max-h-[78vh] !shadow-xl" ref={calendarRef} >
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-semibold">
-                                {monthNames[monthIndex]} {year}
-                            </h2>
-                            <div className="flex gap-2">
-                                <button className="p-2 rounded-xl bg-transparent m-0  h-0 w-0" onClick={handlePrevMonth}>
-                                    <IoChevronBack size={25} />
-                                </button>
-                                <button className="p-2  rounded-xl bg-transparentm-0 h-0 w-0" onClick={handleNextMonth}>
-                                    <IoChevronForward size={25} />
-                                </button>
-                            </div>
-                        </div>
-                        {/* Week headers */}
-                        <div className="grid grid-cols-7 text-center font-medium text-gray-600 mb-2">
-                            {weekDaysShort.map((d) => (
-                                <div key={d}>{d}</div>
-                            ))}
-                        </div>
+                        {calenderType === 'month' &&
+                            <>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-xl font-semibold">
+                                        {monthNames[monthIndex]} {year}
+                                    </h2>
+                                    <div className="flex gap-2">
+                                        <button className="p-2 rounded-xl bg-transparent m-0  h-0 w-0" onClick={handlePrevMonth}>
+                                            <IoChevronBack size={25} />
+                                        </button>
+                                        <button className="p-2  rounded-xl bg-transparentm-0 h-0 w-0" onClick={handleNextMonth}>
+                                            <IoChevronForward size={25} />
+                                        </button>
+                                    </div>
+                                </div>
+                                {/* Week headers */}
+                                <div className="grid grid-cols-7 text-center font-medium text-gray-600 mb-2">
+                                    {weekDaysShort.map((d) => (
+                                        <div key={d}>{d}</div>
+                                    ))}
+                                </div>
 
-                        {/* Calendar cells */}
-                        <div className="grid grid-cols-7 gap-[1px] border bg-gray-200">
-                            {grid.map((row, rIndex) =>
-                                row.map((day, cIndex) => {
-                                    const dateStr =
-                                        day &&
-                                        `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(
-                                            day
-                                        ).padStart(2, "0")}`;
+                                {/* Calendar cells */}
+                                <div className="grid grid-cols-7 gap-[1px] border bg-gray-200">
+                                    {grid.map((row, rIndex) =>
+                                        row.map((day, cIndex) => {
+                                            const dateStr =
+                                                day &&
+                                                `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(
+                                                    day
+                                                ).padStart(2, "0")}`;
 
-                                    const events = day ? getEventsByDate(dateStr) : [];
+                                            const events = day ? getEventsByDate(dateStr) : [];
 
-                                    return (
-                                        <div
-                                            key={`${rIndex}-${cIndex}`}
-                                            className="bg-white h-20 p-2 relative"
-                                        >
-                                            {day && (
-                                                <div className="text-sm font-semibold mb-1">{day}</div>
-                                            )}
+                                            return (
+                                                <div
+                                                    key={`${rIndex}-${cIndex}`}
+                                                    className="bg-white h-20 p-2 relative"
+                                                >
+                                                    {day && (
+                                                        <div className="text-sm font-semibold mb-1">{day}</div>
+                                                    )}
 
-                                            <div className="space-y-1 overflow-hidden">
-                                                {events.map((ev, i) => (
-                                                    <div
-                                                        key={i}
-                                                        className={`text-xs px-1 py-[2px] rounded truncate !text-white cursor-pointer`}
-                                                        style={{ backgroundColor: ev.color }}
-                                                        onClick={(e) => {
-                                                            const rect = e.target.getBoundingClientRect();
-                                                            const container = calendarRef.current.getBoundingClientRect();
-                                                            const popupWidth = 220;
-                                                            const popupHeight = 120;
-                                                            let x = rect.right + 10;
-                                                            let y = rect.top + window.scrollY;
-                                                            // If popup goes outside RIGHT → move LEFT
-                                                            if (x + popupWidth > container.right) {
-                                                                x = rect.left - popupWidth - 10;
-                                                            }
-                                                            // If popup goes outside TOP → push down
-                                                            if (y < container.top) {
-                                                                y = container.top + 10;
-                                                            }
-                                                            // If popup goes outside BOTTOM → shift up
-                                                            const viewportBottom = window.innerHeight + window.scrollY;
-                                                            if (y + popupHeight > viewportBottom) {
-                                                                y = viewportBottom - popupHeight - 10;
-                                                            }
-                                                            setPopupPos({ x, y });
-                                                            setSelectedEvent(ev);
-                                                        }}
+                                                    <div className="space-y-1 overflow-hidden">
+                                                        {events.map((ev, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className={`text-xs px-1 py-[2px] rounded truncate !text-white cursor-pointer`}
+                                                                style={{ backgroundColor: ev.color }}
+                                                                onClick={(e) => {
+                                                                    const rect = e.target.getBoundingClientRect();
+                                                                    const container = calendarRef.current.getBoundingClientRect();
+                                                                    const popupWidth = 220;
+                                                                    const popupHeight = 120;
+                                                                    let x = rect.right + 10;
+                                                                    let y = rect.top + window.scrollY;
+                                                                    // If popup goes outside RIGHT → move LEFT
+                                                                    if (x + popupWidth > container.right) {
+                                                                        x = rect.left - popupWidth - 10;
+                                                                    }
+                                                                    // If popup goes outside TOP → push down
+                                                                    if (y < container.top) {
+                                                                        y = container.top + 10;
+                                                                    }
+                                                                    // If popup goes outside BOTTOM → shift up
+                                                                    const viewportBottom = window.innerHeight + window.scrollY;
+                                                                    if (y + popupHeight > viewportBottom) {
+                                                                        y = viewportBottom - popupHeight - 10;
+                                                                    }
+                                                                    setPopupPos({ x, y });
+                                                                    setSelectedEvent(ev);
+                                                                }}
 
-                                                    >
-                                                        {ev.label}
+                                                            >
+                                                                {ev.label}
+                                                            </div>
+
+                                                        ))}
                                                     </div>
 
-                                                ))}
+                                                </div>
+                                            );
+                                        })
+                                    )}
+                                    {selectedEvent && (
+                                        <div
+                                            ref={popupRef}
+                                            className="fixed z-[9999] bg-white border shadow-xl rounded-xl p-4 animate-fadeIn transition-all"
+                                            style={{
+                                                top: popupPos.y,
+                                                left: popupPos.x,
+                                                width: "220px",
+                                                maxWidth: "calc(100vw - 40px)"
+                                            }}
+                                        >
+                                            {/* Title */}
+                                            <div className="font-semibold text-blue-600 text-sm mb-1">
+                                                {selectedEvent.label}
+                                            </div>
+
+                                            {/* Time */}
+                                            <div className="text-xs text-gray-500 mb-3">
+                                                {selectedEvent.time || "No Time"}
+                                            </div>
+
+                                            {/* ACTION BUTTONS */}
+                                            <div className="flex justify-end gap-1">
+
+                                                {/* Reschedule Icon Button */}
+                                                <button
+                                                    onClick={() => RescheduleEvent(selectedEvent.id)}
+                                                    className="w-10 h-10  flex items-center justify-center 
+                   bg-purple-50 border
+                   hover:bg-purple-100 transition-all shadow-sm rounded"
+                                                >
+                                                    {renderIcons("FaClockRotateLeft", 20, "#7C3AED")}
+                                                </button>
+
+                                                {/* Delete Icon Button (settings icon style) */}
+                                                <button
+                                                    onClick={() => DeleteEvent(selectedEvent.id)}
+                                                    className="w-10 h-10  flex items-center justify-center bg-transparent rounded
+                  border border-[#F87171]
+                   hover:bg-blue-100 transition-all shadow-sm"
+                                                >
+
+                                                    {renderIcons("MdFreeCancellation", 20, "#F87171")}
+                                                </button>
+
                                             </div>
 
                                         </div>
-                                    );
-                                })
-                            )}
-                            {selectedEvent && (
-                                <div
-                                    ref={popupRef}
-                                    className="fixed z-[9999] bg-white border shadow-xl rounded-xl p-4 animate-fadeIn transition-all"
-                                    style={{
-                                        top: popupPos.y,
-                                        left: popupPos.x,
-                                        width: "220px",
-                                        maxWidth: "calc(100vw - 40px)"
-                                    }}
-                                >
-                                    {/* Title */}
-                                    <div className="font-semibold text-blue-600 text-sm mb-1">
-                                        {selectedEvent.label}
-                                    </div>
+                                    )}
 
-                                    {/* Time */}
-                                    <div className="text-xs text-gray-500 mb-3">
-                                        {selectedEvent.time || "No Time"}
-                                    </div>
-
-                                    {/* ACTION BUTTONS */}
-                                    <div className="flex justify-end gap-1">
-
-                                        {/* Reschedule Icon Button */}
-                                        <button
-                                            onClick={() => RescheduleEvent(selectedEvent.id)}
-                                            className="w-10 h-10  flex items-center justify-center 
-                   bg-purple-50 border
-                   hover:bg-purple-100 transition-all shadow-sm rounded"
-                                        >
-                                            {renderIcons("FaClockRotateLeft", 20, "#7C3AED")}
-                                        </button>
-
-                                        {/* Delete Icon Button (settings icon style) */}
-                                        <button
-                                            onClick={() => DeleteEvent(selectedEvent.id)}
-                                            className="w-10 h-10  flex items-center justify-center bg-transparent rounded
-                  border border-[#F87171]
-                   hover:bg-blue-100 transition-all shadow-sm"
-                                        >
-
-                                            {renderIcons("MdFreeCancellation", 20, "#F87171")}
-                                        </button>
-
-                                    </div>
 
                                 </div>
-                            )}
-
-
-                        </div>
-
+                            </>
+                        }
+                        {calenderType === 'week' && <WeekView
+                            currentDate={currentDate}
+                            events={calendarEvents}
+                            setSelectedEvent={setSelectedEvent}
+                            setPopupPos={setPopupPos}
+                            onPrevWeek={handlePrevWeek}
+                            onNextWeek={handleNextWeek}
+                            onToday={handleToday}
+                        />}
+                        {calenderType === "day" && <DayView
+                            currentDate={currentDate}
+                            events={calendarEvents}
+                            setSelectedEvent={setSelectedEvent}
+                            setPopupPos={setPopupPos}
+                            onPrevDay={handlePrevDay}
+                            onNextDay={handleNextDay}
+                            onToday={handleToday}
+                        />}
                     </div>
                 </div>
             </div>
-            {
+            {/* {
                 showEventModal && <EventModal onClose={() => setShowEventModal(false)} />
-            }
+            } */}
         </div>
     );
 };

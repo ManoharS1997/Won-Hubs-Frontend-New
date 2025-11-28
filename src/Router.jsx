@@ -60,7 +60,7 @@ import LocationsTableListView from "./modules/Admin-Portal/Tables/LocationsTable
 import LinkedInSignInButton from "./modules/Admin-Portal/Apps/components/LinkedIn/LinkedIn.jsx";
 import MyGroupTickets from "./modules/Admin-Portal/MyGroupsTickets/pages/MyGroupTickets.jsx";
 import MyTickets from "./modules/Admin-Portal/MyTickets/pages/MyTickets.jsx";
-import MyCalendar from "./modules/Admin-Portal/Calender/pages/Calender";
+// import MyCalendar from "./modules/Admin-Portal/Calender/pages/Calender";
 import NotificationTemplates from "./modules/Admin-Portal/Notifications/pages/NotificationTemplates";
 import PreviewNotification from "./modules/Admin-Portal/Notifications/pages/PreviewNotification.jsx";
 import PreviewTemplate from "./modules/Admin-Portal/Templates/pages/TemplatePreview";
@@ -170,6 +170,7 @@ import WorkFlowComponent from "./modules/Admin-Portal/WorkflowAutomator/pages/Wo
 import IntegrationLayOutComponent from "./modules/Integrations/pages/IntegrationLayout.jsx";
 import SelectWithIcon from "./shared/components/SelectWithIcon.jsx";
 import NewCalendar from "./modules/Admin-Portal/Calender/pages/NewCalendar.jsx";
+import UpdatedEventModal from "./modules/Admin-Portal/Calender/pages/EventModalUpdated.jsx";
 
 const router = createBrowserRouter([
   // Public routes (no authentication required)
@@ -655,7 +656,7 @@ const router = createBrowserRouter([
           },
           {
             path: "/Calender",
-            element: <MyCalendar />,
+            element: <NewCalendar />,
           },
           {
             path: "/email-modal",
@@ -776,6 +777,11 @@ const router = createBrowserRouter([
           {
             path: "/newCal",
             element: <NewCalendar />
+          },
+
+          {
+            path:'/eventUpdate',
+            element:<UpdatedEventModal />
           }
 
         ],
