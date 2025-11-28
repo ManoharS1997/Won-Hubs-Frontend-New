@@ -175,8 +175,7 @@ export const BulkUploadData = async (formData) => {
     // ✅ Correct success check
     if (!response.ok || (payload && payload.success === false)) {
       throw new Error(
-        `HTTP ${response.status}: ${
-          typeof payload === "string" ? payload : JSON.stringify(payload)
+        `HTTP ${response.status}: ${typeof payload === "string" ? payload : JSON.stringify(payload)
         }`
       );
     }
@@ -395,9 +394,8 @@ export const CreateWebhookAPI = async (payload) => {
 // -------------------------------------------------- GET FORM FIELDS DATA------------------------------------
 export const GetExternalRegisterFields = async () => {
   try {
-    const url = `${
-      import.meta.env.VITE_HOSTED_API_URL
-    }/api/external/register-form`;
+    const url = `${import.meta.env.VITE_HOSTED_API_URL
+      }/api/external/register-form`;
     const results = await axios.get(url, {
       method: "GET",
       headers: {
@@ -417,9 +415,8 @@ export const GetExternalRegisterFields = async () => {
 
 export const GetBecomePartnerFields = async () => {
   try {
-    const url = `${
-      import.meta.env.VITE_HOSTED_API_URL
-    }/api/get/become-parter-form`;
+    const url = `${import.meta.env.VITE_HOSTED_API_URL
+      }/api/get/become-parter-form`;
     const results = await axios.get(url, {
       method: "GET",
       headers: {
@@ -436,9 +433,8 @@ export const GetBecomePartnerFields = async () => {
 
 export const GetdesignDepartmentData = async () => {
   try {
-    const url = `${
-      import.meta.env.VITE_HOSTED_API_URL
-    }/api/get/design-department-data`;
+    const url = `${import.meta.env.VITE_HOSTED_API_URL
+      }/api/get/design-department-data`;
     const results = await axios.get(url, {
       method: "GET",
       headers: {
@@ -691,7 +687,7 @@ export const getTableData = async (tableName, componentName) => {
     };
 
     const response = await fetch(url, options);
-    console.log(response,"response From Table ")
+    console.log(response, "response From Table ")
     const data = await response.json();
     // console.log(data,"dat@here")
     return data;
@@ -1347,7 +1343,7 @@ export const deleteUser = async (recordId) => {
 
 //get addUserForm fields
 export const GetAddUserFormFields = async (param) => {
-  console.log(param, "param in get add user form fields");
+  // console.log(param, "param in get add user form fields");
   try {
     const url = `${apiUrl}/api/add/fields/${param}`;
     const options = {
@@ -1358,7 +1354,7 @@ export const GetAddUserFormFields = async (param) => {
       },
     };
     const response = await fetch(url, options);
-    console.log(response, "get add user form fields response in crud");
+    // console.log(response, "get add user form fields response in crud");
     if (response.ok) {
       const data = await response.json();
       // console.log(data, "add user form fields data in crud");
@@ -1438,23 +1434,23 @@ export const deleteAlert = async (recordId) => {
 
 // ------------------------------------------------------- connections table operations -----------------------------------------
 
-export const CreateNotificationFunction =async(formName,formData,isUpdate,recordId)=>{
+export const CreateNotificationFunction = async (formName, formData, isUpdate, recordId) => {
   console.log(formData, "form Data in CRUD");
   console.log(formName, "name ");
-  const options={
-    method:`${isUpdate ? "PUT" : "POST"}`,
-    headers:{
-      "Content-Type":"application/json",
-      Authorization:`Bearer ${Cookies.get("accessToken")}`
+  const options = {
+    method: `${isUpdate ? "PUT" : "POST"}`,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${Cookies.get("accessToken")}`
     },
-    body:JSON.stringify(formData)
+    body: JSON.stringify(formData)
   }
-const url = isUpdate 
-  ? `${apiUrl}/${formName}/update/${recordId}` 
-  : `${apiUrl}/${formName}/new`;
+  const url = isUpdate
+    ? `${apiUrl}/${formName}/update/${recordId}`
+    : `${apiUrl}/${formName}/new`;
   try {
     const response = await fetch(url, options);
-    console.log(response,"response From CreateNotification");
+    console.log(response, "response From CreateNotification");
     if (response.ok) {
       console.log("Notification created successfully!");
       localStorage.removeItem(`${formName}Data`);
@@ -3143,6 +3139,7 @@ export const deleteTask = async (recordId) => {
 };
 
 export const getFormDetails = async (formData) => {
+  console.log("Triggering Heree", formData)
   try {
     const url = `${apiUrl}/api/form-designer/getModuleByFields`;
     const options = {
@@ -3153,10 +3150,10 @@ export const getFormDetails = async (formData) => {
       body: JSON.stringify(formData),
     };
     const response = await fetch(url, options);
-    console.log(response,"response Here")
+    console.log(response, "response Here @ user FormData")
     if (response.ok) {
       const data = await response.json();
-      // console.log(data,"Data Hereeee")
+      console.log(data, "Data Hereeee")
       return data;
     }
   } catch (err) {

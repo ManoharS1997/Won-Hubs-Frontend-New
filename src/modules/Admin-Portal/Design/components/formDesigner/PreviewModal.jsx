@@ -20,24 +20,43 @@ export default function PreviewModal({
   const [twoColumn, setTwoColumn] = useState(true);
   // console.log(previousFieldsData, "previous Data")
   const [FieldData, setFieldData] = useState(previousFieldsData);
-
-
+  // console.log(FieldData, "Field Data Heree")
   // console.log(formButtons)
-
   if (!show) return null;
 
-
   useEffect(() => {
-    console.log("Triggering in UseEffect of Preview Modal");
-    if (previousFieldsData == null) {
-      const data = localStorage.getItem("formDesignerData");
-      if (data) {
-        const parsedData = JSON.parse(data);
-        console.log(parsedData, "Parsed Data in Preview Modal");
-        setFieldData(parsedData);
-      }
+    const apiData = previousFieldsData || {};
+    const localData = JSON.parse(localStorage.getItem("formDesignerData")) || null;
+
+    // CASE 1 → No local data → use API data
+    if (!localData) {
+      setFieldData(apiData);
+      return;
     }
-  }, [])
+
+    // CASE 2 → Local exists → compare & update
+    const merged = {};
+
+    Object.keys({ ...apiData, ...localData }).forEach((key) => {
+      const apiValue = apiData[key];
+      const localValue =
+        typeof localData[key] === "object" && "value" in localData[key]
+          ? localData[key].value
+          : localData[key];
+
+      // If API and local both exist and NOT same → override with local
+      if (localValue !== undefined && localValue !== apiValue) {
+        merged[key] = localValue;
+      }
+      // If local missing → fallback to API
+      else {
+        merged[key] = apiValue;
+      }
+    });
+
+    setFieldData(merged);
+  }, [previousFieldsData]);
+
 
   const handleChange = (name, value) => {
     setValues((prev) => ({ ...prev, [name]: value }));
@@ -193,6 +212,16 @@ export default function PreviewModal({
     }
   };
 
+  const getValue = (obj, key) => {
+    if (!obj || !key) return "";
+    // Case 1: schema format
+    if (obj[key] && typeof obj[key] === "object" && "value" in obj[key]) {
+      return obj[key].value;
+    }
+    // Case 2: flat format
+    return obj[key] ?? "";
+  };
+
 
   const handleSave = async () => {
     let Method = recordId ? "PUT" : "POST";
@@ -204,21 +233,22 @@ export default function PreviewModal({
         formButtons,
         tabs,
         column: twoColumn,
-        departmentName: FieldData?.department.value,
-        category: FieldData?.category?.value,
-        selectedViews: [FieldData?.views?.value],
-        selectedDepartments: state?.selectedDepartments?.value,
-        widgetname: "Desktop",
-        subCategory: FieldData?.subCategory?.value,
-        designName: FieldData?.name?.value
 
+        departmentName: getValue(FieldData, "department"),
+        category: getValue(FieldData, "category"),
+        selectedViews: [getValue(FieldData, "views")],
+        widgetname: "Desktop",
+        subCategory: getValue(FieldData, "subCategory"),
+        designName: getValue(FieldData, "name")
       };
-      console.log(payload, "Payload Here");
+
+      // console.log(payload, "Payload Here");
       // console.log(previousFieldsData, "Previous Field Data")
 
       const url = recordId
         ? `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`
         : `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer`;
+      console.log(url, "Url here")
 
       const res = await fetch(url, {
         method: Method,
@@ -232,7 +262,6 @@ export default function PreviewModal({
       alert("Form saved successfully!");
       localStorage.removeItem("formDesignerData");
       navigation("/create/new/design");
-
     } catch (err) {
       console.log(err, "Error Heree");
       alert("Error saving form");
@@ -240,6 +269,9 @@ export default function PreviewModal({
       setSaving(false);
     }
   };
+
+
+
   return (
     <div className="bg-white rounded-xl p-2 w-full">
       {/* Header */}

@@ -79,9 +79,6 @@ export default function FormDropdown({
   // console.log(options,"options Here")
   // console.log(defaultValue,"default Here")
   // console.log(value,"value Here")
-
-
-
   useEffect(() => {
     if (apiData) {
       const url = apiData.url;
@@ -112,7 +109,8 @@ export default function FormDropdown({
     }
   }, [apiData]);
 
-  // console.log('Field Data:', fieldData);
+// console.log(optionsData,"Options Data Here....")
+// console.log(defaultValue,"Default Value Here....")
   return (
     <div className="group w-full h-fit flex flex-col grow-1 gap-1 ">
       {!noLabel && <label
@@ -130,7 +128,7 @@ export default function FormDropdown({
         <Select
           className="basic-single"
           classNamePrefix="select"
-          value={!onDetailedView?optionsData.find(option => option.value === defaultValue?.value):optionsData.find(option => option.value === value)}
+          value={!onDetailedView?optionsData.find(option => option.value === defaultValue):optionsData.find(option => option.value === value)}
           onChange={onChangeHandler}
           isDisabled={isDisabled}
           isLoading={isLoading}

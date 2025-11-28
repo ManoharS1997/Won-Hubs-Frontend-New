@@ -35,7 +35,6 @@ export default function DetailedView({
 
   // console.log("FORMDATA ===>", formData);
 
-  // Fetch record details when recordId changes
   useEffect(() => {
     if (recordId) {
       fetchRecordDetails();
@@ -91,6 +90,7 @@ export default function DetailedView({
 
   // 🔹 Render Tab Content (form/table)
   const renderTabContent = (tab) => {
+    console.log(tab, "tab here");
     if (tab.type === "form") {
       // console.log(tab, "ppppp");
       return (
@@ -238,9 +238,7 @@ export default function DetailedView({
       tableCols: tab.tableCols,
     })) || []),
   ];
-  // console.log(recordData,"recordData");
-  // console.log(formFieldsWithtypes, "FormFieldsWithType")
-  // console.log(formData,"form Data here")
+
   return (
     <div className="w-full h-fit max-h-[82vh] overflow-hidden flex flex-col gap-2 p-0 rounded-[0.5rem] bg-[var(--background-color)] text-[var(--text-color)]">
       {/* 🔹 Tabs */}

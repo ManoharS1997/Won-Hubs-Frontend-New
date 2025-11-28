@@ -226,7 +226,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     const dbResponse = await response.json();
     console.log(dbResponse, "DbResponse Hereee");
     if (dbResponse.data) {
-      const { formFields, formButtons, tabs, module, category, subCategory, widgetname, views, departName,designName} = dbResponse.data;
+      const { formFields, formButtons, tabs, module, category, subCategory, widgetname, views, departmentName,designName} = dbResponse.data;
       setFormFields(formFields);
       setFormButtons(formButtons);
       setTabs(tabs);
@@ -236,7 +236,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
         subCategory: subCategory || null,
         widgetname: widgetname || null,
         views: views || null,
-        department: departName || null,
+        department: departmentName || null,
         name:designName||null
       }
       setPreviousFieldsData(previousData)
@@ -463,7 +463,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
               </section>
             )}
 
-            {showCreate && (<Fields path="formDesigner" data={previousFieldsData} />)}
+            {(showCreate && !showPreview && !showTabs) && (<Fields path="formDesigner" data={previousFieldsData} />)}
           </div>
         </div>
       </div>

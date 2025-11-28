@@ -2,9 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-
 import { IoIosArrowForward } from "react-icons/io";
-
 import WonContext from '../../../context/WonContext';
 import ReactMultiCarousel from '../../../shared/components/Corousels/ReactMultiCorousel';
 import PasswordLoginForm from '../components/PasswordLoginForm';
@@ -117,12 +115,10 @@ export default function LoginPage() {
   const onselectPasswordLogin = () => {
     setSelectedLoginMethod('password')
   }
-
   // function to respond on select Email method login
   const onselectEmailLogin = () => {
     setSelectedLoginMethod('email')
   }
-
   // function to respond on select SMS method login
   const onselectPhoneNoLogin = () => {
     setSelectedLoginMethod('phoneNo')
@@ -133,6 +129,9 @@ export default function LoginPage() {
     setSelectedLoginMethod('loginKey')
   }
 
+  // const handleGoogleLogin = () => {
+  //   window.location.href = `${hostedUrl}/auth/google`
+  // }
   return (
     <WonContext.Consumer>
       {value => {
@@ -212,9 +211,9 @@ export default function LoginPage() {
               category: data?.user?.category,
               subcategory: data?.user.subcategory,
               view: data?.user.view,
-              department:data?.user.department
+              department: data?.user.department
             }
-            localStorage.setItem("userObj",JSON.stringify(user_obj))
+            localStorage.setItem("userObj", JSON.stringify(user_obj))
             if (!response.ok) {
               return addAlert("Password Doesn't Match", 'failure')
             } else {
@@ -390,6 +389,14 @@ export default function LoginPage() {
                       }
                       {/* <GLogin /> */}
                       <ButtonsContainer>
+                        {/* <button
+                        type="button"
+                          onClick={handleGoogleLogin}
+                          className="px-6 py-2 !bg-red-500 text-white rounded-lg"
+                        >
+                          Login with Google
+                        </button> */}
+
                         {!usernameSubmitted ?
                           <RegisterBtn type='button' onClick={() => navigate('/register')}>Register Now</RegisterBtn>
                           : null
