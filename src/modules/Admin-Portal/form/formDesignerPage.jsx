@@ -178,6 +178,8 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     });
   };
 
+  console.log(formButtons)
+
   // Open modal on custom button add
   const addCustomButton = () => {
     if (module?.length > 0) {

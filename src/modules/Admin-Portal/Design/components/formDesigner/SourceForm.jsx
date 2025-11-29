@@ -161,20 +161,62 @@ function ItemCheck({ field, formValues, handleChange }) {
           </div>
         </fieldset>
       );
-    case "file":
+    case "file": {
+      const value = formValues?.[field?.name];
+
+      const isS3Url =
+        typeof value === "string" &&
+        (value.startsWith("http://") || value.startsWith("https://")) &&
+        value.includes("s3");
+
       return (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-2">
           <label className="font-medium">{field?.label}</label>
-          <input
-            type="file"
-            name={field?.name}
-            onChange={(e) => handleChange(field?.name, e.target.files[0])}
-            className="border border-gray-300 rounded-md px-3 py-2"
-          />
+
+          {/* If S3 URL exists → show preview + download + re-upload */}
+          {isS3Url ? (
+            <div className="flex flex-col gap-2 border p-3 rounded-md bg-gray-50">
+              {/* Preview */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700 truncate w-56">
+                  {value.split("/").pop()}
+                </span>
+
+                <a
+                  href={value}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded"
+                >
+                  View
+                </a>
+              </div>
+
+              {/* Re-upload option */}
+              <div>
+                <label className="text-sm font-medium text-gray-600">
+                  Re-upload File
+                </label>
+                <input
+                  type="file"
+                  name={field?.name}
+                  onChange={(e) => handleChange(field?.name, e.target.files[0])}
+                  className="border border-gray-300 rounded-md px-3 py-2 mt-1"
+                />
+              </div>
+            </div>
+          ) : (
+            // Normal upload when NO existing file
+            <input
+              type="file"
+              name={field?.name}
+              onChange={(e) => handleChange(field?.name, e.target.files[0])}
+              className="border border-gray-300 rounded-md px-3 py-2"
+            />
+          )}
         </div>
       );
-
-    // ✅ API button
+    }
     case "button":
       return (
         <button
@@ -417,9 +459,7 @@ export default function SourceForm({
 
         body: JSON.stringify(payload),
       });
-    } catch (e) {
-      console.log(e, "error in email export");
-    }
+    } catch (e) {}
   };
 
   useEffect(() => {
@@ -443,7 +483,7 @@ export default function SourceForm({
 
         if (response.data?.success && response.data.data) {
           const saved = response.data.data;
-
+          console.log(saved, "saved");
           const cleaned = {};
           Object.entries(saved).forEach(([key, value]) => {
             try {
@@ -521,34 +561,6 @@ export default function SourceForm({
       let config = { url: endpoint, method };
 
       if (hasFile) {
-        // const fd = new FormData();
-console.log(payload)
-        // Object.entries(payload).forEach(([key, value]) => {
-        //   if (value === undefined || value === null) {
-        //     fd.append(key, "");
-        //     return;
-        //   }
-
-        //   if (value instanceof File || value instanceof Blob) {
-        //     fd.append(key, value);
-        //     return;
-        //   }
-
-        //   if (typeof value === "object") {
-        //     if (Array.isArray(value)) {
-        //       fd.append(key, JSON.stringify(value));
-        //     } else if (Object.keys(value).length === 0) {
-        //       return;
-        //     } else {
-        //       fd.append(key, JSON.stringify(value));
-        //     }
-        //     return;
-        //   }
-
-        //   // 4) Everything else → string
-        //   fd.append(key, String(value));
-        // });
-
         config.data = payload;
         config.headers = {
           "Content-Type": "multipart/form-data",
@@ -557,7 +569,6 @@ console.log(payload)
         config.data = payload;
       }
 
-      console.log(config)
       const resp = await axios(config);
 
       if (resp?.data?.success) alert(`${btn.label} successful!`);
