@@ -32,7 +32,6 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
   const [showCreate, setShowCreate] = useState(true)
   const [previousFieldsData, setPreviousFieldsData] = useState(JSON.parse(localStorage.getItem("formDesignerData")))
   const Navigate = useNavigate()
-
   // const [recordId,setRecordId]=useState(recordId)
 
   const titleOptions = [
@@ -226,7 +225,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     const dbResponse = await response.json();
     console.log(dbResponse, "DbResponse Hereee");
     if (dbResponse.data) {
-      const { formFields, formButtons, tabs, module, category, subCategory, widgetname, views, departmentName,designName} = dbResponse.data;
+      const { formFields, formButtons, tabs, module, category, subCategory, widgetname, views, departmentName,designName,selectedViews} = dbResponse.data;
       setFormFields(formFields);
       setFormButtons(formButtons);
       setTabs(tabs);
@@ -235,7 +234,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
         category: category || null,
         subCategory: subCategory || null,
         widgetname: widgetname || null,
-        views: views || null,
+        views: [...selectedViews ]|| null,
         department: departmentName || null,
         name:designName||null
       }
@@ -248,6 +247,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
       getRecordDetails();
     }
   }, []);
+  // console.log(previousFieldsData,"Previous Field Dataaa")
 
   return (
     <>

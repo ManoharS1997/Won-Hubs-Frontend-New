@@ -68,7 +68,7 @@ const NewCalendar = () => {
     const popupRef = useRef(null);// to popup
     const Navigate = useNavigate();
     const calendarRef = useRef(null);
-
+    const [eventType,setEventType]=useState("")
     // to diaplay events
     const handlePrevMonth = () => {
         setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
@@ -238,6 +238,10 @@ const NewCalendar = () => {
         }
         getEventsForDisplayingMonth();
     }
+  
+    const onClickEventInput= (event) => {
+        console.log(event.target,"Event Hereeee")
+    }
 
     return (
         <div className="h-[100%] w-full p-3 bg-white font-sans  overflow-hidden">
@@ -283,12 +287,12 @@ const NewCalendar = () => {
                         <div>
                             <h4 className="font-semibold text-xl p-0 mb-2">Filters</h4>
                             <div className="flex flex-col !gap-2">
-                                <Filter label="Meetings" color="#F87171" />         {/* red-400 */}
+                                <Filter label="Meetings" color="#F87171"  />         {/* red-400 */}
                                 <Filter label="Video calls" color="#4ADE80" />      {/* green-400 */}
                                 <Filter label="Tasks" color="#C084FC" />            {/* purple-400 */}
                                 <Filter label="Deadlines" color="#FDBA74" />        {/* orange-300 */}
                                 <Filter label="Followups" color="#60A5FA" />        {/* blue-400 */}
-                                <Filter label="Personal" color="#F472B6" />         {/* pink-400 */}
+                                <Filter label="Personal" color="#F472B6" onClickFunction={onClickEventInput}/>         {/* pink-400 */}
                             </div>
                         </div>
                         <MiniCalendar
@@ -459,14 +463,11 @@ const NewCalendar = () => {
                     </div>
                 </div>
             </div>
-            {/* {
-                showEventModal && <EventModal onClose={() => setShowEventModal(false)} />
-            } */}
         </div>
     );
 };
 
-const Filter = ({ label, color }) => (
+const Filter = ({ label, color,onClickFunction }) => (
     <div
         className="border border-white rounded px-2 py-1 flex items-center gap-2"
         style={{ backgroundColor: color }}   // card bg color
@@ -475,7 +476,10 @@ const Filter = ({ label, color }) => (
             type="checkbox"
             defaultChecked
             className="custom-checkbox"
-            style={{ "--check-color": color }}   // pass dynamic color
+            style={{ "--check-color": color }} 
+            value={label}
+            onClick={onClickFunction}
+            // checked={checked}  // pass dynamic color
         />
 
         <label className="text-sm text-white">{label}</label>
