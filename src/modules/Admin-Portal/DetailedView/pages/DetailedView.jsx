@@ -1,14 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  GetAddUserFormFields,
-  getRecordData,
-} from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
-import convertName from "../../../../utils/conevrtName";
-import FormInput from "../../../../shared/UIElements/FormInput";
 import PropTypes from "prop-types";
 import axios from "axios";
 import SourceForm from "../../Design/components/formDesigner/SourceForm";
-import RenderFields from "../../../../shared/components/FormFieldsRendering";
+import { getRecordData } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 
 const RECORD_TABS = [{ id: 1, name: "Details" }];
 
@@ -16,6 +10,7 @@ DetailedView.propTypes = {
   recordId: PropTypes.any.isRequired,
   tableName: PropTypes.any.isRequired,
   formData: PropTypes.any.isRequired,
+  activeTable: PropTypes.any.isRequired,
 };
 
 export default function DetailedView({
@@ -24,201 +19,133 @@ export default function DetailedView({
   formData,
   activeTable,
 }) {
-  // console.log(tableName, "Here..,")
-  // console.log(formData,"Form Data NO1")
   const [recordData, setRecordData] = useState(null);
-  const [recordFields, setRecordFields] = useState([]);
   const [activeTab, setActiveTab] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [formFieldsWithtypes, setFormFieldsWithtypes] = useState([]);
 
-  // console.log("FORMDATA ===>", formData);
-
+  /** LOAD RECORD & INITIALIZE */
   useEffect(() => {
-    if (recordId) {
+    if (recordId && formData) {
       fetchRecordDetails();
       setActiveTab(1);
     }
-  }, [recordId]);
+  }, [recordId, formData]);
 
   const fetchRecordDetails = async () => {
-    setLoading(true);
-    setError(null);
     try {
+      setLoading(true);
       const { data } = await getRecordData(tableName, recordId);
-      const recordFieldsResponse = await GetAddUserFormFields(tableName);
-      setFormFieldsWithtypes(recordFieldsResponse.data);
 
-      if (data?.[0]) {
-        setRecordData(data[0]);
-        setRecordFields(Object.keys(data[0]));
-      } else {
-        setError("No record found.");
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Failed to fetch record details.");
+      if (data?.[0]) setRecordData(data[0]);
+      else setError("No record found.");
+    } catch (e) {
+      console.error(e);
+      setError("Failed to fetch record.");
     } finally {
       setLoading(false);
     }
   };
 
-  // 🔹 Handle API Call Buttons
+  /** BUTTON API CALLS */
   const handleButtonClick = async (btn) => {
     try {
-      let endpoint = btn.apiEndpoint?.replace(":id", recordId);
+      const endpoint = btn.apiEndpoint?.replace(":id", recordId);
+      if (!endpoint) return alert("❌ No API endpoint in button config");
+
       const method = btn.apiMethod?.toUpperCase() || "GET";
-      const res =
-        method === "GET"
-          ? await axios.get(endpoint)
-          : method === "POST"
-          ? await axios.post(endpoint, recordData)
-          : method === "PUT"
-          ? await axios.put(endpoint, recordData)
-          : method === "DELETE"
-          ? await axios.delete(endpoint)
-          : null;
+
+      if (method === "GET") await axios.get(endpoint);
+      if (method === "POST") await axios.post(endpoint, recordData);
+      if (method === "PUT") await axios.put(endpoint, recordData);
+      if (method === "DELETE") await axios.delete(endpoint);
 
       alert(`${btn.label} successful!`);
-      console.log("Response:", res?.data);
-    } catch (error) {
-      console.error("API call failed:", error);
-      alert("API call failed!");
+    } catch (err) {
+      console.error(err);
+      alert("API failed!");
     }
   };
 
-  // 🔹 Render Tab Content (form/table)
+  /** TAB CONTENT */
   const renderTabContent = (tab) => {
-    console.log(tab, "tab here");
+    /** FORM TAB */
     if (tab.type === "form") {
-      // console.log(tab, "ppppp");
       return (
-        <div>
-          {tab.fields?.length > 0 ? (
-            // tab.fields.map((field) => (
-            //   <FormInput
-            //     key={field._id}
-            //     inputType={field.type}
-            //     name={field.name}
-            //     label={field.label}
-            //     value={recordData?.[field.name] ?? ""}
-            //     placeholder={`Enter ${field.label}`}
-            //   />
-            // ))
-            <SourceForm
-              formFields={tab.fields}
-              formButtons={tab.buttons}
-              activeTable={activeTable}
-              tabName={tab?.name?.toLowerCase()}
-            />
-          ) : (
-            <div className="text-gray-400 col-span-2 text-center">
-              No form fields
-            </div>
-          )}
-        </div>
+        <SourceForm
+          formFields={tab.fields}
+          formButtons={tab.buttons}
+          activeTable={activeTable}
+          tabName={tab.name.toLowerCase()}
+          existingValues={recordData}
+        />
       );
     }
 
+    /** TABLE TAB */
     if (tab.type === "table") {
-      const columns = tab.tableCols || [];
-      // Separate data and action columns
-      const dataColumns = columns.filter((col) => col.type !== "action");
-      const actionColumns = columns.filter((col) => col.type === "action");
-      const totalCols = [...dataColumns, ...(actionColumns.length ? [{ label: "Actions" }] : [])];
-      const colWidth = `${100 / totalCols.length}%`; // Equal width percentage
+      const cols = tab.tableCols || [];
+      const dataCols = cols.filter((c) => c.type !== "action");
+      const actionCols = cols.filter((c) => c.type === "action");
+
       return (
-        <div className="p-4 overflow-auto">
-          {columns.length > 0 ? (
-            <table className="w-full border-collapse border border-gray-300 text-sm table-fixed">
+        <div className="p-4">
+          {cols.length === 0 ? (
+            <div className="text-gray-400 text-center">No table columns</div>
+          ) : (
+            <table className="w-full border border-gray-300">
               <thead className="bg-gray-100">
                 <tr>
-                  {dataColumns.map((col) => (
-                    <th
-                      key={col._id}
-                      className="border border-gray-300 p-2 text-left font-semibold"
-                      style={{ width: colWidth }}
-                    >
-                      {col.label}
+                  {dataCols.map((c) => (
+                    <th key={c._id} className="border p-2">
+                      {c.label}
                     </th>
                   ))}
-                  {actionColumns.length > 0 && (
-                    <th
-                      className="border border-gray-300 p-2 text-left font-semibold"
-                      style={{ width: colWidth }}
-                    >
-                      Actions
-                    </th>
+                  {actionCols.length > 0 && (
+                    <th className="border p-2">Actions</th>
                   )}
                 </tr>
               </thead>
 
               <tbody>
                 <tr>
-                  {dataColumns.map((col) => (
-                    <td
-                      key={col._id}
-                      className="border border-gray-300 p-2 text-left"
-                      style={{ width: colWidth }}
-                    >
-                      {recordData?.[col.name] ?? "-"}
+                  {dataCols.map((c) => (
+                    <td key={c._id} className="border p-2">
+                      {recordData?.[c.name] ?? "-"}
                     </td>
                   ))}
-                  {actionColumns.length > 0 && (
-                    <td
-                      className=" p-2 flex items-center justify-start gap-2"
-                      style={{ width: colWidth }}
-                    >
-                      {actionColumns.map((action) => {
-                        const { name, label } = action;
-                        let btnColor = "";
-                        if (name === "edit") btnColor = "!bg-blue-600 hover:bg-blue-700";
-                        else if (name === "delete") btnColor = "!bg-red-600 hover:bg-red-700";
-                        else if (name === "view") btnColor = "!bg-yellow-500 hover:bg-yellow-600";
-                        return (
-                          <button
-                            key={action._id}
-                            className={`${btnColor} text-white px-3 py-1 rounded text-xs`}
-                            onClick={() => handleActionClick(action)}
-                          >
-                            {label}
-                          </button>
-                        );
-                      })}
+
+                  {actionCols.length > 0 && (
+                    <td className="border p-2 flex gap-2">
+                      {actionCols.map((action) => (
+                        <button
+                          key={action._id}
+                          className="px-3 py-1 bg-blue-600 text-white rounded"
+                          onClick={() => console.log("Action:", action)}
+                        >
+                          {action.label}
+                        </button>
+                      ))}
                     </td>
                   )}
                 </tr>
               </tbody>
             </table>
-          ) : (
-            <div className="text-gray-400 text-center">No table columns defined</div>
           )}
         </div>
       );
     }
 
-    // Example Action Handler
-    const handleActionClick = (action) => {
-      console.log("Clicked:", action.label);
-      console.log("API Config:", action.apiConfig);
-    };
-
-
-    return (
-      <div className="text-gray-400 text-center p-6">
-        Unsupported tab type: {tab.type}
-      </div>
-    );
+    return <div className="text-gray-500 p-4">Unsupported tab type</div>;
   };
 
+  /** LOADING & ERROR */
   if (loading)
     return (
-      <div className="flex justify-center items-center h-[80vh] text-gray-500">
-        Loading record details...
+      <div className="flex justify-center items-center h-[80vh]">
+        Loading...
       </div>
     );
-
   if (error)
     return (
       <div className="flex justify-center items-center h-[80vh] text-red-500">
@@ -226,11 +153,11 @@ export default function DetailedView({
       </div>
     );
 
-  // Combine default and backend tabs
+  /** FINAL TAB MERGE */
   const combinedTabs = [
     ...RECORD_TABS,
-    ...(formData?.tabs?.map((tab, index) => ({
-      id: index + 2,
+    ...(formData?.tabs?.map((tab, idx) => ({
+      id: idx + 2,
       name: tab.name,
       type: tab.type,
       fields: tab.fields,
@@ -240,18 +167,18 @@ export default function DetailedView({
   ];
 
   return (
-    <div className="w-full h-fit max-h-[82vh] overflow-hidden flex flex-col gap-2 p-0 rounded-[0.5rem] bg-[var(--background-color)] text-[var(--text-color)]">
-      {/* 🔹 Tabs */}
-      <div className="h-[5%]" style={{ background: `var(--primary-color)` }}>
-        <ul className="h-[2rem] flex items-end gap-2 p-0 px-2 overflow-auto no-scrollbar">
+    <div className="w-full max-h-[82vh] flex flex-col bg-white rounded-lg">
+      {/* Tabs Header */}
+      <div className="bg-[var(--primary-color)]">
+        <ul className="flex gap-3 p-2">
           {combinedTabs.map((tab) => (
             <li
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-1 rounded-t-[0.3rem] cursor-pointer text-nowrap font-semibold transition-all ${
+              className={`px-4 py-1 rounded-t cursor-pointer font-semibold ${
                 activeTab === tab.id
                   ? "bg-white text-[var(--primary-color)]"
-                  : "text-white hover:bg-[#ccc] hover:text-black"
+                  : "text-white hover:bg-gray-300 hover:text-black"
               }`}
             >
               {tab.name}
@@ -260,91 +187,31 @@ export default function DetailedView({
         </ul>
       </div>
 
-      {/* 🔹 Top-Level Buttons */}
-      {/* <div className="w-full flex items-center justify-end gap-4 px-4">
-        {formData?.formButtons?.map((btn) => (
-          <button
-            key={btn._id}
-            type="button"
-            onClick={() => handleButtonClick(btn)}
-            className="py-2 px-4 !bg-blue-500 text-white !rounded-md hover:bg-blue-600"
-          >
-            {btn.label}
-          </button>
-        ))}
-        <button
-          type="button"
-          onClick={handleSave}
-          className="py-2 px-4 !bg-blue-500 text-white !rounded-md hover:bg-blue-600"
-        >
-          Save
-        </button>
-        <button
-          type="button"
-          onClick={handleUpdate}
-          className="py-2 px-4 !bg-blue-500 text-white !rounded-md hover:bg-blue-600"
-        >
-          Update
-        </button>
-      </div> */}
-
-      {/* 🔹 Tab Content */}
-      <div className="grow overflow-auto rounded-b-[1rem]">
+      {/* Content */}
+      <div className="grow overflow-auto p-4">
         {activeTab === 1 ? (
-          // Default Details tab
-          <ul className="grid md:grid-cols-2 gap-4 p-4 overflow-auto rounded-b-[1rem]">
-            {/* {recordFields.map((field) => (
-              <li key={field} className="flex items-center gap-4">
-                <FormInput
-                  inputType="text"
-                  name={convertName(field)}
-                  label={convertName(field)}
-                  value={recordData?.[field] ?? ""}
-                  placeholder="Enter value"
-                />
-              </li>
-            ))} */}
-            {formFieldsWithtypes.length > 0 &&
-              formFieldsWithtypes.map((field) => (
-                <li key={field} className="flex items-center gap-4">
-                  <>
-                    {/* <div className="w-full md:w-1/2 h-fit gap-4 flex flex-col p-2">
-                  {formFieldsWithtypes
-                    .filter((_, index) => index % 2 === 0) // Even index items
-                    .map((field) =>
-                      RenderFields({
-                        ...field,
-                        // value: formFields[field.name]?.value,
-                      })
-                    )}
-                </div> */}
-
-                    {RenderFields({
-                      ...field,
-                      // value: formFields[field.name]?.value,
-                      value: recordData?.[field.name],
-                    })}
-                    {/* </div> */}
-                  </>
-                </li>
-              ))}
-          </ul>
+          /** ⭐ DETAILS TAB => SHOW SAME SOURCEFORM */
+          <SourceForm
+            formFields={formData.formFields}
+            formButtons={formData.formButtons}
+            activeTable={activeTable}
+            tabName="details"
+            existingValues={recordData}
+          />
         ) : (
           combinedTabs
-            .filter((tab) => tab.id === activeTab)
+            .filter((t) => t.id === activeTab)
             .map((tab) => (
               <div key={tab.id}>
                 {renderTabContent(tab)}
 
-                {/* ✅ Only show buttons if NOT a form tab */}
                 {tab.type !== "form" && tab.buttons?.length > 0 && (
-                  <div className="flex justify-end gap-3 p-4">
+                  <div className="flex justify-end gap-3 mt-4">
                     {tab.buttons.map((btn) => (
                       <button
                         key={btn._id}
-                        type="button"
+                        className="py-2 px-4 bg-green-500 text-white rounded"
                         onClick={() => handleButtonClick(btn)}
-                        className="py-2 px-4 !bg-green-500 text-white rounded-md hover:bg-green-600"
                       >
                         {btn.label}
                       </button>

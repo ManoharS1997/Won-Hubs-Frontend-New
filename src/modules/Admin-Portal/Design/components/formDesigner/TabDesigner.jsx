@@ -800,6 +800,10 @@ export default function TabDesigner({ tabs, setTabs, module }) {
   const addCustomTab = () => {
     const name = prompt("Enter tab name");
     if (!name) return;
+    if (name?.toLowerCase() === "details") {
+      alert(`Can't use!! Tab "${name}" is a reserved name.`);
+      return;
+    }
     if (tabs.some((t) => t.name.toLowerCase() === name.toLowerCase())) {
       alert(`Tab "${name}" already exists.`);
       return;

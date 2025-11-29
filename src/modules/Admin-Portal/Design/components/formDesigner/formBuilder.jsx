@@ -106,47 +106,7 @@ export default function FormBuilder({
             {renderIcons("FaSearch", 15, "gray")}
           </div>
         </div>
-
-        {/* Predefined Fields */}
-        {/* <div className="flex flex-wrap items-center gap-3 mb-4">
-          {filteredFields.map((f) => (
-            <DraggableButton
-              key={f.label}
-              item={f}
-              category="field"
-              onDragStart={onDragStart}
-              className="bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
-                border border-blue-600/40 text-white font-medium rounded-md 
-                px-5 py-2.5 shadow-sm transition-all duration-300
-                hover:from-blue-700 hover:via-blue-900 hover:to-blue-500
-                hover:shadow-md active:scale-95 whitespace-nowrap"
-            >
-              {f.label}
-            </DraggableButton>
-          ))}
-
-          <div className="flex justify-between w-[97%] items-center">
-            <button
-              style={{ borderRadius: 6 }}
-              className="!bg-green-500 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-green-600 active:scale-95 transition whitespace-nowrap"
-              onClick={() => setShowAddFieldModal(true)}
-            >
-              + Custom
-            </button>
-
-            <button className="bg-transparent m-0 p-0 text-blue-500">
-              +more
-            </button>
-
-            <AddFieldModal
-              open={showAddFieldModal}
-              onClose={() => setShowAddFieldModal(false)}
-              onSubmit={onAddFieldModalSubmit}
-            />
-          </div>
-        </div> */}
         <div className="flex flex-col gap-3 mb-4">
-          {/* Scrollable list area */}
           <div
             className={`flex flex-wrap items-center gap-3 overflow-y-auto transition-all duration-300 ${
               showAllFields ? "max-h-[180px]" : "max-h-[140px]"
