@@ -346,7 +346,7 @@
 //   );
 // }
 import React, { useState, useEffect } from "react";
-import Select from "react-select";
+
 import { Loader2, Check, BarChart2, PieChart, Circle } from "lucide-react";
 
 import FormInput from '../../shared/UIElements/FormInput';
@@ -408,6 +408,7 @@ const FormDesignerFields = {
       { label: "Finance", value: "Finance" },
       { label: "Operations", value: "Operations" },
       { label: "Global", value: "Global" },
+      { label: 'Technical', value: 'Technical' }
     ],
   },
   category: {
@@ -422,6 +423,8 @@ const FormDesignerFields = {
       { label: "Graphic", value: "graphic" },
       { label: "Digital", value: "digital" },
       { label: "Offline", value: "offline" },
+      { label: "IT", value: "IT" },
+
     ],
   },
   subCategory: {
@@ -436,6 +439,9 @@ const FormDesignerFields = {
       { label: "Graphic", value: "graphic" },
       { label: "Digital", value: "digital" },
       { label: "Offline", value: "offline" },
+      { label: "Offline", value: "offline" },
+      { label: "Frontend", value: "Frontend" },
+
     ],
   },
   views: {
@@ -444,12 +450,9 @@ const FormDesignerFields = {
     type: "dropdown",
     label: "Views",
     options: [
-      { label: "Software", value: "software" },
-      { label: "Hardware", value: "hardware" },
-      { label: "UI/UX", value: "UI/Ux" },
-      { label: "Graphic", value: "graphic" },
-      { label: "Digital", value: "digital" },
-      { label: "Offline", value: "offline" },
+      { label: "Admin", value: "admin" },
+      { label: "Super Admin", value: "Super Admin" },
+      { label: "User", value: "user" },
     ],
   },
 };
@@ -499,7 +502,6 @@ const WorkFlowFields = {
   description: { value: "", isMandatory: true, type: "text", label: "Description" },
 };
 
-
 export default function Fields({ title, data, path }) {
   const defaultFields = {
     name: { value: "", isMandatory: false, type: "text", label: "Name" },
@@ -511,7 +513,8 @@ export default function Fields({ title, data, path }) {
   };
   const [FieldsState, setFieldsState] = useState(defaultFields);
   const [isLoading, setIsLoading] = useState(true);
-  
+  // console.log(data, "Data Hereeee");
+
   useEffect(() => {
     let baseFields = defaultFields;
     if (path === "flowreport") baseFields = templateFields;
@@ -522,30 +525,29 @@ export default function Fields({ title, data, path }) {
 
     // CASE 1: If data is passed (EDIT mode)
     if (data) {
-      const extractValue = (item) => {
-        if (item && typeof item === "object" && "value" in item) {
-          return item.value;
-        }
-        return item;
-      };
-
       const merged = {};
+
       Object.keys(baseFields).forEach((key) => {
+        const incomingValue = data[key];
+
+        const hasValue =
+          incomingValue !== undefined &&
+          incomingValue !== null &&
+          incomingValue !== "";
+
         merged[key] = {
-          ...baseFields[key],
-          value:
-            data[key] !== undefined && data[key] !== null
-              ? extractValue(data[key])
-              : baseFields[key].value
+          ...baseFields[key],   // preserve label, type, options, isMandatory
+          value: hasValue
+            ? incomingValue     // override ONLY if value exists
+            : baseFields[key].value, // otherwise keep default
         };
       });
 
       setFieldsState(merged);
+      // console.log(data, "In use Effect");
       setIsLoading(false);
       return;
     }
-
-
     // CASE 2: If localStorage exists
     if (saved) {
       const merged = {};
@@ -555,7 +557,7 @@ export default function Fields({ title, data, path }) {
           value: saved[key]?.value ?? "",
         };
       });
-
+      // console.log(FieldsState, "Fields Stateeee")
       setFieldsState(merged);
       setIsLoading(false);
       return;
@@ -566,7 +568,7 @@ export default function Fields({ title, data, path }) {
     setIsLoading(false);
   }, [path, data]);
 
-    const saveToLocalStorage = () => {
+  const saveToLocalStorage = () => {
     localStorage.setItem(`${path}Data`, JSON.stringify(FieldsState));
   };
   const onChangeInput = (e) => {
@@ -587,11 +589,19 @@ export default function Fields({ title, data, path }) {
 
   const renderField = (key, field) => {
     const value = field?.value || "";
-   
+
 
     if (field.type === "dropdown") {
       // console.log(field.options,"Field Options Here....")
       // console.log(value,"value")  
+      // console.log(field,"field Hereeee")
+      const normalizedValue = Array.isArray(value)
+        ? value[0]
+        : Array.isArray(field.value)
+          ? field.value[0]
+          : value ?? field.value;
+
+
       if (field.label === "GraphType") {
         return <SelectWithIcon />;
       }
@@ -603,13 +613,13 @@ export default function Fields({ title, data, path }) {
           name={key}
           options={field.options}
           isMandatory={field.isMandatory}
-          value={value}
+          value={normalizedValue || field.value}
+          // value={field.value}
           onChangeHandler={(e) => onChangeDropdown(e, key)}
-          defaultValue={field.value}
+          defaultValue={normalizedValue}// if the value is  a list pass the list [0] here
         />
       );
     }
-
     if (field.type === "textarea") {
       return (
         <FormTextarea
@@ -623,7 +633,6 @@ export default function Fields({ title, data, path }) {
         />
       );
     }
-
     return (
       <FormInput
         key={key}
@@ -639,8 +648,9 @@ export default function Fields({ title, data, path }) {
   };
   const entries = Object.entries(FieldsState);
 
-  // console.log(data, "Data Here....")
-  console.log(FieldsState, "FieldsState Here....")
+  // console.log(data, "Data Here")
+  // console.log(FieldsState, "FieldsState Here....")
+  // console.log(entries, "Entries Hereee")
 
   return (
     <div className="w-full h-[100vh] flex justify-center items-start px-4 py-6">

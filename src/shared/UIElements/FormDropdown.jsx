@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 import renderIcons from "../functions/renderIcons";
 import Cookies from "js-cookie";
-import { Value } from "sass";
 
-const customStyles = {
+export const customStyles = {
   container: (base, state) => ({
     ...base,
     width: '100%'

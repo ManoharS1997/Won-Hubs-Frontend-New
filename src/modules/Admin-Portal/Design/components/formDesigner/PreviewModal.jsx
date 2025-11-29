@@ -2,6 +2,8 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { AiOutlineSwap } from "react-icons/ai"; // or MdSwapHoriz / HiOutlineSwitchHorizontal
 import { useNavigate } from "react-router-dom";
+import FormDropdown from "../../../../../shared/UIElements/FormDropdown";
+import Select from "react-dropdown-select";
 
 export default function PreviewModal({
   show,
@@ -115,6 +117,13 @@ export default function PreviewModal({
         );
 
       case "dropdown":
+      //  return  <FormDropdown />
+      return (
+        <div key={field.name} className="">
+          <label className=""> {field.label}</label>
+          <Select />
+          </div>
+      )
       case "multi-select":
         return (
           <div key={field.name} className={wrapperClasses}>
@@ -269,8 +278,6 @@ export default function PreviewModal({
       setSaving(false);
     }
   };
-
-
 
   return (
     <div className="bg-white rounded-xl p-2 w-full">
