@@ -15,13 +15,41 @@ import { GetAddUserFormFields, CreateNewUser } from '../../../../../utils/CheckA
 import FormPhoneInput from '../../../../../shared/components/PhoneInput';
 import TimezoneSelectDropdown from '../../../../../shared/components/TimezoneSelect';
 import convertName from '../../../../../utils/conevrtName';
-
+import { getFormDetails } from '../../../../../utils/CheckAndExecuteFlows/CRUDoperations';
+import { ContinuousColorLegend } from '@mui/x-charts';
 
 export default function CreateUser() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formFields, setFormFields] = useState([]);
   const [userFormFields, setUserFormFields] = useState([]);
+  const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("userObj")));
+  const [newDataFromFormDesigner, setNewDataFromFormDesigner] = useState([])
+  const [Buttons, setButtons] = useState([]);
+
+
+  const getUserFormDesignerFields = async () => {
+    // console.log(data, "data Here");
+    try {
+      const result = await getFormDetails({
+        module: "Users",
+        category: userData.category,
+        subcategory: userData.subcategory,
+        view: userData.view,
+        department: userData.department,
+      });
+      if (result) {
+        // setFormData(result.data);
+        console.log(result.data, "result here");
+        const { formFields, formButtons } = result.data
+        setNewDataFromFormDesigner(formFields);
+        setButtons(formButtons);
+      }
+    } catch (e) {
+      console.log(e, "error");
+      console.log("Error fetching Users Data");
+    }
+  };
 
   useEffect(() => {
     const getUserFormFields = async () => {
@@ -30,9 +58,8 @@ export default function CreateUser() {
         // const response = await fetch('http://localhost:3001/AdminPortalForms/User%20Form/Core%20Forms/Global');
         const data = await GetAddUserFormFields('user');
         if (data?.success === true) {
-          console.log("User Form Fields:", data.data);
+          // console.log("User Form Fields:", data.data);
           setUserFormFields(data.data)
-
           let updatedFields = {};
           const mapFields = () =>
             data.data.map((field) => {
@@ -57,20 +84,25 @@ export default function CreateUser() {
     };
 
     getUserFormFields();
+    getUserFormDesignerFields()
   }, []);
 
   const onChangeInput = (e) => {
+    // below is the old code and it is working
+    // setFormFields((prevState) => {
+    //   // console.log(prevState, e.target.id)
+    //   return {
+    //     ...prevState,
+    //     [e.target.id]: {
+    //       isMandatory: prevState[e.target.id].isMandatory,
+    //       value: e.target.value,
+    //     },
+    //   };
+    // });
 
-    setFormFields((prevState) => {
-      // console.log(prevState, e.target.id)
-      return {
-        ...prevState,
-        [e.target.id]: {
-          isMandatory: prevState[e.target.id].isMandatory,
-          value: e.target.value,
-        },
-      };
-    });
+
+    // setNewDataFromFormDesigner(e);
+    console.log(e, e.target.index, e.target.value, "E Heree in the inout");
   };
 
   const handleCheckboxChange = (e, name) => {
@@ -187,7 +219,7 @@ export default function CreateUser() {
           confirmButtonText: "OK",
         });
       } else {
-        const response = await CreateNewUser("users",formFields)
+        const response = await CreateNewUser("users", formFields)
         if (response.success === true) {
           navigate('/users')
         } else {
@@ -204,15 +236,18 @@ export default function CreateUser() {
   const renderForField = (field) => {
     switch (field.type) {
       case "input":
+      case "text":
+      case "file":
+      case "email":
         return (
           <FormInput
-            type={field.contentType}
+            type={field.contentType || field.type}
             name={field.name}
             label={field.label}
             value={field.value}
             placeholder={field.placeholder}
             customstyles={field.customstyles}
-            isMandatory={field.isMandatory}
+            isMandatory={field?.isMandatory || field?.required}
             onChangeHandler={onChangeInput}
             iconName={field.iconName}
           />
@@ -329,6 +364,7 @@ export default function CreateUser() {
           />
         );
       case "phone":
+      case "tel":
         return (
           <FormPhoneInput
             name={field.name}
@@ -363,8 +399,12 @@ export default function CreateUser() {
   const allRequiredFilled = Object.keys(formFields).every(
     (field) => !formFields[field].isMandatory || formFields[field].value !== ""
   );
-  console.log("Form Fields State:", formFields);  
 
+  
+  console.log(newDataFromFormDesigner, "new Data From the form")
+
+
+  const safeFields = newDataFromFormDesigner.filter(Boolean)
   return (
     <div className="w-full h-full overflow-auto flex flex-col gap-2 pb-4">
       <div className=" h-[10%] flex items-center gap-4 px-4">
@@ -390,10 +430,43 @@ export default function CreateUser() {
           <div className=" h-fit md:h-[90%] w-full flex flex-col md:flex-row justify-between
            self-center overflow-auto md:px-10 px-2 ">
             {userFormFields ? (
+              // COMPLETED WORKING CODE BEFORE NOW CHANGING IT to sutable for form Designer
+              // <>
+              //   <div className="w-full md:w-1/2 h-fit gap-4 flex flex-col p-2">
+              //     {userFormFields
+              //       .filter((_, index) => index % 2 === 0) // Even index items
+              //       .map((field) =>
+              //         renderForField({
+              //           ...field,
+              //           value: formFields[field.name]?.value,
+              //         })
+              //       )}
+              //   </div>
+              //   <div className="w-full md:w-1/2 h-fit gap-4 flex flex-col p-2">
+              //     {userFormFields
+              //       .filter((_, index) => index % 2 !== 0) // Odd index items
+              //       .map((field) =>
+              //         renderForField({
+              //           ...field,
+              //           value: formFields[field.name]?.value,
+              //         })
+              //       )}
+              //   </div>
+              // </>
+              //  <div className="w-full md:w-1/2 h-fit gap-4 flex flex-col p-2">
+              //      {userFormFields
+              //        .filter((_, index) => index % 2 === 0) // Even index items
+              //        .map((field) =>
+              //          renderForField({
+              //            ...field,
+              //           value: formFields[field.name]?.value,
+              //          })
+              //        )}
+              //    </div>
               <>
                 <div className="w-full md:w-1/2 h-fit gap-4 flex flex-col p-2">
-                  {userFormFields
-                    .filter((_, index) => index % 2 === 0) // Even index items
+                  {safeFields
+                    .filter((_, index) => index % 2 !== 0) // Odd index items
                     .map((field) =>
                       renderForField({
                         ...field,
@@ -402,8 +475,8 @@ export default function CreateUser() {
                     )}
                 </div>
                 <div className="w-full md:w-1/2 h-fit gap-4 flex flex-col p-2">
-                  {userFormFields
-                    .filter((_, index) => index % 2 !== 0) // Odd index items
+                  {safeFields
+                    .filter((_, index) => index % 2 == 0) // Odd index items
                     .map((field) =>
                       renderForField({
                         ...field,

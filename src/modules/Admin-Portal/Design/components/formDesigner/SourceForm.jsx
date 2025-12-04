@@ -7,8 +7,10 @@ import ExportModal from "./ExportModal";
 import ExcelJS from "exceljs/dist/exceljs.min.js";
 import EmailModel from "./EmailModal";
 import Cookies from "js-cookie";
-
 import { saveAs } from "file-saver";
+import renderIcons from "../../../../../shared/functions/renderIcons";
+import Select from "react-dropdown-select";
+import { customStyles } from "../../../../../shared/UIElements/FormDropdown";
 
 function ItemCheck({ field, formValues, handleChange }) {
   const handleButtonClick = async () => {
@@ -64,28 +66,81 @@ function ItemCheck({ field, formValues, handleChange }) {
 
     case "dropdown":
       return (
-        <div className="flex flex-col gap-1">
-          <label className="font-medium">{field?.label}</label>
-          <select
-            name={field?.name}
-            value={formValues?.[field?.name] || ""}
-            onChange={(e) => handleChange(field?.name, e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-blue-500"
-          >
-            <option value="">Select...</option>
-            {field?.options?.map((opt, idx) => {
-              const val = typeof opt === "string" ? opt : opt.value;
-              const label = typeof opt === "string" ? opt : opt.label;
-              return (
-                <option key={idx} value={val}>
-                  {label}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-      );
+        // <div className="flex flex-col gap-1">
+        //   <label className="font-medium">{field?.label}</label>
+        //   <select
+        //     name={field?.name}
+        //     value={formValues?.[field?.name] || ""}
+        //     onChange={(e) => handleChange(field?.name, e.target.value)}
+        //     className="border border-gray-300 rounded-md px-3 py-2 focus:outline-blue-500"
+        //   >
+        //     <option value="">Select...</option>
+        //     {field?.options?.map((opt, idx) => {
+        //       const val = typeof opt === "string" ? opt : opt.value;
+        //       const label = typeof opt === "string" ? opt : opt.label;
+        //       return (
+        //         <option key={idx} value={val}>
+        //           {label}
+        //         </option>
+        //       );
+        //     })}
+        //   </select>
+        // </div>
 
+        //new code
+            <div className="group w-full flex flex-col gap-1">
+              {/* Label */}
+              <div className="flex items-center">
+                <label>{field?.label}</label>
+                {field?.isMandatory && renderIcons("FaStarOfLife", 6, "#ff0000")}
+                <span className="border border-[#ccc] rounded-[2px] ml-auto p-[2px]"></span>
+              </div>
+
+              {/* Select Wrapper */}
+              <div
+                onClick={() =>
+                  document.getElementById(`select-${field?.name}`)?.focus()
+                }
+                className="
+          relative w-full 
+          border border-[#ccc] 
+          rounded-md  py-1 px-2
+          cursor-pointer
+          group-focus-within:shadow-[0_0_0.5rem_0.1rem_var(--primary-color)]
+        "
+              >
+                {/* NATIVE SELECT */}
+                <select
+                  id={`select-${field?.name}`}
+                  name={field?.name}
+                  value={formValues?.[field?.name] || ""}
+                  onChange={(e) => handleChange(field?.name, e.target.value)}
+                  className="
+            w-full 
+            bg-transparent 
+            cursor-pointer 
+            outline-none 
+            appearance-none 
+            border-0 
+            text-sm
+          "
+                >
+                  <option value="">Select...</option>
+
+                  {field?.options?.map((opt, i) => (
+                    <option key={i} value={typeof opt === "string" ? opt : opt.value}>
+                      {typeof opt === "string" ? opt : opt.label}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Custom Arrow */}
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
+                  ▼
+                </span>
+              </div>
+            </div>
+      );
     case "radio":
       return (
         <fieldset className="flex flex-col gap-2">
@@ -238,6 +293,7 @@ export default function SourceForm({
   formButtons = [],
   activeTable,
   tabName,
+  existingValues,
 }) {
   const [formValues, setFormValues] = useState({});
   const [exportModalOpen, setExportModalOpen] = useState(false);
@@ -459,15 +515,14 @@ export default function SourceForm({
 
         body: JSON.stringify(payload),
       });
-    } catch (e) {}
+    } catch (e) { }
   };
 
   useEffect(() => {
     const fetchExistingData = async () => {
       try {
-        const endpoint = `${
-          import.meta.env.VITE_HOSTED_API_URL
-        }/api/form-designer/dynamic/get`;
+        const endpoint = `${import.meta.env.VITE_HOSTED_API_URL
+          }/api/form-designer/dynamic/get`;
 
         const activeUser = JSON.parse(localStorage.getItem("activeUserData"));
         const userId = activeUser?.id;
@@ -554,9 +609,8 @@ export default function SourceForm({
       );
 
       const method = (btn.apiMethod || "POST").toUpperCase();
-      const endpoint = `${import.meta.env.VITE_HOSTED_API_URL}${
-        btn.apiEndpoint
-      }`;
+      const endpoint = `${import.meta.env.VITE_HOSTED_API_URL}${btn.apiEndpoint
+        }`;
 
       let config = { url: endpoint, method };
 
@@ -584,7 +638,7 @@ export default function SourceForm({
     handleExport(type); // Export as excel/csv/pdf
     setExportModalOpen(false); // Close modal
   };
-
+  console.log(existingValues,tabName,activeTable,formFields,formButtons,"Here in the source.jsx")
   return (
     <div className="w-[100%] h-fit bg-white p-6 overflow-y-auto rounded-b-[0.5rem]">
       {/* Form Fields */}
@@ -619,11 +673,10 @@ export default function SourceForm({
               type={btn.type || "button"}
               onClick={() => handleButtonClick(btn)}
               disabled={loadingBtn === btn._id}
-              className={`px-6 py-2 text-white rounded transition-all ${
-                loadingBtn === btn._id
-                  ? "!bg-gray-400 cursor-not-allowed"
-                  : "!bg-blue-600 hover:!bg-blue-700"
-              }`}
+              className={`px-6 py-2 text-white rounded transition-all ${loadingBtn === btn._id
+                ? "!bg-gray-400 cursor-not-allowed"
+                : "!bg-blue-600 hover:!bg-blue-700"
+                }`}
             >
               {loadingBtn === btn._id ? "Processing..." : btn.label}
             </button>

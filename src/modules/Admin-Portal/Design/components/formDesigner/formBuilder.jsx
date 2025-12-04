@@ -6,7 +6,6 @@ import renderIcons from "../../../../../shared/functions/renderIcons";
 
 const PREDEFINED_FIELDS = [
   { type: "text", label: "Id" },
-  { type: "text", label: "Name" },
   { type: "text", label: "Channel" },
   { type: "text", label: "Org Id" },
   { type: "text", label: "Action Plan" },
@@ -14,6 +13,9 @@ const PREDEFINED_FIELDS = [
   { type: "text", label: "Internal Notes" },
   { type: "text", label: "Label" },
   { type: "text", label: "On Behalf Of" },
+  {type:"text",label:"First Name"},
+  {type:"text",label:"Last Name"},
+  {type:"email",label:"Email"}
 ];
 
 const PREDEFINED_BUTTONS = [

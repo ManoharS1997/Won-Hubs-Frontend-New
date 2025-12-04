@@ -117,13 +117,13 @@ export default function PreviewModal({
         );
 
       case "dropdown":
-      //  return  <FormDropdown />
-      return (
-        <div key={field.name} className="">
-          <label className=""> {field.label}</label>
-          <Select />
+        //  return  <FormDropdown />
+        return (
+          <div key={field.name} className="">
+            <label className=""> {field.label}</label>
+            <Select />
           </div>
-      )
+        )
       case "multi-select":
         return (
           <div key={field.name} className={wrapperClasses}>
@@ -231,7 +231,7 @@ export default function PreviewModal({
     return obj[key] ?? "";
   };
 
-
+  //  by praveen
   const handleSave = async () => {
     let Method = recordId ? "PUT" : "POST";
     try {
@@ -242,7 +242,6 @@ export default function PreviewModal({
         formButtons,
         tabs,
         column: twoColumn,
-
         departmentName: getValue(FieldData, "department"),
         category: getValue(FieldData, "category"),
         selectedViews: [getValue(FieldData, "views")],
@@ -257,15 +256,14 @@ export default function PreviewModal({
       const url = recordId
         ? `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer/${recordId}`
         : `${import.meta.env.VITE_HOSTED_API_URL}/api/form-designer`;
-      console.log(url, "Url here")
 
+      // console.log(url, "Url here")
       const res = await fetch(url, {
         method: Method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       console.log(res, "Response Here");
-
       if (!res.ok) throw new Error("Failed to save form");
       await res.json();
       alert("Form saved successfully!");
@@ -278,6 +276,40 @@ export default function PreviewModal({
       setSaving(false);
     }
   };
+
+  //by sandhya
+  const handleSave2 = async () => {
+    let Method = recordId ? "PUT" : "POST";
+    try {
+      // setSaving(true);
+      const payload = {
+        module,
+        formFields,
+        formButtons,
+        tabs,
+        column: twoColumn,
+        departmentName: getValue(FieldData, "department"),
+        category: getValue(FieldData, "category"),
+        selectedViews: [getValue(FieldData, "views")],
+        widgetname: "Desktop",
+        subCategory: getValue(FieldData, "subCategory"),
+        designName: getValue(FieldData, "name")
+      }
+      const url = `${import.meta.env.VITE_HOSTED_API_URL}/dynamic/related/`;
+      // console.log(url, "Url here")
+      const res = await fetch(url, {
+        method: Method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      console.log(res, "response Here @form")
+      // localStorage.removeItem("formDesignerData");
+
+    } catch (e) {
+      console.log(e, "e response heree")
+    }
+
+  }
 
   return (
     <div className="bg-white rounded-xl p-2 w-full">
@@ -467,7 +499,8 @@ export default function PreviewModal({
       <div className="mt-6">
         <button
           type="button"
-          onClick={handleSave}
+          // onClick={handleSave} by praveen
+          onClick={handleSave2}
           disabled={saving}
           className={`px-6 py-2 !rounded-lg shadow text-white transition ${saving
             ? "!bg-gray-400 cursor-not-allowed"

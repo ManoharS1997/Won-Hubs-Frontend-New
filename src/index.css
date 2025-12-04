@@ -687,6 +687,16 @@ html,
   animation: fadeIn 0.15s ease-out forwards;
 }
 
+select {
+  width: 100%;
+  min-width: 100%;
+  display: block;
+}
+
+select option {
+  width: 100%;
+}
+
 
 
 /* body {

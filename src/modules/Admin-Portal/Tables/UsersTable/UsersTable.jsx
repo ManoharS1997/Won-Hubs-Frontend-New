@@ -59,7 +59,7 @@ const UsersTable = () => {
         setFormData(result.data);
       }
     } catch {
-      console.log("Error fetching Tickets Data");
+      console.log("Error fetching Users Data");
     }
   };
 

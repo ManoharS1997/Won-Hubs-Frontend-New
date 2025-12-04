@@ -10,6 +10,7 @@ import renderIcons from "../../../shared/functions/renderIcons";
 import PropTypes from "prop-types";
 import Fields from "../../../shared/CreationEditor/Fields";
 
+
 FormDesignerPage.propTypes = {
   recordId: PropTypes.any.isRequired,
 };
