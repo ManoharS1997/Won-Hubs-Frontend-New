@@ -4,6 +4,7 @@ import { AiOutlineSwap } from "react-icons/ai"; // or MdSwapHoriz / HiOutlineSwi
 import { useNavigate } from "react-router-dom";
 import FormDropdown from "../../../../../shared/UIElements/FormDropdown";
 import Select from "react-dropdown-select";
+import Cookies from "js-cookie";
 
 export default function PreviewModal({
   show,
@@ -295,16 +296,22 @@ export default function PreviewModal({
         subCategory: getValue(FieldData, "subCategory"),
         designName: getValue(FieldData, "name")
       }
+      console.log(payload, "payload heree")
       const url = `${import.meta.env.VITE_HOSTED_API_URL}/dynamic/related/`;
-      // console.log(url, "Url here")
+      console.log(url, "Url here")
+      const token = Cookies.get("accessToken") || null;
+
       const res = await fetch(url, {
-        method: Method,
-        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(payload),
       })
       console.log(res, "response Here @form")
-      // localStorage.removeItem("formDesignerData");
-
+      localStorage.removeItem("formDesignerData");
+      navigation("/All Designs",{replace:true});
     } catch (e) {
       console.log(e, "e response heree")
     }

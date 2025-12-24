@@ -3,7 +3,6 @@ import { createBrowserRouter } from "react-router-dom";
 // Import all page and component modules used in the routes
 import LoginPage from "./modules/LoginPage/pages/login.jsx";
 import ProtectedRoute from "./modules/ProtectedRoute/ProtectedRoute.jsx";
-
 // Admin Testing modules
 import Admin from "./modules/Admin-Portal/Admin/pages/Admin";
 import AdminDashboard from "./modules/Admin-Portal/Admin/pages/AdminDashboard";
@@ -15,7 +14,6 @@ import AllReports from "./modules/Admin-Portal/Reports/ReportsTable/AllReports.j
 import AllTemplates from "./modules/Admin-Portal/Templates/pages/AllTemplates";
 import AllWorkflows from "./modules/Admin-Portal/WorkflowAutomator/pages/AllWorkflows";
 import Apps from "./modules/Admin-Portal/Apps/pages/Apps";
-
 // Import additional admin portal components
 import Catalogs from "./modules/Admin-Portal/Design/components/Catalogs/Catalogs.jsx";
 import CMDBTable from "./modules/Admin-Portal/Tables/CMDBTable/pages/CMDBTable.jsx";
@@ -38,7 +36,6 @@ import CustomDateTimePicker from "./modules/Admin-Portal/WorkflowAutomator/pages
 import ChatBot from "./modules/UserPortal/UserPortal-InternalFlow/Chat/Chat";
 import CreateTable from "./modules/Admin-Portal/Tables/CreateNewTable/CreateTable.jsx";
 import CreateConnection from "./modules/Admin-Portal/Tables/ConnectionsTable/pages/CreateConnection.jsx";
-
 import DepartmentDetailsView from "./modules/Admin-Portal/Tables/DepartmentsTable/DepartmentDetailsView/DepartmentDetailsView.jsx";
 import DepartmentsListView from "./modules/Admin-Portal/Tables/DepartmentsTable/DepartmentsListView.jsx";
 import DesignForm from "./modules/Admin-Portal/Design/pages/CreateDesign.jsx";
@@ -123,7 +120,6 @@ import UserTickets from "./modules/UserPortal/UserPortal-InternalFlow/UserTicket
 import UserTicketDetailedView from "./modules/UserPortal/UserTicketDetailedView/UserTicketDetailedView";
 import MFA from "./modules/MFA/MFApage.jsx";
 import MFAProtectedRoute from "./modules/ProtectedRoute/MFAProtectedRoute.jsx";
-
 import ReportCardSelection from "./modules/Admin-Portal/Reports/pages/ReportCardSelection.jsx";
 import ArticlesDetailedView from "./modules/UserPortal/UserPortal-InternalFlow/Articles/ArticlesDetailedView.jsx";
 import AnnouncementDetailView from "./modules/UserPortal/UserPortal-InternalFlow/Announcements/AnnouncementDetailView/AnnouncementDetailedView.jsx";
@@ -142,7 +138,6 @@ import AllWebhooks from "./modules/Administration/Webhooks/pages/AllWebhooks.jsx
 import AdminAccount from "./modules/Admin-Portal/Account/pages/AdminAccount.jsx";
 import CIRecordForm from "./modules/Admin-Portal/Tables/CMDBTable/pages/AddCIRecord.jsx";
 import ChooseCIType from "./modules/Admin-Portal/Tables/CMDBTable/pages/ChooseCIType.jsx";
-
 import Layout from "../Layout/layout.jsx";
 import UserLayout from "../Layout/UserLayout.jsx";
 import CreateWebhook from "./modules/Administration/Webhooks/pages/CreateWebhook.jsx";
@@ -171,6 +166,10 @@ import IntegrationLayOutComponent from "./modules/Integrations/pages/Integration
 import SelectWithIcon from "./shared/components/SelectWithIcon.jsx";
 import NewCalendar from "./modules/Admin-Portal/Calender/pages/NewCalendar.jsx";
 import UpdatedEventModal from "./modules/Admin-Portal/Calender/pages/EventModalUpdated.jsx";
+import FormDesignerTesting from "./modules/Admin-Portal/FormDesignerTesting/FormDesignerTesting.jsx";
+import TestingTableView from "./modules/Admin-Portal/FormDesignerTesting/FormTestingTableView.jsx";
+import TableCompnent2 from "./modules/TableComponent/components/TabTable2.jsx";
+
 
 const router = createBrowserRouter([
   // Public routes (no authentication required)
@@ -478,7 +477,7 @@ const router = createBrowserRouter([
             element: <CreateDepartment />,
           },
           // {
-          // path: "/create/new-integration",
+          // path: "/createt-integration",
           // element: <ChooseIntegraionmodes />,
           // },
           {
@@ -780,8 +779,17 @@ const router = createBrowserRouter([
           },
 
           {
-            path:'/eventUpdate',
-            element:<UpdatedEventModal />
+            path: '/eventUpdate',
+            element: <UpdatedEventModal />
+          },
+          {
+            path: '/formtest',
+            // element: <FormDesignerTesting />
+            element: <TestingTableView />
+
+          },{
+            path:"/test-table",
+            element:<TableCompnent2 />
           }
 
         ],

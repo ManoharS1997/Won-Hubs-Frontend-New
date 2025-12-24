@@ -16,6 +16,7 @@ import {
   ModelCustomContainerRight, ModelHeaderContainer, ModelHeadingText, TableContainer,
   DragCardItem, ConfigureFieldsListContainer
 } from './StyledComponents'
+import Select from 'react-dropdown-select';
 
 const CustomPointerSensor = () => {
   return useSensor(PointerSensor, {
@@ -103,21 +104,22 @@ export default function ConfigureFields({
         onClick={e => e.stopPropagation()}
         onMouseDown={e => e.stopPropagation()}
       >
-        <DragCardItem isSelected={checkIfSelected(item.name)} >
+        <DragCardItem isSelected={checkIfSelected(item?.name)} >
           <CheckBoxTag
             type="checkbox"
-            checked={checkIfSelected(item.name)}
+            checked={checkIfSelected(item?.name)}
             onChange={(e) => {
               e.stopPropagation()
               handleColumnVisibility(item)
             }}
           />
-
+{/* 
           {item.name.replace(/_/g, ' ') // Replace underscores with space
             .replace(/([A-Z])/g, ' $1') // Add space before capital letters
             .replace(/^./, (str) => str.toUpperCase()) // Capitalize the first letter
             .replace(/\b\w/g, (str) => str.toUpperCase()) // Capitalize each word
-          }
+          }  previous */ }
+          {item}
         </DragCardItem>
       </div>
     );
@@ -137,6 +139,7 @@ export default function ConfigureFields({
     // console.log(selectedList)
     return selectedList.length > 0
   }
+  console.log(selectedColumns, "selectedColumns Hereee")
 
   return (
     <>
@@ -175,13 +178,15 @@ export default function ConfigureFields({
                   onDragEnd={handleDragEnd}
                 >
                   <SortableContext
-                    items={filteredColumns}
+                    // items={filteredColumns}
+                    items={selectedColumns}
                     strategy={verticalListSortingStrategy}
                     style={{ overflow: 'auto' }}
                   >
-                    {filteredColumns.map((field, index) => ({ ...field, id: index })).map((item) => (
+                    {/* {filteredColumns.map((field, index) => ({ ...field, id: index })).map((item) => (
                       <SortableItem key={item.id} id={item.id} name={item.name} item={item} />
-                    ))}
+                    ))} previous list */ }
+                   <SortableItem />
                   </SortableContext>
                 </DndContext>
               </ConfigureFieldsListContainer>

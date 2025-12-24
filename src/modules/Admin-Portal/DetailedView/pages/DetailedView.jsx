@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import SourceForm from "../../Design/components/formDesigner/SourceForm";
 import { getRecordData } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
+import Cookies from "js-cookie";
+
 
 const RECORD_TABS = [{ id: 1, name: "Details" }];
 
@@ -19,10 +21,17 @@ export default function DetailedView({
   formData,
   activeTable,
 }) {
+  console.log("TRIGGERING IN DETAILED VIEw")
+  console.log(recordId,
+    tableName,
+    formData,
+    activeTable, "Props Checking Here")
+
   const [recordData, setRecordData] = useState(null);
   const [activeTab, setActiveTab] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const apiUrl = import.meta.env.VITE_HOSTED_API_URL;
 
   /** LOAD RECORD & INITIALIZE */
   useEffect(() => {
@@ -31,14 +40,39 @@ export default function DetailedView({
       setActiveTab(1);
     }
   }, [recordId, formData]);
-
   const fetchRecordDetails = async () => {
     try {
       setLoading(true);
+
+      // 🔹 CASE 1: tableName = form_test -> Call Dummy_Test table
+      if (tableName === "formtest") {
+        const url = `${apiUrl}/dynamic/related/table/getdata/${recordId}`;
+
+        const options = {
+          method: "GET",
+          headers: {
+            authorization: `Bearer ${Cookies.get("accessToken")}`
+          }
+        };
+
+        const response = await fetch(url, options);
+        const result = await response.json();
+
+        if (result?.data) {
+          setRecordData(result.data);
+        } else {
+          setError("No record found in Dummy_Test.");
+        }
+
+        return; // ✅ Stop execution here
+      }
+
+      // 🔹 CASE 2: Default case -> call normal API
       const { data } = await getRecordData(tableName, recordId);
 
       if (data?.[0]) setRecordData(data[0]);
       else setError("No record found.");
+
     } catch (e) {
       console.error(e);
       setError("Failed to fetch record.");
@@ -166,6 +200,8 @@ export default function DetailedView({
     })) || []),
   ];
 
+
+
   return (
     <div className="w-full max-h-[82vh] flex flex-col bg-white rounded-lg">
       {/* Tabs Header */}
@@ -175,11 +211,10 @@ export default function DetailedView({
             <li
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-1 rounded-t cursor-pointer font-semibold ${
-                activeTab === tab.id
-                  ? "bg-white text-[var(--primary-color)]"
-                  : "text-white hover:bg-gray-300 hover:text-black"
-              }`}
+              className={`px-4 py-1 rounded-t cursor-pointer font-semibold ${activeTab === tab.id
+                ? "bg-white text-[var(--primary-color)]"
+                : "text-white hover:bg-gray-300 hover:text-black"
+                }`}
             >
               {tab.name}
             </li>
@@ -192,12 +227,20 @@ export default function DetailedView({
         {activeTab === 1 ? (
           /** ⭐ DETAILS TAB => SHOW SAME SOURCEFORM */
           <SourceForm
-            formFields={formData.formFields}
-            formButtons={formData.formButtons}
+            formFields={formData}
+            formButtons={formData}
             activeTable={activeTable}
             tabName="details"
-            existingValues={recordData}
+            existingValues={[recordData]}
           />
+          // <SourceForm2
+          //   formFields={[formData]}
+          //   formButtons={[formData]}
+          //   activeTable={activeTable}
+          //   tabName="details"
+          //   existingValues={[recordData]}
+          // />
+
         ) : (
           combinedTabs
             .filter((t) => t.id === activeTab)

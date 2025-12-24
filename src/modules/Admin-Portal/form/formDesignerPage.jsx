@@ -9,6 +9,7 @@ import { set } from "date-fns";
 import renderIcons from "../../../shared/functions/renderIcons";
 import PropTypes from "prop-types";
 import Fields from "../../../shared/CreationEditor/Fields";
+import { GetAllDesignes, GetDesignerFields, GetDesignById } from "../../../utils/CheckAndExecuteFlows/CRUDoperations";
 
 
 FormDesignerPage.propTypes = {
@@ -31,7 +32,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     open: false,
   });
   const [showCreate, setShowCreate] = useState(true)
-  const [previousFieldsData, setPreviousFieldsData] = useState(JSON.parse(localStorage.getItem("formDesignerData")))
+  const [previousFieldsData, setPreviousFieldsData] = useState({} || JSON.parse(localStorage.getItem("formDesignerData")))
   const Navigate = useNavigate()
   // const [recordId,setRecordId]=useState(recordId)
 
@@ -178,7 +179,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     });
   };
 
-  console.log(formButtons)
+  // console.log(formButtons)
 
   // Open modal on custom button add
   const addCustomButton = () => {
@@ -228,7 +229,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     const dbResponse = await response.json();
     console.log(dbResponse, "DbResponse Hereee");
     if (dbResponse.data) {
-      const { formFields, formButtons, tabs, module, category, subCategory, widgetname, views, departmentName,designName,selectedViews} = dbResponse.data;
+      const { formFields, formButtons, tabs, module, category, subCategory, widgetname, views, department_name, designer_name, selectedViews } = dbResponse.data;
       setFormFields(formFields);
       setFormButtons(formButtons);
       setTabs(tabs);
@@ -237,20 +238,45 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
         category: category || null,
         subCategory: subCategory || null,
         widgetname: widgetname || null,
-        views: [...selectedViews ]|| null,
+        views: [...selectedViews] || null,
         department: departmentName || null,
-        name:designName||null
+        name: designer_name || null
       }
       setPreviousFieldsData(previousData)
+
     }
   };
 
+  const getDesignDetails = async () => {
+    const response = await GetDesignById(recordId)
+    console.log(response, "Hereee")
+    if (response.success) {
+      const { fields, formButtons, tabs, designName, views, module, departmentName, subCategory, category, designerName } = response;
+      console.log(category,"category Hereee")
+      setFormFields(fields)
+      setFormButtons(formButtons)
+      setTabs(tabs)
+      setModule(designName || module)
+      const object_for_localdata = {
+        views: { value: views },
+        category: { value: category },
+        subCategory: { value: subCategory },
+        department: { value: departmentName },
+        name: { value: designerName }
+      }
+      setPreviousFieldsData(object_for_localdata)
+    }
+  }
+
   useEffect(() => {
     if (recordId) {
-      getRecordDetails();
+      // getRecordDetails();
+      console.log("Trigggering in useEffect")
+      getDesignDetails()
     }
   }, []);
   // console.log(previousFieldsData,"Previous Field Dataaa")
+  // console.log(Fields,"Fields Herreee")
 
   return (
     <>
@@ -270,7 +296,6 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                 </button>
                 <span>Form Designer</span>
               </h3>
-
               {/* Center: Tab Buttons */}
               <div className="flex-1 flex justify-center">
                 <TabsContainer style={{ marginBottom: 20 }}>
@@ -282,7 +307,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                       setShowTabs(false);
                       setShowPreview(false);
                     }}
-
+                    className="bg-transparent"
                   >
                     Create
                   </TabItem>
@@ -434,6 +459,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                 removeField={removeField}
                 removeButton={removeButton}
                 setFormFields={setFormFields}
+                setFormButtons={setFormButtons}
               />
             )}
 

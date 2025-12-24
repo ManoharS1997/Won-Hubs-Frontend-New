@@ -1,21 +1,19 @@
 import PropTypes from "prop-types";
 import DraggableButton from "./DraggableButton";
 import AddFieldModal from "./AddFieldModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import renderIcons from "../../../../../shared/functions/renderIcons";
 
 const PREDEFINED_FIELDS = [
-  { type: "text", label: "Id" },
   { type: "text", label: "Channel" },
-  { type: "text", label: "Org Id" },
   { type: "text", label: "Action Plan" },
   { type: "text", label: "External Notes" },
   { type: "text", label: "Internal Notes" },
   { type: "text", label: "Label" },
   { type: "text", label: "On Behalf Of" },
-  {type:"text",label:"First Name"},
-  {type:"text",label:"Last Name"},
-  {type:"email",label:"Email"}
+  { type: "text", label: "First Name" },
+  { type: "text", label: "Last Name" },
+  { type: "email", label: "Email" }
 ];
 
 const PREDEFINED_BUTTONS = [
@@ -36,13 +34,16 @@ export default function FormBuilder({
   removeField,
   removeButton,
   setFormFields,
+  setFormButtons,
 }) {
-  const [showAddFieldModal, setShowAddFieldModal] = useState(false);
   const [filteredFields, setFilteredFields] = useState(PREDEFINED_FIELDS);
   const [filteredButtons, setFilteredButtons] = useState(PREDEFINED_BUTTONS);
   const [showAllFields, setShowAllFiels] = useState(false);
   const [showButtonFields, setShowButtonFields] = useState(false);
-
+  const [draggedFieldIndex, setDraggedFieldIndex] = useState(null);
+  const [buttonDragFieldIndex, setButtonDragFieldIndex] = useState(null);
+  const [showAddFieldModal, setShowAddFieldModal] = useState(false);
+  const [fieldToEdit, setFieldToEdit] = useState(null);
   // When user submits Add Field Modal
   const onAddFieldModalSubmit = ({ label, type, options, required }) => {
     if (
@@ -66,6 +67,7 @@ export default function FormBuilder({
     setShowAddFieldModal(false);
   };
 
+  // console.log(formFields, "Form Fields Hereee")
   // Toggle required flag for an existing field
   const toggleRequired = (index) => {
     setFormFields((prev) =>
@@ -74,6 +76,24 @@ export default function FormBuilder({
       )
     );
   };
+  const reorderFields = (fromIndex, toIndex) => {
+    setFormFields((prev) => {
+      const updated = [...prev];
+      const [movedItem] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, movedItem);
+      return updated;
+    });
+  };
+
+  const reorderButtonFields = (fromIndex, toIndex) => {
+    console.log(fromIndex, toIndex, "FROM && TO");
+    setFormButtons((prev) => {
+      const updated = [...prev]
+      const [movedItem] = updated.splice(fromIndex, 1)
+      updated.splice(toIndex, 0, movedItem);
+      return updated;
+    })
+  }
 
   return (
     <section className="bg-white p-4 rounded-2xl shadow-lg border border-indigo-100 flex-grow min-w-[320px] transition">
@@ -110,25 +130,40 @@ export default function FormBuilder({
         </div>
         <div className="flex flex-col gap-3 mb-4">
           <div
-            className={`flex flex-wrap items-center gap-3 overflow-y-auto transition-all duration-300 ${
-              showAllFields ? "max-h-[180px]" : "max-h-[140px]"
-            }`}
+            className={`flex flex-wrap items-center gap-3 overflow-y-auto transition-all duration-300 ${showAllFields ? "max-h-[180px]" : "max-h-[140px]"
+              }`}
           >
             {(showAllFields ? filteredFields : filteredFields.slice(0, 7)).map(
               (f) => (
-                <DraggableButton
+
+                <div
                   key={f.label}
-                  item={f}
-                  category="field"
-                  onDragStart={onDragStart}
-                  className="bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
+                  onClick={() => {
+                    console.log("Field Click JESUS", f)
+                    setFieldToEdit(f)
+                    setShowAddFieldModal(true);
+                  }}
+                >
+                  <DraggableButton
+                    key={f.label}
+                    item={f}
+                    category="field"
+                    onDragStart={onDragStart}
+                    onClick={() => {
+                      console.log("Field Click JESUS", f)
+                      setFieldToEdit(f)
+                      setShowAddFieldModal(true);
+                    }}
+                    className="bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
           border border-blue-600/40 text-white font-medium rounded-md 
           px-5 py-2.5 shadow-sm transition-all duration-300
           hover:from-blue-700 hover:via-blue-900 hover:to-blue-500
           hover:shadow-md active:scale-95 whitespace-nowrap"
-                >
-                  {f.label}
-                </DraggableButton>
+
+                  >
+                    {f.label}
+                  </DraggableButton>
+                </div>
               )
             )}
           </div>
@@ -137,8 +172,11 @@ export default function FormBuilder({
           <div className="flex justify-between w-[97%] items-center">
             <button
               style={{ borderRadius: 6 }}
-              className="!bg-green-500 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-green-600 active:scale-95 transition whitespace-nowrap"
-              onClick={() => setShowAddFieldModal(true)}
+              className="!bg-green-500 text-white px-4 py-2 rounded-lg font-medium shadow hover:!bg-green-600 active:scale-95 transition whitespace-nowrap"
+              onClick={() => {
+                setFieldToEdit(null);
+                setShowAddFieldModal(true);
+              }}
             >
               + Custom
             </button>
@@ -158,10 +196,10 @@ export default function FormBuilder({
               open={showAddFieldModal}
               onClose={() => setShowAddFieldModal(false)}
               onSubmit={onAddFieldModalSubmit}
+              fieldToEdit={fieldToEdit}
             />
           </div>
         </div>
-
         {/* Drop Zone for Fields */}
         <div
           className="border-2 border-dashed border-indigo-300 rounded-xl h-44 overflow-auto p-4 bg-indigo-50/30 hover:bg-indigo-50 transition"
@@ -173,13 +211,23 @@ export default function FormBuilder({
               Drag & drop fields here
             </p>
           )}
-
           {/* Field List */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {formFields.map((field, i) => (
               <div
                 key={field.name}
-                className="flex justify-between items-center bg-white border border-indigo-100 rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition"
+                draggable
+                onDragStart={() => setDraggedFieldIndex(i)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => {
+                  if (draggedFieldIndex !== null && draggedFieldIndex !== i) {
+                    reorderFields(draggedFieldIndex, i);
+                  }
+                  setDraggedFieldIndex(null);
+                }}
+                className="flex justify-between items-center bg-white border border-indigo-100
+               rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition
+               cursor-move select-none"
               >
                 <div>
                   <span className="font-medium">{field.label}</span>{" "}
@@ -194,9 +242,8 @@ export default function FormBuilder({
                   <button
                     onClick={() => toggleRequired(i)}
                     title="Toggle required"
-                    className={`text-sm font-semibold ${
-                      field.required ? "text-red-500" : "text-gray-400"
-                    } hover:text-red-600 transition`}
+                    className={`text-sm font-semibold ${field.required ? "text-red-500" : "text-gray-400"
+                      } hover:text-red-600 transition`}
                   >
                     {field.required ? "Req" : "Opt"}
                   </button>
@@ -250,27 +297,35 @@ export default function FormBuilder({
         {/* Buttons List Area */}
         <div className="flex flex-col gap-3 mb-2">
           <div
-            className={`flex flex-wrap items-center gap-3 overflow-y-auto transition-all duration-300 ${
-              showButtonFields ? "max-h-[180px]" : "max-h-[140px]"
-            }`}
+            className={`flex flex-wrap items-center gap-3 overflow-y-auto transition-all duration-300 ${showButtonFields ? "max-h-[180px]" : "max-h-[140px]"
+              }`}
           >
             {(showButtonFields
               ? filteredButtons
               : filteredButtons.slice(0, 7)
             ).map((b) => (
-              <DraggableButton
+              <div
                 key={b.label}
-                item={b}
-                category="button"
-                onDragStart={onDragStart}
-                className="bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
+                onClick={() => {
+                  console.log("Button clicked:", b);
+                  setFieldToEdit({ ...b, isButton: true }); // flag it as a button
+                  setShowAddFieldModal(true);
+                }}
+              >
+                <DraggableButton
+                  key={b.label}
+                  item={b}
+                  category="button"
+                  onDragStart={onDragStart}
+                  className="bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
             border border-blue-600/40 text-white font-medium rounded-md
             px-5 py-2.5 shadow-sm transition-all duration-300
             hover:from-blue-700 hover:via-blue-900 hover:to-blue-500
             hover:shadow-md active:scale-95 whitespace-nowrap"
-              >
-                {b.label}
-              </DraggableButton>
+                >
+                  {b.label}
+                </DraggableButton>
+              </div>
             ))}
           </div>
 
@@ -306,13 +361,33 @@ export default function FormBuilder({
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+
             {formButtons.map((btn, i) => (
               <div
                 key={`${btn.label}-${i}`}
-                className="flex justify-between items-center bg-white border border-indigo-100 rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition"
+                draggable
+                onDragStart={() => setButtonDragFieldIndex(i)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => {
+                  if (
+                    buttonDragFieldIndex !== null &&
+                    buttonDragFieldIndex !== i
+                  ) {
+                    reorderButtonFields(buttonDragFieldIndex, i);
+                  }
+                  setButtonDragFieldIndex(null); // ✅ FIXED
+                }}
+                className="flex justify-between items-center bg-white border border-indigo-100
+          rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition
+          cursor-move select-none"
               >
-                <div className="font-medium">{btn.label}</div>
+                <div className="font-medium select-none">
+                  {btn.label}
+                </div>
+
                 <button
+                  draggable={false}
+                  onMouseDown={(e) => e.stopPropagation()}
                   onClick={() => removeButton(i)}
                   className="text-red-500 hover:text-red-700 text-lg font-bold transition"
                   type="button"
@@ -324,6 +399,7 @@ export default function FormBuilder({
             ))}
           </div>
         </div>
+
       </div>
     </section>
   );

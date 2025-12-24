@@ -687,7 +687,7 @@ export const getTableData = async (tableName, componentName) => {
     };
 
     const response = await fetch(url, options);
-    console.log(response, "response From Table ")
+    // console.log(response, "response From Table ")
     const data = await response.json();
     // console.log(data,"dat@here")
     return data;
@@ -749,6 +749,7 @@ export const getRecordData = async (
     body: JSON.stringify({ eventData: eventData }),
   };
   const response = await fetch(url, options);
+  console.log(response, "Response Hereee")
   const data = await response.json();
   return data;
 };
@@ -764,6 +765,7 @@ export const getTableColumnNames = async (tableName) => {
     },
   };
   const response = await fetch(url, options);
+
   const data = await response.json();
   return data;
 };
@@ -3160,3 +3162,269 @@ export const getFormDetails = async (formData) => {
     return err;
   }
 };
+
+// created By Sandhya  to test form Designer
+
+export const GetDesignerFields = async (param) => {
+  // console.log(param, "param in get add user form fields");
+  try {
+    const url = `${apiUrl}/dynamic/related/designer-fields/${param}`;
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+    };
+    const response = await fetch(url, options);
+    // console.log(response, "reponse from the designer");
+    if (response.ok) {
+      const data = await response.json();
+      // console.log(data, "response Data");
+      return data;
+    }
+  } catch (err) {
+    console.error("error getting add user form fields", err);
+  }
+};
+
+export const GetDesignById = async (param) => {
+  // console.log(param, "param in get add user form fields");
+  try {
+    const url = `${apiUrl}/dynamic/related/designer-fields-byId/${param}`;
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+    };
+    const response = await fetch(url, options);
+    // console.log(response, "reponse from the designer");
+    if (response.ok) {
+      const data = await response.json();
+      // console.log(data, "response Data");
+      return data;
+    }
+  } catch (err) {
+    console.error("error getting add user form fields", err);
+  }
+};
+
+export const addDynamicaRecord = async (designName, fields, recordId = null) => {
+  try {
+    const url = `${apiUrl}/dynamic/related/record/save`;
+
+    const payload = {
+      designName,
+      recordId,
+      data: fields
+    };
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+      body: JSON.stringify(payload)
+    };
+
+    const response = await fetch(url, options);
+    // console.log(response, "response from SaveDynamicRecord");
+    if (!response.ok) {
+      const err = await response.json();
+      // console.error("SaveDynamicRecord Error:", err);
+      return err;
+    }
+
+    const data = await response.json();
+    console.log(data, "SaveDynamicRecord Response Data");
+    return data;
+
+  } catch (err) {
+    console.error("❌ Frontend addDynamicaRecord ERROR:", err);
+    return { success: false, message: err.message };
+  }
+};
+
+
+export const GetDynamicRecordData = async (tableName, recordId = null) => {
+  try {
+    const url = `${apiUrl}/dynamic/related/${tableName}/${recordId}`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+
+    };
+
+    const response = await fetch(url, options);
+    // console.log(response, "response from SaveDynamicRecord");
+    if (!response.ok) {
+      const err = await response.json();
+      // console.error("SaveDynamicRecord Error:", err);
+      return err;
+    }
+    const data = await response.json();
+    // console.log(data, "SaveDynamicRecord Response Data");
+    return data;
+
+  } catch (err) {
+    console.error("❌ Frontend addDynamicaRecord ERROR:", err);
+    return { success: false, message: err.message };
+  }
+};
+
+export const GetTabValues = async (designName, tabName, recordId) => {
+  try {
+    const url = `${apiUrl}/dynamic/related/tabRecord/${designName}/${tabName}/${recordId}`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+    };
+
+    const response = await fetch(url, options);
+    console.log(response, "response from tab values");
+    if (!response.ok) {
+      const err = await response.json();
+      console.log("SaveDynamicRecord Error:", err);
+      return err;
+    }
+    const data = await response.json();
+    return data;
+
+  } catch (err) {
+    console.error("❌ Frontend addDynamicaRecord ERROR:", err);
+    return { success: false, message: err.message };
+  }
+};
+export const SaveTabRecord = async (designName, fields, recordId = null, activeTab, isTable = false) => {
+  try {
+    const url = `${apiUrl}/dynamic/related/tab/save`;
+    const payload = {
+      designName,
+      recordId,
+      tabName: activeTab,
+      ...(isTable ? { rows: fields } : { data: fields }),
+      isTable: isTable
+    };
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+      body: JSON.stringify(payload)
+    };
+
+    const response = await fetch(url, options);
+    // console.log(response, "response from SaveDynamicRecord");
+    if (!response.ok) {
+      const err = await response.json();
+      // console.error("SaveDynamicRecord Error:", err);
+      return err;
+    }
+
+    const data = await response.json();
+    console.log(data, "SaveDynamicRecord Response Data");
+    return data;
+
+  } catch (err) {
+    console.error("❌ Frontend addDynamicaRecord ERROR:", err);
+    return { success: false, message: err.message };
+  }
+};
+
+export const FetchTableColumns = async (tableName) => {
+  try {
+    const res = await fetch(`${apiUrl}/dynamic/related/table/columns/${tableName}`, {
+      headers: {
+        authorization: `Bearer ${Cookies.get("accessToken")}`
+      }
+    });
+
+    const data = await res.json();
+
+    // console.log("Columns:", data.columns);
+    return data.columns;
+
+  } catch (err) {
+    console.log(err, "Error Hereeee")
+    console.error("Frontend error fetching columns:", err);
+  }
+};
+
+export const GetAllDesignes = async () => {
+  try {
+    const url = `${apiUrl}/dynamic/related/get-All-Designs`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+    };
+
+    const response = await fetch(url, options);
+    console.log(response, "response from SaveDynamicRecord");
+    if (!response.ok) {
+      const err = await response.json();
+      // console.error("SaveDynamicRecord Error:", err);
+      return err;
+    }
+    const data = await response.json();
+    return data;
+
+  } catch (err) {
+    console.error("❌ Frontend addDynamicaRecord ERROR:", err);
+    return { success: false, message: err.message };
+  }
+};
+
+export const UpdateTabRecord = async (designName, fields, recordId = null, activeTab) => {
+  try {
+    const url = `${apiUrl}/dynamic/related/tab/update`;
+    const payload = {
+      designName,
+      recordId,
+      data: fields,
+      tabName: activeTab
+    };
+
+    const options = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+      body: JSON.stringify(payload)
+    };
+
+    const response = await fetch(url, options);
+    console.log(response, "response from update");
+    if (!response.ok) {
+      const err = await response.json();
+      // console.error("SaveDynamicRecord Error:", err);
+      return err;
+    }
+
+    const data = await response.json();
+    console.log(data, "SaveDynamicRecord Response Data");
+    return data;
+
+  } catch (err) {
+    console.error("❌ Frontend addDynamicaRecord ERROR:", err);
+    return { success: false, message: err.message };
+  }
+};
+

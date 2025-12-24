@@ -5,6 +5,7 @@ import renderIcons from "../../../../../shared/functions/renderIcons";
 import AddButtonEventModal from "./AddButtonEventModal";
 import AddTableEventModal from "./AddTableEventModal";
 import AddTableActionEventModal from "./AddTableActionEventModal";
+import { Table } from "lucide-react";
 
 const PREDEFINED_TABS = ["History", "Settings"];
 
@@ -27,11 +28,12 @@ const PREDEFINED_BUTTONS = [
   { type: "export", label: "Export" },
 ];
 
-// const TABLE_ACTIONS = [
-//   { type: "edit", label: "Edit" },
-//   { type: "delete", label: "Delete" },
-//   { type: "view", label: "View" },
-// ];
+const TABLE_ACTIONS = [
+  { id: 1, label: 'Search' },
+  { id: 2, label: 'Filter' },
+  { id: 3, label: 'Add' },
+
+];
 
 const fieldTypesWithOptions = ["dropdown", "radio", "checkbox"];
 function fieldSupportsOptions(type) {
@@ -144,7 +146,28 @@ function Tab({
   removeTab,
   // addCustomButton,
   toggleRequired,
+  setTabs,
 }) {
+
+
+
+  const reorderTabFields = (tabIdx, fromIndex, toIndex) => {
+    setTabs((prevTabs) => {
+      const updatedTabs = [...prevTabs];
+      const fields = [...updatedTabs[tabIdx].fields];
+
+      const [moved] = fields.splice(fromIndex, 1);
+      fields.splice(toIndex, 0, moved);
+
+      updatedTabs[tabIdx] = {
+        ...updatedTabs[tabIdx],
+        fields,
+      };
+
+      return updatedTabs;
+    });
+  };
+
   return (
     <section className="bg-indigo-50 rounded-lg p-6 shadow-md w-full mb-2.5">
       <header className="flex justify-between items-center mb-4">
@@ -156,11 +179,10 @@ function Tab({
             <button
               onClick={() => setTabType(tabIdx, "form")}
               className={`px-5 py-2 text-sm font-medium transition-all duration-200
-      ${
-        tab.type === "form"
-          ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
-          : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
-      }
+      ${tab.type === "form"
+                  ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
+                  : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
+                }
       rounded-l-md
     `}
             >
@@ -169,11 +191,10 @@ function Tab({
             <button
               onClick={() => setTabType(tabIdx, "table")}
               className={`px-5 py-2 text-sm font-medium transition-all duration-200
-      ${
-        tab.type === "table"
-          ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
-          : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
-      }
+      ${tab.type === "table"
+                  ? "bg-gradient-to-r from-indigo-700 to-indigo-400 text-white shadow-md"
+                  : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
+                }
       rounded-r-md
     `}
             >
@@ -240,9 +261,8 @@ function Tab({
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => toggleRequired(tabIdx, idx)}
-                        className={`text-sm font-semibold ${
-                          field.required ? "text-red-500" : "text-gray-400"
-                        } hover:text-red-600 transition`}
+                        className={`text-sm font-semibold ${field.required ? "text-red-500" : "text-gray-400"
+                          } hover:text-red-600 transition`}
                         title="Toggle required"
                       >
                         {field.required ? "Req" : "Opt"}
@@ -321,7 +341,6 @@ function Tab({
           </div>
         </>
       )}
-
       {tab.type === "table" && (
         <>
           <div
@@ -343,17 +362,6 @@ function Tab({
                 </DraggableButton>
               ))}
 
-              {/* {TABLE_ACTIONS.map((action) => (
-                <DraggableButton
-                  key={action.type}
-                  item={action}
-                  category="action"
-                  onDragStart={onDragStart}
-                  className="px-3 py-1 !bg-blue-500 text-white rounded cursor-grab text-sm shadow-sm"
-                >
-                  {action.label}
-                </DraggableButton>
-              ))} */}
 
               <button
                 onClick={() => {
@@ -394,7 +402,55 @@ function Tab({
               </p>
             )}
           </div>
+          {/* Filter elements section */}
+          <div
+            onDrop={(e) => onDrop(e, tabIdx, "column")}
+            onDragOver={allowDrop}
+            className="border-2 border-dashed border-indigo-400 p-4 rounded-lg mb-6 min-h-[10rem]"
+          >
+            {/* Predefined draggable fields & table actions */}
+            <div className="flex flex-wrap gap-3 mb-4">
+              {TABLE_ACTIONS.map((field) => (
+                <DraggableButton
+                  key={field.label}
+                  item={field}
+                  category="field"
+                  onDragStart={onDragStart}
+                  className="px-3 py-1 bg-white border border-indigo-300 rounded cursor-grab text-sm text-indigo-700 shadow-sm"
+                >
+                  {field.label}
+                </DraggableButton>
+              ))}
+            </div>
 
+            {/* Responsive grid layout for dropped columns */}
+            {TABLE_ACTIONS.length > 0 ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {tab.tableCols.map((col, idx) => (
+                  <div
+                    key={col.name}
+                    className="flex justify-between items-center bg-white rounded px-4 py-2 shadow-sm hover:shadow-md transition"
+                  >
+                    <span>
+                      {col.label}{" "}
+                      <small className="text-indigo-500">({col.type})</small>
+                    </span>
+                    <button
+                      onClick={() => removeColumn(tabIdx, idx)}
+                      className="text-red-600 hover:text-red-800 rounded focus:outline-none"
+                      aria-label="Remove column"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-500 italic">
+                Drop columns here
+              </p>
+            )}
+          </div>
           <table className="w-full table-fixed border border-gray-300 rounded-md text-center shadow-sm">
             <thead className="bg-indigo-200 text-indigo-700 font-semibold">
               <tr>
@@ -406,12 +462,11 @@ function Tab({
                       key={col.name}
                       className="border border-gray-300 px-4 py-2"
                       style={{
-                        width: `${
-                          100 /
+                        width: `${100 /
                           (tab.tableCols.filter((c) => c.type !== "action")
                             .length +
                             1)
-                        }%`,
+                          }%`,
                       }}
                     >
                       {col.label}
@@ -423,12 +478,11 @@ function Tab({
                   <th
                     className="border border-gray-300 px-4 py-2"
                     style={{
-                      width: `${
-                        100 /
+                      width: `${100 /
                         (tab.tableCols.filter((c) => c.type !== "action")
                           .length +
                           1)
-                      }%`,
+                        }%`,
                     }}
                   >
                     Actions
@@ -447,12 +501,11 @@ function Tab({
                       key={col.name}
                       className="border border-gray-300 px-4 py-2 truncate"
                       style={{
-                        width: `${
-                          100 /
+                        width: `${100 /
                           (tab.tableCols.filter((c) => c.type !== "action")
                             .length +
                             1)
-                        }%`,
+                          }%`,
                       }}
                     >
                       {fieldSupportsOptions(col.type)
@@ -466,12 +519,11 @@ function Tab({
                   <td
                     className="border border-gray-300 px-4 py-2"
                     style={{
-                      width: `${
-                        100 /
+                      width: `${100 /
                         (tab.tableCols.filter((c) => c.type !== "action")
                           .length +
                           1)
-                      }%`,
+                        }%`,
                     }}
                   >
                     <div className="flex justify-center gap-2">
@@ -482,10 +534,10 @@ function Tab({
                             actionCol.label.toLowerCase() === "edit"
                               ? "!bg-indigo-600 hover:bg-indigo-700"
                               : actionCol.label.toLowerCase() === "delete"
-                              ? "!bg-red-600 hover:bg-red-700"
-                              : actionCol.label.toLowerCase() === "view"
-                              ? "!bg-yellow-500 hover:bg-yellow-600"
-                              : "!bg-gray-500 hover:bg-gray-600";
+                                ? "!bg-red-600 hover:bg-red-700"
+                                : actionCol.label.toLowerCase() === "view"
+                                  ? "!bg-yellow-500 hover:bg-yellow-600"
+                                  : "!bg-gray-500 hover:bg-gray-600";
 
                           return (
                             <button
@@ -557,9 +609,21 @@ function TabsDesigner({
   // updateTabFilters,
   addCustomButton,
   toggleRequired,
+  setTabs,
+  
 }) {
   const [showAllButtonFields, setShowAllButtonFields] = useState(false);
   const [updatedTabsList, setUpdatedTabsList] = useState(tabsList);
+  const [draggedTabIndex, setDraggedTabIndex] = useState(null);
+
+  const reorderTabs = (fromIndex, toIndex) => {
+    setTabs((prev) => {
+      const updated = [...prev];
+      const [moved] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, moved);
+      return updated;
+    });
+  };
 
   return (
     <section className="bg-white rounded-lg  mx-auto mt-2 min-h-full">
@@ -596,7 +660,6 @@ function TabsDesigner({
               setUpdatedTabsList(filteredTabs);
             }}
           />
-
           {renderIcons("FaSearch", 15, "gray")}
         </div>
       </div>
@@ -606,12 +669,15 @@ function TabsDesigner({
           ? updatedTabsList
           : updatedTabsList.slice(0, 4)
         ).map((t) => (
-          <DraggableButton
+          <div
             key={t}
-            item={t}
-            category="tab"
-            onDragStart={onDragStart}
-            className="
+          >
+            <DraggableButton
+              key={t}
+              item={t}
+              category="tab"
+              onDragStart={onDragStart}
+              className="
         bg-gradient-to-r from-blue-500 via-blue-500 to-cyan-500
         border border-blue-600/40
         text-white 
@@ -626,9 +692,10 @@ function TabsDesigner({
         active:scale-95
         whitespace-nowrap
       "
-          >
-            {t}
-          </DraggableButton>
+            >
+              {t}
+            </DraggableButton>
+          </div>
         ))}
       </div>
 
@@ -661,26 +728,43 @@ function TabsDesigner({
         ) : (
           <div className="flex-col items-center gap-5">
             {tabs.map((tab, idx) => (
-              <Tab
+              <div
                 key={tab.name + idx}
-                tab={tab}
-                tabIdx={idx}
-                setTabType={setTabType}
-                removeField={removeField}
-                removeButton={removeButton}
-                removeColumn={removeColumn}
-                onDragStart={onDragStart}
-                onDrop={onDrop}
-                allowDrop={allowDrop}
-                addTabField={addTabField}
-                addTabButton={addTabButton}
-                addTabColumn={addTabColumn}
-                addCustomField={addCustomField}
-                openAddFieldModal={addCustomField}
-                removeTab={removeTab}
-                addCustomButton={addCustomButton}
-                toggleRequired={toggleRequired}
-              />
+                draggable
+                onDragStart={() => setDraggedTabIndex(idx)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => {
+                  if (
+                    draggedTabIndex !== null &&
+                    draggedTabIndex !== idx
+                  ) {
+                    reorderTabs(draggedTabIndex, idx);
+                  }
+                  setDraggedTabIndex(null);
+                }}
+                className="cursor-move select-none"
+              >
+                <Tab
+                  key={tab.name + idx}
+                  tab={tab}
+                  tabIdx={idx}
+                  setTabType={setTabType}
+                  removeField={removeField}
+                  removeButton={removeButton}
+                  removeColumn={removeColumn}
+                  onDragStart={onDragStart}
+                  onDrop={onDrop}
+                  allowDrop={allowDrop}
+                  addTabField={addTabField}
+                  addTabButton={addTabButton}
+                  addTabColumn={addTabColumn}
+                  addCustomField={addCustomField}
+                  openAddFieldModal={addCustomField}
+                  removeTab={removeTab}
+                  addCustomButton={addCustomButton}
+                  toggleRequired={toggleRequired}
+                />
+              </div>
             ))}
           </div>
         )}
@@ -731,6 +815,8 @@ export default function TabDesigner({ tabs, setTabs, module }) {
     buttonData: null,
     tabIdx: null,
   });
+
+  const [buttonFilters,setButtonFilters] = useState(Table_ACTIONS);
 
   const onDragStart = (e, item, category) => {
     e.dataTransfer.setData(
@@ -844,12 +930,12 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === selectedTabIndex
           ? {
-              ...tab,
-              apiConfig: {
-                apiUrl: apiCallData.endpoint,
-                method: apiCallData.method,
-              },
-            }
+            ...tab,
+            apiConfig: {
+              apiUrl: apiCallData.endpoint,
+              method: apiCallData.method,
+            },
+          }
           : tab
       )
     );
@@ -866,21 +952,21 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === selectedTabIndex
           ? {
-              ...tab,
-              tableCols: [
-                ...tab.tableCols,
-                {
-                  type: "action",
-                  label: actionLabel,
-                  name: actionLabel.toLowerCase(),
-                  apiConfig: {
-                    apiUrl: apiCallData.endpoint,
-                    method: apiCallData.method,
-                    description: apiCallData.description,
-                  },
+            ...tab,
+            tableCols: [
+              ...tab.tableCols,
+              {
+                type: "action",
+                label: actionLabel,
+                name: actionLabel.toLowerCase(),
+                apiConfig: {
+                  apiUrl: apiCallData.endpoint,
+                  method: apiCallData.method,
+                  description: apiCallData.description,
                 },
-              ],
-            }
+              },
+            ],
+          }
           : tab
       )
     );
@@ -923,16 +1009,16 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === idx
           ? {
-              ...tab,
-              fields: [
-                ...tab.fields,
-                {
-                  ...field,
-                  required: !!field.required,
-                  name: fieldName,
-                },
-              ],
-            }
+            ...tab,
+            fields: [
+              ...tab.fields,
+              {
+                ...field,
+                required: !!field.required,
+                name: fieldName,
+              },
+            ],
+          }
           : tab
       )
     );
@@ -943,11 +1029,11 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-              ...tab,
-              fields: tab.fields.map((field, j) =>
-                j === fieldIdx ? { ...field, required: !field.required } : field
-              ),
-            }
+            ...tab,
+            fields: tab.fields.map((field, j) =>
+              j === fieldIdx ? { ...field, required: !field.required } : field
+            ),
+          }
           : tab
       )
     );
@@ -981,9 +1067,9 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-              ...tab,
-              buttons: tab.buttons.filter((_, idx) => idx !== buttonIdx),
-            }
+            ...tab,
+            buttons: tab.buttons.filter((_, idx) => idx !== buttonIdx),
+          }
           : tab
       )
     );
@@ -1013,12 +1099,12 @@ export default function TabDesigner({ tabs, setTabs, module }) {
         prev.map((tab, i) =>
           i === idx
             ? {
-                ...tab,
-                tableCols: [
-                  ...tab.tableCols,
-                  { ...column, name: `${column.label}` },
-                ],
-              }
+              ...tab,
+              tableCols: [
+                ...tab.tableCols,
+                { ...column, name: `${column.label}` },
+              ],
+            }
             : tab
         )
       );
@@ -1030,9 +1116,9 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       prev.map((tab, i) =>
         i === tabIdx
           ? {
-              ...tab,
-              tableCols: tab.tableCols.filter((_, idx) => idx !== colIdx),
-            }
+            ...tab,
+            tableCols: tab.tableCols.filter((_, idx) => idx !== colIdx),
+          }
           : tab
       )
     );
@@ -1199,6 +1285,7 @@ export default function TabDesigner({ tabs, setTabs, module }) {
         updateTabFilters={updateTabFilters}
         addCustomButton={addCustomButton}
         toggleRequired={toggleRequired}
+        setTabs={setTabs}
       />
       <AddFieldModal
         open={showAddFieldModal}

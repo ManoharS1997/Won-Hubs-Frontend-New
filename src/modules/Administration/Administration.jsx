@@ -84,6 +84,7 @@ const Tables = [
   //   description: "Relations are a way to organize users. They can be used to create relations between cmdb ci records and display in graphical representations.",
   // },
   // import { TbTransform } from "react-icons/tb";
+ 
 ];
 
 export default function Administration() {

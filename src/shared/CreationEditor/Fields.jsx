@@ -513,7 +513,7 @@ export default function Fields({ title, data, path }) {
   };
   const [FieldsState, setFieldsState] = useState(defaultFields);
   const [isLoading, setIsLoading] = useState(true);
-  // console.log(data, "Data Hereeee");
+  console.log(data, "Data Hereeee in Child");
 
   useEffect(() => {
     let baseFields = defaultFields;
@@ -528,7 +528,7 @@ export default function Fields({ title, data, path }) {
       const merged = {};
 
       Object.keys(baseFields).forEach((key) => {
-        const incomingValue = data[key];
+        const incomingValue = data[key]?.value ?? data[key];
 
         const hasValue =
           incomingValue !== undefined &&
@@ -536,18 +536,18 @@ export default function Fields({ title, data, path }) {
           incomingValue !== "";
 
         merged[key] = {
-          ...baseFields[key],   // preserve label, type, options, isMandatory
+          ...baseFields[key],
           value: hasValue
-            ? incomingValue     // override ONLY if value exists
-            : baseFields[key].value, // otherwise keep default
+            ? incomingValue
+            : baseFields[key].value,
         };
       });
 
       setFieldsState(merged);
-      // console.log(data, "In use Effect");
       setIsLoading(false);
       return;
     }
+
     // CASE 2: If localStorage exists
     if (saved) {
       const merged = {};

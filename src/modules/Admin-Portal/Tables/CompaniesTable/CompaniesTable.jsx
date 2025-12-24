@@ -1,16 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 
-// ICON  IMPORTS
-
-// COMPONENT IMPORTS
 import WonContext from "../../../../context/WonContext";
 import TableComponent from "../../../TableComponent/pages/TableComponent";
 // import { CompaniesDummyData } from "../../../../DataFile/DefaultDataFile";
-import { getTableColumnNames , getTableData} from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
-
-const hostedUrl = import.meta.env.VITE_HOSTED_API_URL
-
+import { FetchTableColumns , getTableData} from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 import {
     CustomContainer, CustomViewContainer, FormContent, SideNavNContentContainer
 } from './StyledComponents'
@@ -20,35 +14,30 @@ const CompaniesTable = () => {
     const navigate = useNavigate();
     const [CompaniesData, setCompaniesData] = useState([]) //state for table data 
     const [TableColumnNames, setTableColumnNames] = useState([])
-
-    // <<<<API CALL
-
+    const [designerKeyWord, setDesignerKeyWord] = useState("Companies")
     useEffect(() => {
-        fetchCompaniesData()
+        fetchGroupsData()      
     }, [])
-
-    const fetchCompaniesData = async () => {
-        try {
-            const data = await getTableData('company')
-            console.log(data,"data Hereeee")
-            const newColumnNames = await getTableColumnNames('company')
-            if (data?.company?.length === 0) {
-                // setUsersData(ApprovalsDummyData)
-            } else {
-                setCompaniesData(data.company)
+      const fetchGroupsData = async () => {
+            try {
+                const data = await getTableData(designerKeyWord)
+                const newColumnNames = await FetchTableColumns(designerKeyWord)
+                // console.log(newColumnNames, "column Names Hereee")
+                // console.log(data,"data Hereeee")
+                if (data) {
+                    // setUsersData(ApprovalsDummyData)
+                    setCompaniesData(data.Companies)
+                }
+                setTableColumnNames(newColumnNames)
+            } catch (e) {
+                console.log(e, "Error hereee")
+                console.log('Error fetching Groups Data')
             }
-            setTableColumnNames(newColumnNames.columns)
-        } catch {
-            console.log('Error fetching Companies Data')
         }
-    }
-    // API CALL >>>>>
-
     return (
         <WonContext.Consumer>
             {value => {
                 const { openSettings, recordsPerPage } = value
-
                 return (
                     <CustomViewContainer>
                         <SideNavNContentContainer>
@@ -57,13 +46,13 @@ const CompaniesTable = () => {
                                     <TableComponent
                                         tableData={CompaniesData}
                                         recordsPerPage={recordsPerPage}
-                                        tableName={'company'}
+                                        tableName={'Companies'}
                                         TableColumnNames={TableColumnNames}
                                         setTableColumnNames={setTableColumnNames}
                                         id={'id'}
                                         showConfigurefieldsBtn={true}
                                         title='Companies'
-                                        fetchTableData={fetchCompaniesData}
+                                        fetchTableData={fetchGroupsData}
                                         rdtColValue={'id'}
                                         createNewPath={'company'}
                                         // redirectionPath={`/company/`}

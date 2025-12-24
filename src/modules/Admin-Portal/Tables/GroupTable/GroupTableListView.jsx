@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import WonContext from "../../../../context/WonContext";
 import TableComponent from "../../../TableComponent/pages/TableComponent";
 // import { GroupsDummyData as Data } from "../../../../DataFile/DefaultDataFile";
-import { getTableColumnNames ,getTableData} from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
+import { getTableColumnNames, getTableData, FetchTableColumns } from "../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 
 const hostedUrl = import.meta.env.VITE_HOSTED_API_URL
 
@@ -15,6 +15,7 @@ import {
 const GroupsTableListView = () => {
     const [GroupsData, setGroupsData] = useState([])
     const [TableColumnNames, setTableColumnNames] = useState([])
+    const [designerKeyWord, setDesignerKeyWord] = useState("Groups")
 
     // <<<<API CALL
     useEffect(() => {
@@ -25,15 +26,17 @@ const GroupsTableListView = () => {
 
     const fetchGroupsData = async () => {
         try {
-            const data = await getTableData('group_names')
-            const newColumnNames = await getTableColumnNames('group_names')
-            if (data?.group_names?.length === 0) {
+            const data = await getTableData('Groups')
+            const newColumnNames = await FetchTableColumns(designerKeyWord)
+            console.log(newColumnNames, "column Names Hereee")
+            console.log(data)
+            if (data) {
                 // setUsersData(ApprovalsDummyData)
-            } else {
-                setGroupsData(data.group_names)
+                setGroupsData(data.Groups)
             }
-            setTableColumnNames(newColumnNames.columns)
-        } catch {
+            setTableColumnNames(newColumnNames)
+        } catch (e) {
+            console.log(e, "Error hereee")
             console.log('Error fetching Groups Data')
         }
     }
@@ -50,7 +53,7 @@ const GroupsTableListView = () => {
                                 <TableComponent
                                     tableData={GroupsData}
                                     recordsPerPage={recordsPerPage}
-                                    tableName={'group_names'}
+                                    tableName={'Groups'}
                                     TableColumnNames={TableColumnNames}
                                     setTableColumnNames={setTableColumnNames}
                                     id={'id'}

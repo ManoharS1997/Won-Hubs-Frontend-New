@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { IoIosArrowBack } from "react-icons/io";
-import { CreateNewUser, GetAddUserFormFields } from "../../../../../utils/CheckAndExecuteFlows/CRUDoperations";
+import { addDynamicaRecord, CreateNewUser, GetAddUserFormFields, GetDesignerFields } from "../../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 import FormInput from "../../../../../shared/UIElements/FormInput";
 import FormDropdown from "../../../../../shared/UIElements/FormDropdown";
 import Swal from 'sweetalert2';
-
-
+import ToggleBtn from "../../../../../shared/UIElements/ToggleBtn";
+import FormTextarea from "../../../../../shared/UIElements/FormTextarea";
+// import KeyValueInput from "../../../../../shared/UIElements/";
 
 // const GroupTableCreateView = () => {
 //     const navigate = useNavigate()
@@ -222,7 +223,6 @@ import Swal from 'sweetalert2';
 //     )
 // }
 
-
 import WONLoader from "../../../../../shared/components/loader";// <-- adjust path
 
 const GroupTableCreateView = () => {
@@ -235,10 +235,13 @@ const GroupTableCreateView = () => {
     const getGroupFormFields = async () => {
       setLoading(true);
       try {
-        const data = await GetAddUserFormFields("groups");
-        console.log("Group Form Fields:", data?.data);
+        // const data = await GetAddUserFormFields("groups");
+        const data= await GetDesignerFields("Groups")
+        console.log("Group Form Fields:", data);
+        const {designName}=data;
+        console.log(designName)
         if (data?.success === true) {
-          setGroupFormFields(data.data);
+          setGroupFormFields(data?.fields);
           let updatedFields = {};
           data.data.forEach((field) => {
             updatedFields[field.name] = {
@@ -266,7 +269,7 @@ const GroupTableCreateView = () => {
       return {
         ...prevState,
         [e.target.id]: {
-          isMandatory: prevState[e.target.id].isMandatory,
+          // isMandatory: prevState[e.target.id].isMandatory,
           value: e.target.value,
         },
       };
@@ -277,7 +280,7 @@ const GroupTableCreateView = () => {
     setFormFields((prev) => ({
       ...prev,
       [name]: {
-        isMandatory: prev[name].isMandatory,
+        // isMandatory: prev[name].isMandatory,
         value: e.target.checked,
       },
     }));
@@ -287,7 +290,7 @@ const GroupTableCreateView = () => {
     setFormFields((prev) => ({
       ...prev,
       [field]: {
-        isMandatory: prev[field].isMandatory,
+        // isMandatory: prev[field].isMandatory,
         value: value,
       },
     }));
@@ -367,7 +370,8 @@ const GroupTableCreateView = () => {
           confirmButtonColor: "#3085d6",
         });
       }
-      const response = await CreateNewUser("groups", formFields)
+      // const response = await CreateNewUser("groups", formFields)
+      const response= await addDynamicaRecord("Groups",formFields)
       console.log(response, "response")
       if (!response?.success) {
         const errorText = await response.text();
@@ -388,9 +392,11 @@ const GroupTableCreateView = () => {
   const renderForField = (field) => {
     switch (field.type) {
       case "input":
+      case 'text':
+      case 'email':
         return (
           <FormInput
-            type={field.contentType}
+            type={field.type}
             name={field.name}
             label={field.label}
             value={formFields[field.name]?.value || ""}
@@ -510,6 +516,7 @@ const GroupTableCreateView = () => {
       !formFields[field].isMandatory || formFields[field].value !== ""
   );
   // console.log(formFields,"Form Fields here")
+  console.log(groupFormFields,"Group Form Fields here")
   return (
     <div className="w-full h-full overflow-auto flex flex-col gap-2 pb-4">
       <div className="h-[10%] flex items-center gap-4 px-4">
@@ -551,7 +558,8 @@ const GroupTableCreateView = () => {
                       })
                     )}
                 </div>
-                <div className="w-full md:w-1/2 h-fit gap-4 flex flex-col p-2">
+                
+              <div className="w-full md:w-1/2 h-fit gap-4 flex flex-col p-2">
                   {groupFormFields
                     .filter((_, i) => i % 2 !== 0)
                     .map((field) =>
@@ -561,6 +569,7 @@ const GroupTableCreateView = () => {
                       })
                     )}
                 </div>
+              
               </>
             ) : (
               <div className="w-full h-full min-h-[50vh] flex items-center justify-center text-2xl text-gray-400 text-center">

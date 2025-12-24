@@ -87,6 +87,7 @@ import {
 import FormDesignerPage from "../../Admin-Portal/form/formDesignerPage";
 import CreateFeedBack2 from "../../Admin-Portal/Feedback/pages/CreateFeedBack2";
 import FlowStepComponent from "../../Admin-Portal/Templates/pages/FlowStep";
+import FormUIDemo from "./FormDetailedView";
 const conditions = ["Like", "Not Like", "Equals To", "Not Equals To"];
 
 // <<<<<Model Styles
@@ -112,7 +113,7 @@ const customStyles = {
 const selectCustomStyles = {
   control: (provided) => ({
     ...provided,
-    // border: 'none', // Remove border from control
+
     boxShadow: "none", // Remove box-shadow
     borderRadius: "50px",
     "&:hover": {
@@ -194,6 +195,7 @@ export default function TableComponent({
   const [oppenedRecordsList, setOppenedRecordsList] = useState([]);
   const navigate = useNavigate();
   const maxPages = Math.ceil(recievedTableData.length / 10);
+  const implemented_designs = ['Companies', 'Groups', 'form_test','designs']
   function formatDateForMySQL(isoDateString) {
     const date = new Date(isoDateString);
 
@@ -204,10 +206,8 @@ export default function TableComponent({
     const hours = ("0" + date.getHours()).slice(-2);
     const minutes = ("0" + date.getMinutes()).slice(-2);
     const seconds = ("0" + date.getSeconds()).slice(-2);
-
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
-
   useEffect(() => {
     setTableData(tableData);
     setAllTableFields(TableColumnNames || []);
@@ -218,7 +218,6 @@ export default function TableComponent({
     updateSelectedColumns();
   }, [selectedColumns]);
 
-  console.log(formData, "====");
 
   // const SelectedRowActionsList = ["Delete", "Mark As Favorite", "Move", "Copy"];
 
@@ -249,15 +248,15 @@ export default function TableComponent({
 
   const getSelectedColumns = async () => {
     const columns = await getTableData("table_selected_columns");
-    // console.log(columns,"in get selected")
+    // console.log(columns, "in get selected")
     const displayColumns =
       columns?.table_selected_columns?.filter((record) => {
         // console.log(record.table_name, tableName)
         return record.table_name === tableName;
       })[0]?.selected_columns || [];
     // console.log(displayColumns,"in display")
-
     setSelectedColumns(displayColumns);
+
   };
 
   const SelectAllCheckBox = (e) => {
@@ -280,22 +279,22 @@ export default function TableComponent({
       setselectedRowIds(selectedRowIds.filter((item) => item !== ID));
     }
   };
+  // const camelCaseToReadable = (columns) => {
+  //   // console.log(columns, "cols Hereee");
 
-  const camelCaseToReadable = (columns) => {
-    const readableColumns = columns.map((column) => {
-      return (
-        column.name
-          .replace(/_/g, " ") // Replace underscores with space
-          .replace(/([A-Z])/g, " $1") // Add space before capital letters
-          .replace(/^./, (str) => str.toUpperCase()) // Capitalize the first letter
+  //   const readableColumns = columns.map((column) => {
+  //     // If column is object → use column.name
+  //     // If column is string → use column
+  //     const col = column?.name ? column.name : column;
 
-          // Capitalize the first letter of each word
-          .replace(/\b\w/g, (str) => str.toUpperCase())
-      );
-    });
+  //     return col
+  //       .replace(/_/g, " ")                 // snake_case → snake case
+  //       .replace(/([a-z])([A-Z])/g, "$1 $2") // camelCase → camel Case
+  //       .replace(/\b\w/g, (c) => c.toUpperCase()); // Capitalize each word
+  //   });
 
-    return readableColumns;
-  };
+  //   return readableColumns;
+  // };
 
   const closeConfig = () => {
     setConfigure(false);
@@ -522,7 +521,7 @@ export default function TableComponent({
     // deleteFunction()
     for (let id of selectedRowIds) {
       DeleteRecord("event_logs", id, "Table Component", window.location.href);
-      setTableData(recievedTableData.filter((record) => record.id !== id));
+      setTableData(recievedTableData?.filter((record) => record.id !== id));
     }
   };
   const closeTab = (tabId) => {
@@ -604,8 +603,9 @@ export default function TableComponent({
         return true;
     }
   }
-
+  // Main Redirection Logic based on table name
   const renderTabView = (tableName) => {
+    console.log(tableName, selectedTab, "Triggering in renderTableView")
     switch (tableName) {
       case "notifications":
         return (
@@ -622,9 +622,18 @@ export default function TableComponent({
         return <FlowStepComponent recordId={selectedTab} path="templates" />;
 
       case "designs":
+        // console.log("Triggering Herreeeee")
+        console.log(selectedTab, "selectedTab")
         return <FormDesignerPage recordId={selectedTab} />;
 
+      case 'formtest':
+      case 'group_names':
+      case 'Groups':
+      case 'Companies':
+        return <FormUIDemo recordId={selectedTab || 1} tableName={tableName} />
+
       default:
+        // console.log("Triggering Here to display DetailedView")
         return (
           <DetailedView
             recordId={selectedTab}
@@ -635,6 +644,7 @@ export default function TableComponent({
         );
     }
   };
+
   useEffect(() => {
     // Only run if filter is active, optionally
     if (isFilterActive) {
@@ -644,6 +654,21 @@ export default function TableComponent({
     }
   }, [filterConditions, isFilterActive, tableData]);
 
+  const camelCaseToReadable = (columns) => {
+    return columns.map((column) => {
+      const col = column?.name ? column.name : column;
+
+      return col
+        .replace(/_/g, " ")
+        .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    });
+  };
+  // console.log(recievedTableData, "tableData here")
+  // console.log(selectedRowIds, "selectedRowIds")
+  // console.log(selectedTab,"Selected Tab")
+  // console.log(tableName,"tableName")
+  console.log(selectedColumns, "selectedColumns Hereee")
   return (
     <MainContainer>
       <div className="w-full h-fit bg-[var(--bakground-color)] pb-[4px] mb-2 overflow-auto scrollbar-hide ">
@@ -735,7 +760,6 @@ export default function TableComponent({
                 </span>
               )}
             </TitleContainer>
-
             <RowActionsContainer isSelectedRows={selectedRowIds.length > 0}>
               {allowDeleting && (
                 <RowActionBtn
@@ -746,13 +770,12 @@ export default function TableComponent({
                   <MdDelete size={18} />
                 </RowActionBtn>
               )}
-
               <RowActionBtn
                 type="button"
                 title="Export Record (s)"
                 onClick={() =>
                   ExportData(
-                    recievedTableData.filter((record) =>
+                    recievedTableData?.filter((record) =>
                       selectedRowIds.includes(record.id)
                     )
                   )
@@ -765,7 +788,6 @@ export default function TableComponent({
                 <MdLabelImportant size={20} />
               </RowActionBtn>
             </RowActionsContainer>
-
             <ActionsContainer>
               {createNewPath && (
                 <button
@@ -897,7 +919,8 @@ export default function TableComponent({
               </FilterContainer>
             ))}
           {/* </FiltersContainer> */}
-
+          {console.log(allTableFields, "allTableFields Hereee")}
+          {console.log(selectedColumns, "selectedColumns Hereee")}
           {showConfigurefieldsBtn === true && (
             <ConfigureFields
               isConfigureActive={isConfigureActive}
@@ -909,7 +932,7 @@ export default function TableComponent({
               }))}
               allFields={allTableFields}
               setSelectedColumns={setSelectedColumns}
-              selectedColumns={selectedColumns}
+              selectedColumns={implemented_designs.includes(tableName)?TableColumnNames:selectedColumns}
               recievedTableData={recievedTableData}
               setTableColumnNames={setAllTableFields}
             />
@@ -935,8 +958,7 @@ export default function TableComponent({
                       onChange={(e) => SelectAllCheckBox(e)}
                     />
                   </CustomTh>
-
-                  {selectedColumns?.length > 0 &&
+                  {!implemented_designs.includes(tableName) && selectedColumns?.length > 0 &&
                     typeof selectedColumns[0] !== "string" &&
                     camelCaseToReadable(selectedColumns).map((column) => {
                       return (
@@ -968,13 +990,35 @@ export default function TableComponent({
                         </CustomTh>
                       );
                     })}
+                  {
+                    implemented_designs.includes(tableName)  &&
+                    Array.isArray(TableColumnNames) &&
+                    TableColumnNames.length > 0 &&
+                    camelCaseToReadable(TableColumnNames).map((column) => (
+                      <CustomTh key={column}>
+                        <ThContent>
+                          <span>{column}</span>
+
+                          <ColumnOptions>
+                            <SortOptBtn onClick={() => sortTableData(column, "asc")}>
+                              <IoIosArrowRoundUp size={20} />
+                            </SortOptBtn>
+
+                            <SortOptBtn onClick={() => sortTableData(column, "desc")}>
+                              <IoIosArrowRoundDown size={20} />
+                            </SortOptBtn>
+                          </ColumnOptions>
+
+                        </ThContent>
+                      </CustomTh>
+                    ))
+                  }
                 </CustomThead>
 
                 <CustomTbody>
                   {/* filteredData().slice(0, recordsPerPage) */}
                   {recievedTableData?.length > 0 &&
                     // (recordsPerPage ? recievedTableData.slice(0, recordsPerPage) : recievedTableData) commented by sanju
-
                     (recordsPerPage
                       ? recievedTableData.slice(
                         (currPage - 1) * recordsPerPage,
@@ -982,9 +1026,6 @@ export default function TableComponent({
                       )
                       : recievedTableData
                     ).map((row, index) => {
-                      {
-                        /* console.log(`${row[column.name]}`) */
-                      }
                       return (
                         <CustomTr
                           key={index}
@@ -1007,10 +1048,7 @@ export default function TableComponent({
                             />
                           </CustomTd>
 
-                          {selectedColumns.map((column) => {
-                            {
-                              /* console.log(column.type ) */
-                            }
+                          {(tableName !== 'formtest') && (tableName !== 'Groups') && selectedColumns.map((column) => {
                             return rdtColValue === column.name ? (
                               <CustomTd
                                 key={column.name}
@@ -1023,6 +1061,8 @@ export default function TableComponent({
                                 onClick={() => {
                                   setOppenedRecordsList((prevTabs) => {
                                     const tabId = row[column.name];
+                                    console.log(tabId, "TabIdd Here")
+
                                     // Check if the tab already exists
                                     if (
                                       prevTabs.some((tab) => tab.id === tabId)
@@ -1046,10 +1086,12 @@ export default function TableComponent({
                                       return [...prevTabs, newTab];
                                     }
                                   });
+
                                   oppenedRecordsList.length < 9 &&
                                     setSelectedTab(row[column.name]);
                                 }}
                               >
+                                {/* {console.log(selectedTab<"selectedTab")} */}
                                 {column.type === "object"
                                   ? `Object Data`
                                   : column.type === "timestamp"
@@ -1070,6 +1112,71 @@ export default function TableComponent({
                               </CustomTd>
                             );
                           })}
+                          {
+                            implemented_designs.includes(tableName) &&
+                            TableColumnNames.map((column) => {
+                              return rdtColValue === column ? (
+                                <CustomTd
+                                  key={column}
+                                  style={{
+                                    textDecoration: "underline",
+                                    color: "blue",
+                                    cursor: "pointer",
+                                  }}
+                                  // onClick={() => navigate(`${redirectionPath}${row[id]}`)}
+                                  onClick={() => {
+                                    // console.log("Triggering hereeee ")
+                                    setOppenedRecordsList((prevTabs) => {
+                                      const tabId = row[column];
+                                      console.log(tabId, "Tab ID");
+                                      setSelectedTab(tabId)
+                                      if (
+                                        prevTabs.some((tab) => tab.id === tabId)
+                                      ) {
+                                        setSelectedTab(tabId); // Just switch to the existing tab
+                                        return prevTabs;
+                                      } else if (prevTabs.length >= 9) {
+                                        Swal.fire({
+                                          icon: "error",
+                                          title: "Oops...",
+                                          text: "Maximum number of tabs reached!",
+                                        });
+                                        return prevTabs;
+                                      } else {
+                                        // If not a duplicate, add the new tab
+                                        const newTab = {
+                                          id: tabId,
+                                          name: `${tabId}`,
+                                          status: "Active",
+                                        };
+                                        return [...prevTabs, newTab];
+                                      }
+                                    });
+                                    oppenedRecordsList.length < 9 &&
+                                      setSelectedTab(row[column]);
+                                  }}
+                                >
+                                  {column.type === "object"
+                                    ? `Object Data`
+                                    : column.type === "timestamp"
+                                      ? formatDateForMySQL(row[column])
+                                      : column.type === "json"
+                                        ? "json data"
+                                        : row[column]}
+                                </CustomTd>
+                              ) : (
+                                <CustomTd key={column}>
+                                  {column.type === "object"
+                                    ? `Object Data`
+                                    : column.type === "timestamp"
+                                      ? formatDateForMySQL(row[column])
+                                      : column.type === "json"
+                                        ? "json data"
+                                        : row[column]}
+                                </CustomTd>
+                              );
+                            })
+                          }
                           {redirectionPath && (
                             <span
                               className="redirectionIcon hidden text-bold"
@@ -1088,6 +1195,7 @@ export default function TableComponent({
                       );
                     })}
                 </CustomTbody>
+
               </CustomTable>
             )}
             {recievedTableData?.length === 0 && (

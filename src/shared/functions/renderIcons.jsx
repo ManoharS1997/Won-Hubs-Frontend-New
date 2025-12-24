@@ -72,7 +72,8 @@ import { MdOutgoingMail, MdOutlineKeyboardArrowDown, MdPieChart } from "react-ic
 import { FaClockRotateLeft } from "react-icons/fa6";
 import { MdFreeCancellation } from "react-icons/md";
 import { IoChevronForward } from "react-icons/io5";
-
+import { GoPlus } from "react-icons/go";
+import { FiTool } from "react-icons/fi";
 
 
 
@@ -101,8 +102,8 @@ const iconMap = {
   GrChannel, FaBuilding, FaUserCheck, FaDollarSign, FaTasks, FaHashtag, FaUsersCog, FaBook, FaCalendarDay, FaObjectGroup, FaUser,
   TfiEmail, HiOutlineMailOpen, LuMailOpen, MdOutgoingMail, MdOutlineKeyboardArrowDown, MdPieChart, BiBarChart, AiOutlineLineChart,
   MdAreaChart, FaBox, MdBarChart, GiFunnel, RiDonutChartFill, BiScatterChart, MdRadar, TbGauge, MdGridOn, TbCircles,
-  TbChartHistogram, TbChartCandle, FaClockRotateLeft, MdFreeCancellation, IoChevronForward
-
+  TbChartHistogram, TbChartCandle, FaClockRotateLeft, MdFreeCancellation, IoChevronForward, GoPlus,
+  FiTool,
 };
 
 export default function renderIcons(icon, size = 20, color = "#000") {

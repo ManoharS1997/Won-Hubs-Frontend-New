@@ -1,53 +1,43 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import FormInput from "../../../shared/UIElements/FormInput";
 import { IoIosArrowBack } from "react-icons/io";
-import Swal from 'sweetalert2'
-// component Imports
-import WONLoader from '../../../../../shared/components/loader';
-import {GetDesignerFields } from '../../../../../utils/CheckAndExecuteFlows/CRUDoperations';
-import FormInput from '../../../../../shared/UIElements/FormInput';
-import FormDropdown from '../../../../../shared/UIElements/FormDropdown';
-import FormPhoneInput from '../../../../../shared/components/PhoneInput';
-import { addDynamicaRecord } from '../../../../../utils/CheckAndExecuteFlows/CRUDoperations';
+import { addDynamicaRecord, GetDesignerFields } from "../../../utils/CheckAndExecuteFlows/CRUDoperations";
+import WONLoader from "../../../shared/components/loader";
+import FormDropdown from "../../../shared/UIElements/FormDropdown";
+import Swal from "sweetalert2";
 
-const CreateCompany = () => {
+
+const FormDesignerTesting = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [formFields, setFormFields] = useState({});
     const [groupFormFields, setGroupFormFields] = useState([]);
-    const keyWord = "Companies"
 
     useEffect(() => {
-        const getGroupFormFields = async () => {
+        const getCompanyFormFields = async () => {
             setLoading(true);
             try {
-                // const data = await GetAddUserFormFields("groups");
-                const data = await GetDesignerFields(keyWord)
-                console.log("Group Form Fields:", data);
-                const { designName } = data;
-                console.log(designName)
+                const data = await GetDesignerFields("Dummy_Test");
+                // console.log("data from response",data);
                 if (data?.success === true) {
-                    setGroupFormFields(data?.fields);
-                    let updatedFields = {};
-                    data.data.forEach((field) => {
-                        updatedFields[field.name] = {
-                            value: "",
-                            isMandatory: field.required,
-                        };
-                    });
-                    console.log(updatedFields, "updated Fields")
+                    // console.log("Triggering inside")
+                    setGroupFormFields(data.fields);
+
                     setFormFields(data.fields);
                 } else {
-                    alert("No Group Form Fields Found.");
+                    // alert("No Group Form Fields Found.");
                 }
             } catch (error) {
-                console.error("Error fetching group fields:", error);
+                // set
+                console.log("Error fetching group fields:", error);
             } finally {
                 setLoading(false);
             }
         };
-        getGroupFormFields();
+        getCompanyFormFields();
     }, []);
+
     const onChangeInput = (e) => {
         setFormFields((prevState) => {
             // console.log(prevState, e.target.id)
@@ -70,6 +60,7 @@ const CreateCompany = () => {
             },
         }));
     };
+
     const onPhoneNumberChange = (phoneNumber, name) => {
         let value = phoneNumber || "";
         const maxLen = 15;
@@ -86,92 +77,72 @@ const CreateCompany = () => {
         }));
     };
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-    //     try {
-    //         console.log("Triggering TryBlock")
-    //         setLoading(true);
+    const convertToDBData = (fields) => {
+        const output = {};
 
-    //         const emptyFields = Object.keys(formFields).filter(
-    //             (field) =>
-    //                 formFields[field].isMandatory && formFields[field].value === ""
-    //         );
-    //         if (emptyFields.length > 0) {
-    //             setLoading(false);
-    //             return Swal.fire({
-    //                 title: "Missing Mandatory Fields!",
-    //                 text: emptyFields.join(", "),
-    //                 icon: "warning",
-    //                 confirmButtonColor: "#3085d6",
-    //             });
-    //         }
+        Object.entries(fields).forEach(([key, val]) => {
 
-    //         //   const url = "http://localhost:3001/groups/newGroup";
-    //         const response = await CreateNewUser("company", formFields)
-    //         console.log(response, "response")
-    //         if (!response.success) {
-    //             const errorText = await response.text();
-    //             throw new Error(`Network error: ${errorText}`);
-    //         }
-    //         console.log("Group created successfully:", response);
-    //         navigate("/companies");
-    //     } catch (err) {
-    //         console.log(err, "err")
-    //         console.error("Error creating group:", err);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
+            if (!isNaN(key)) return;
 
+            if (key.toLowerCase() === "id") return;
 
-     const handleSubmit = async (e) => {
+            if (!val || typeof val !== "object" || val.value === undefined) return;
+
+            const cleanKey = key.replace(/\s+/g, "_").toLowerCase();
+
+            output[cleanKey] = val.value;
+        });
+
+        return output;
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-          // console.log("Triggering TryBlock")
-          setLoading(true);
-          const emptyFields = Object.keys(formFields).filter(
-            (field) =>
-              formFields[field].isMandatory && formFields[field].value === ""
-          );
-          if (emptyFields.length > 0) {
-            setLoading(false);
-            return Swal.fire({
-              title: "Missing Mandatory Fields!",
-              text: emptyFields.join(", "),
-              icon: "warning",
-              confirmButtonColor: "#3085d6",
-            });
-          }
-          // const response = await CreateNewUser("groups", formFields)
-          const response= await addDynamicaRecord(keyWord,formFields)
-          console.log(response, "response")
-          if (!response?.success) {
-            const errorText = await response.text();
-            throw new Error(`Network error: ${errorText}`);
-          }
-    
-     
-          console.log("Company created successfully:", response);
-          navigate("/companies");
+            // console.log("Triggering TryBlock")
+            setLoading(true);
+
+            const emptyFields = Object.keys(formFields).filter(
+                (field) =>
+                    formFields[field].isMandatory && formFields[field].value === ""
+            );
+            if (emptyFields.length > 0) {
+                setLoading(false);
+                return Swal.fire({
+                    title: "Missing Mandatory Fields!",
+                    text: emptyFields.join(", "),
+                    icon: "warning",
+                    confirmButtonColor: "#3085d6",
+                });
+            }
+
+            //   const url = "http://localhost:3001/groups/newGroup";
+            const cleaned_data = convertToDBData(formFields)
+            const response = await addDynamicaRecord("Dummy_Test", cleaned_data)
+            console.log(response, "response")
+
+
+            if (!response.success) {
+                const errorText = await response.text();
+                throw new Error(`Network error: ${errorText}`);
+            }
+
+
+            console.log("Group created successfully:", response);
+            navigate(`/locations`);
         } catch (err) {
-          console.log(err, "err")
-          console.error("Error creating company:", err);
+            console.log(err, "err")
+            console.error("Error creating group:", err);
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
-    
-
-
-
-
+    };
 
     const renderForField = (field) => {
-        // console.log(field, "Rendering Field")
+        console.log(field, "field");
         switch (field.type) {
             case "input":
-            case 'text':
-            case 'email':
+            case "text":
                 return (
                     <FormInput
                         type={field.contentType}
@@ -180,7 +151,7 @@ const CreateCompany = () => {
                         value={formFields[field.name]?.value || ""}
                         placeholder={field.placeholder}
                         customstyles={field.customstyles}
-                        isMandatory={field.isMandatory}
+                        // isMandatory={field.isMandatory}
                         onChangeHandler={onChangeInput}
                         iconName={field.iconName}
                     />
@@ -199,7 +170,6 @@ const CreateCompany = () => {
                         isMandatory={field.isMandatory}
                         apiData={field.api_data}
                         fieldData={field}
-                        iconName={field.iconName}
                         onChangeHandler={(option) =>
                             onChangeDropdown(option.value, field.name)
                         }
@@ -207,8 +177,7 @@ const CreateCompany = () => {
                 );
 
 
-            case "phone_no":
-            
+            case "phone":
                 return (
                     <FormPhoneInput
                         name={field.name}
@@ -224,15 +193,12 @@ const CreateCompany = () => {
                 return null;
         }
     };
-
     const allRequiredFilled = Object.keys(formFields).every(
         (field) =>
             !formFields[field].isMandatory || formFields[field].value !== ""
     );
-
-    // console.log(formFields,"Form Fields here");
-    // console.log(groupFormFields,"Group Form Fields here");
-
+    console.log(groupFormFields, "group Fields here")
+    console.log(formFields, "Form Fields")
     return (
         <div className="w-full h-full overflow-auto flex flex-col gap-2 pb-4">
             <div className="h-[10%] flex items-center gap-4 px-4">
@@ -243,7 +209,7 @@ const CreateCompany = () => {
                     <IoIosArrowBack size={30} />
                 </button>
                 <h3 className="text-2xl font-semibold m-0">New
-                    Company
+                    Testing
                 </h3>
                 <button
                     onClick={handleSubmit}
@@ -260,7 +226,7 @@ const CreateCompany = () => {
                 <WONLoader />
             ) : (
                 <form
-                    onSubmit={handleSubmit}
+                    // onSubmit={handleSubmit}
                     className="w-full h-[90%] self-center gap-6 rounded-lg"
                 >
                     <div className="h-fit md:h-[90%] w-full flex flex-col md:flex-row justify-between self-center overflow-auto md:px-10 px-2">
@@ -299,4 +265,4 @@ const CreateCompany = () => {
     );
 };
 
-export default CreateCompany;
+export default FormDesignerTesting;

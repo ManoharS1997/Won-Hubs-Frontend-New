@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import renderIcons from "../../../../../shared/functions/renderIcons";
 import { ReactSelect } from "../StyledComponents";
 import FormInput from "../../../../../shared/UIElements/FormInput";
-import WonContext from "../../../../../context/WonContext";
-import FormDesignerPage from "../../../form/formDesignerPage";
+import { GetAllDesignes } from "../../../../../utils/CheckAndExecuteFlows/CRUDoperations";
+
 
 const dummyData = [
   {
@@ -174,7 +174,8 @@ export default function DesignTemplates() {
   // const [openExistRecord, setOpenExistRecord] = useState(false);
   // const [recordId, setRecordId] = useState("");
   useEffect(() => {
-    fetchConnectionsData();
+    // fetchConnectionsData();
+    fetchNewData()
   }, []);
 
   const fetchConnectionsData = async () => {
@@ -191,6 +192,14 @@ export default function DesignTemplates() {
       console.log("Error fetching Design Data");
     }
   };
+  const fetchNewData = async () => {
+    const response = await GetAllDesignes()
+    console.log(response, "response from new");
+   if(response.success){
+        setTemplatesData(response.designs);
+
+   }
+  }
   const Navigate = useNavigate();
 
   console.log(selectedDepartments, selectedViews, departmentName, category);
@@ -209,23 +218,23 @@ export default function DesignTemplates() {
         return selectedDepartments.department &&
           departmentData[selectedDepartments.department]
           ? Object.keys(departmentData[selectedDepartments.department]).map(
-              (cat) => ({
-                label: cat,
-                value: cat,
-              })
-            )
+            (cat) => ({
+              label: cat,
+              value: cat,
+            })
+          )
           : [];
       case "sub_category":
         return selectedDepartments.category &&
           departmentData[selectedDepartments.department]?.[
-            selectedDepartments.category
+          selectedDepartments.category
           ]
           ? departmentData[selectedDepartments.department][
-              selectedDepartments.category
-            ].map((subCat) => ({
-              label: subCat,
-              value: subCat,
-            }))
+            selectedDepartments.category
+          ].map((subCat) => ({
+            label: subCat,
+            value: subCat,
+          }))
           : [];
       default:
         return [];
@@ -280,33 +289,40 @@ export default function DesignTemplates() {
     <div className="w-full h-full flex flex-col overflow-auto">
       <div className="w-full h-full flex flex-col p-4">
         <div className="w-full grid grid-cols-3 ">
-          <span></span>
-          <div className="w-full flex items-center justify-center gap-4">
-            {["Desktop", "Tab", "Mobile"].map((item, index) => (
+
+          {/* LEFT EMPTY SPACE */}
+          <div></div>
+
+          {/* CENTER TABS */}
+          <div className="w-full flex items-center justify-center gap-6">
+            {["Desktop", "Tab", "Mobile"].map((item) => (
               <button
-                key={index}
-                className={`h-fit w-[100px] !border-b-2 transition-all duration-500 py-2 font-semibold
-                 ${
-                   selectedTab === item
-                     ? "!border-black"
-                     : "!border-transparent"
-                 }`}
+                key={item}
+                className={`h-fit w-[100px] !border-b-2 transition-all duration-500 py-2 font-semibold bg-transparent
+          ${selectedTab === item ? "!border-black" : "!border-transparent"}
+        `}
                 onClick={() => setSelectedtab(item)}
               >
                 {item}
               </button>
             ))}
           </div>
-          <select
-            className="!ml-auto !mr-2 min-w-[150px] border "
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="IT">IT </option>
-            <option value="HR">HR</option>
-            <option value="Sales">Sales</option>
-            <option value="Agent">Agent</option>
-            <option value="User">User</option>
-          </select>
+
+          {/* RIGHT SELECT DROPDOWN */}
+          <div className="flex justify-end items-center pr-4 ml-40 w-70">
+            <select
+              className="min-w-[100px] border rounded py-1"
+              onChange={(e) => setCategory(e.target.value)}
+              defaultValue="IT"
+            >
+              <option value="IT">IT</option>
+              <option value="HR">HR</option>
+              <option value="Sales">Sales</option>
+              <option value="Agent">Agent</option>
+              <option value="User">User</option>
+            </select>
+          </div>
+
         </div>
 
         <div className="w-full h-fit">
@@ -321,7 +337,7 @@ export default function DesignTemplates() {
             <li
               onClick={() => {
                 // setOpenConfigure(true);
-                 Navigate("/form-designer", {
+                Navigate("/form-designer", {
                   state: {
                     widgetname: selectedTab,
                     selectedDepartments,

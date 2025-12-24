@@ -486,8 +486,6 @@ const CreateLocation = () => {
             },
         }));
     };
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {

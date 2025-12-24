@@ -38,7 +38,6 @@ import { getCatalog, getAdminForms, replaceData } from "../components/functions"
 export default function DesignForm() {
   const { id } = useParams();
 
-  // console.log(id,"hereeee")
   // what are already created getting them
   const location = useLocation()
   console.log(location,"location Here")
@@ -384,7 +383,6 @@ export default function DesignForm() {
 
   const removeSelectOption = (id, optionId) => {
     const [firstKey, secondKey] = Object.keys(columns);
-
     const updateDropColumns = Object.values(columns)[1].items.map(item => {
       if (item.id === id) {
         const filterOptions = item.details.options.filter(item => item !== optionId)

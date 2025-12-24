@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const FIELD_TYPES = [
   { value: "text", label: "Text" },
@@ -23,107 +23,141 @@ const FIELD_TYPES = [
   { value: "color", label: "Color Picker" },
 ];
 
-export default function AddFieldModal({ open, onClose, onSubmit }) {
+export default function AddFieldModal({ open, onClose, onSubmit, fieldToEdit }) {
   const [label, setLabel] = useState("");
   const [type, setType] = useState("text");
   const [options, setOptions] = useState([""]);
   const [maxRating, setMaxRating] = useState(5);
-  const [required, setRequired] = useState(false); // ✅ new state
+  const [required, setRequired] = useState(false);
+
+  // Detect whether modal is opened for a button
+  const isButtonItem = fieldToEdit?.isButton === true;
+
+  // PREFILL WHEN EDITING
+  useEffect(() => {
+    if (fieldToEdit) {
+      setLabel(fieldToEdit.label || "");
+
+      if (!isButtonItem) {
+        // Field edit mode
+        setType(fieldToEdit.type || "text");
+        setOptions(fieldToEdit.options || [""]);
+        setRequired(!!fieldToEdit.required);
+      } else {
+        // Button view-only mode
+        setType("button");
+        setOptions([]);
+        setRequired(false);
+      }
+    } else {
+      // Reset modal when adding new field
+      setLabel("");
+      setType("text");
+      setOptions([""]);
+      setRequired(false);
+    }
+  }, [fieldToEdit]);
 
   const handleSubmit = () => {
-    let fieldData = { label, type, required };
+    // If a button is clicked, we DO NOT allow saving / editing
+    if (isButtonItem) {
+      onClose();
+      return;
+    }
 
-    if (
-      ["dropdown", "radio", "multi-select", "switch", "checkbox"].includes(type)
-    ) {
+    let fieldData = {
+      label,
+      type,
+      required,
+    };
+
+    if (["dropdown", "radio", "multi-select", "switch", "checkbox"].includes(type)) {
       fieldData.options = options.filter((opt) => opt.trim() !== "");
     }
 
+    if (type === "rating") {
+      fieldData.maxRating = maxRating;
+    }
+
+    if (fieldToEdit) {
+      fieldData.isEdit = true;
+      fieldData.originalLabel = fieldToEdit.label;
+    }
+
     onSubmit(fieldData);
-
-    // reset form
-    setLabel("");
-    setType("text");
-    setOptions([""]);
-    setMaxRating(5);
-    setRequired(false);
-  };
-
-  const handleOptionChange = (index, value) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    setOptions(newOptions);
-  };
-
-  const addOption = () => {
-    if (type === "switch" && options.length >= 2) return; // Limit to two options
-    setOptions([...options, ""]);
-  };
-
-  const removeOption = (index) => {
-    setOptions((prevOptions) => prevOptions.filter((_, i) => i !== index));
+    onClose();
   };
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center !bg-black/50 z-50">
-      <div className="!bg-white p-6 rounded-2xl shadow-lg w-[400px]">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div className="bg-white p-6 rounded-2xl shadow-lg w-[400px]">
+
         <h2 className="text-lg font-semibold text-indigo-600 mb-4">
-          ➕ Add Custom Field
+          {isButtonItem
+            ? "Button Details"
+            : fieldToEdit
+              ? "Edit Field"
+              : "➕ Add Custom Field"}
         </h2>
 
-        {/* Field Label */}
-        <label className="w-full mb-2 text-sm font-medium text-gray-700">
-          Label
-        </label>
+        {/* Label */}
+        <label className="text-sm font-medium text-gray-700 mb-1 block">Label</label>
         <input
           type="text"
           value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:ring-2 focus:ring-indigo-500 outline-none"
-          placeholder="Enter field label"
+          onChange={(e) => !isButtonItem && setLabel(e.target.value)}
+          disabled={isButtonItem}
+          className={`w-full border border-gray-300 rounded-lg p-2 mb-4 ${isButtonItem ? "bg-gray-100" : ""
+            }`}
         />
 
         {/* Field Type */}
-        <label className="w-full mb-2 text-sm font-medium text-gray-700">
-          Type
-        </label>
-        <select
-          value={type}
-          style={{ width: "100%", height: 35 }}
-          onChange={(e) => setType(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-2 mb-4 focus:ring-2 focus:ring-indigo-500 outline-none"
-        >
-          {FIELD_TYPES.map((f) => (
-            <option key={f.value} value={f.value}>
-              {f.label}
-            </option>
-          ))}
-        </select>
-
-        {/* Options Field (for dropdown, radio, etc.) */}
-        {["dropdown", "radio", "multi-select", "switch", "checkbox"].includes(
-          type
-        ) && (
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Options
+        {!isButtonItem && (
+          <>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">
+              Type
             </label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-2 mb-4"
+            >
+              {FIELD_TYPES.map((f) => (
+                <option key={f.value} value={f.value}>
+                  {f.label}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
 
-            <div className="max-h-40 overflow-y-auto pr-1 space-y-2 no-scrollbar">
+        {/* Options (only for fields, not buttons) */}
+        {!isButtonItem &&
+          ["dropdown", "radio", "multi-select", "switch", "checkbox"].includes(type) && (
+            <div className="mb-4">
+              <label className="text-sm font-medium text-gray-700 block mb-2">
+                Options
+              </label>
+
               {options.map((opt, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={index} className="flex items-center gap-2 mb-1">
                   <input
                     type="text"
                     value={opt}
-                    onChange={(e) => handleOptionChange(index, e.target.value)}
-                    className="flex-1 border border-gray-300 rounded-lg p-2 outline-none"
-                    placeholder={`Option ${index + 1}`}
+                    onChange={(e) => {
+                      const arr = [...options];
+                      arr[index] = e.target.value;
+                      setOptions(arr);
+                    }}
+                    className="flex-1 border border-gray-300 rounded-lg p-2"
                   />
                   {options.length > 1 && (
                     <button
-                      onClick={() => removeOption(index)}
+                      onClick={() =>
+                        setOptions(options.filter((_, i) => i !== index))
+                      }
                       className="text-red-500 font-bold"
                     >
                       ×
@@ -131,66 +165,49 @@ export default function AddFieldModal({ open, onClose, onSubmit }) {
                   )}
                 </div>
               ))}
+
+              <button
+                onClick={() => setOptions([...options, ""])}
+                className="text-indigo-600 text-sm mt-2"
+              >
+                + Add Option
+              </button>
             </div>
+          )}
 
-            <button
-              onClick={addOption}
-              className="text-indigo-600 text-sm font-medium mt-2 hover:underline"
-            >
-              + Add Option
-            </button>
-          </div>
-        )}
-
-        {/* Rating Field */}
-        {type === "rating" && (
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Max Stars
-            </label>
+        {/* Required Toggle (fields only) */}
+        {!isButtonItem && (
+          <div className="flex items-center gap-2 mb-4">
             <input
-              type="number"
-              min="1"
-              max="10"
-              value={maxRating}
-              onChange={(e) => setMaxRating(Number(e.target.value))}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+              type="checkbox"
+              checked={required}
+              onChange={(e) => setRequired(e.target.checked)}
+              className="w-4 h-4"
             />
+            <label className="text-sm font-medium text-gray-700">
+              Mark as required
+            </label>
           </div>
         )}
 
-        {/* ✅ Required Checkbox */}
-        <div className="flex items-center mb-5 mt-3 gap-2">
-          <input
-            id="required"
-            type="checkbox"
-            checked={required}
-            onChange={(e) => setRequired(e.target.checked)}
-            className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-          />
-          <label
-            htmlFor="required"
-            className="text-sm font-medium text-gray-700"
-          >
-            Mark as required
-          </label>
-        </div>
-
-        {/* Action Buttons */}
+        {/* Buttons */}
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300"
+            className="px-4 py-2 rounded !bg-red-500  text-white "
           >
-            Cancel
+            Close
           </button>
-          <button
-            onClick={handleSubmit}
-            disabled={!label.trim()}
-            className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 disabled:opacity-50"
-          >
-            Add
-          </button>
+
+          {!isButtonItem && (
+            <button
+              onClick={handleSubmit}
+              disabled={!label.trim()}
+              className="px-4 py-2 rounded !bg-indigo-600 text-white disabled:opacity-50"
+            >
+              {fieldToEdit ? "Save" : "Add"}
+            </button>
+          )}
         </div>
       </div>
     </div>
