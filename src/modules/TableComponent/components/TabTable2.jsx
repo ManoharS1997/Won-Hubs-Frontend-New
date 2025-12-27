@@ -3,7 +3,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { FaSearch } from "react-icons/fa";
 import { useGridApiContext } from "@mui/x-data-grid";
 import { FaFilter } from "react-icons/fa";
-import {  FiTool } from "react-icons/fi";
+import { FiTool } from "react-icons/fi";
 import { FiSearch } from "react-icons/fi";
 import { SaveTabRecord } from "../../../utils/CheckAndExecuteFlows/CRUDoperations";
 import DynamicRowForm from "./TabForm";
@@ -32,53 +32,12 @@ const initial_buttons = [
     { key: "save", label: "Save" },
 ]
 
-const SearchInput = ({
-    searchText,
-    setSearchText,
-    onBlur,
-}) => {
-    return (
-        <div
-            className="
-        flex items-center gap-2
-        h-9
-        px-4
-        bg-white
-        border border-[#b6c3e6]
-        rounded-full
-        shadow-sm
-        focus-within:border-[#08107D]
-        focus-within:ring-1
-        focus-within:ring-[#08107D]
-        transition
-      "
-        >
-            {/* Search Icon */}
-            <FaSearch size={14} className="text-[#08107D]" />
 
-            {/* Input */}
-            <input
-                autoFocus
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                onBlur={onBlur}
-                placeholder="Search"
-                className="
-          w-52
-          text-sm
-          text-gray-700
-          placeholder-gray-400
-          bg-transparent
-          outline-none
-        "
-            />
-        </div>
-    );
-};
-const CustomToolbar = ({ searchText, setSearchText, onAddRow }) => {
+const CustomToolbar = ({ searchText, setSearchText, onAddRow, allowedFilters = [] }) => {
     const apiRef = useGridApiContext();
-
-
+    const condition = (label) => {
+        return allowedFilters.some((filter) => filter.label === label)
+    }
     return (
         <div className="p-2 flex items-center gap-3 justify-end">
             <button
@@ -89,25 +48,25 @@ const CustomToolbar = ({ searchText, setSearchText, onAddRow }) => {
                 onClick={onAddRow}
                 title="Add New Record"
             >
-
                 {renderIcons('GoPlus', 20, "#ffffff")}
             </button>
 
             {/* 📊 Columns */}
-            <button className="bg-transparent"
+            {condition("Configure") && <button className="bg-transparent"
                 onClick={() => apiRef.current.showPreferences("columns")}
                 title="Manage Columns"
             >
                 <FiTool size={16} />
-            </button>
+            </button>}
 
             {/* 🔽 Filters */}
-            <button className="bg-transparent"
+            {condition("Filter") && <button className="bg-transparent"
                 onClick={() => apiRef.current.showPreferences("filters")}
                 title="Manage Filters"
             >
                 <FaFilter size={14} />
             </button>
+            }
 
             {/* ⬇ Export
             <CircleIconButton
@@ -117,7 +76,8 @@ const CustomToolbar = ({ searchText, setSearchText, onAddRow }) => {
             </CircleIconButton> */}
 
             {/* 🔍 Search */}
-            <div className="bg-[#08107D]  text-center
+
+            {condition("Search") && <div className="bg-[#08107D]  text-center
                  flex items-center justify-center  rounded-full border
                    ">
 
@@ -137,11 +97,12 @@ const CustomToolbar = ({ searchText, setSearchText, onAddRow }) => {
                     className="m-1 !text-white"
                 />
             </div>
+            }
         </div>
     );
 };
-const TableCompnent2 = ({ tableObj, formValues, recordId, activeTab, designName }) => {
-    const [columns, setColumnns] = useState(intial_columns);
+
+const TableCompnent2 = ({ tableObj, formValues, recordId, activeTab, designName, allowedFilters }) => {
     const [persistedRows, setPersistedRows] = useState(initialRows); // READ-ONLY
     const [draftRows, setDraftRows] = useState([]);
     const [EditedRows, setEditedRows] = useState(
@@ -149,9 +110,6 @@ const TableCompnent2 = ({ tableObj, formValues, recordId, activeTab, designName 
     );
     const [searchText, setSearchText] = useState("");
     const [filteredRows, setFilteredRows] = useState(EditedRows);
-    const [filters, setFilters] = useState({});
-    const [selectedRowIds, setSelectedRowIds] = useState([]);
-    const rowClickRef = useRef(false);
     const [dirtyRowIds, setDirtyRowIds] = useState(new Set());
     // maintaining changes for Add Form
     const [openForm, setOpenForm] = useState(false);
@@ -259,82 +217,93 @@ const TableCompnent2 = ({ tableObj, formValues, recordId, activeTab, designName 
         setEditingRow(params.row);
         setOpenForm(true);
     }
-
-
+    // console.log(allowedFilters, "allowedFilters in table component 2");
     return (
-        <div>
+        <div className="max-h-[75vh]">
             {!openForm &&
-                <>            <DataGrid
-                    // rows={filteredRows}
-                    rows={filteredRowsForGrid}
-                    columns={gridColumns}
-                    getRowId={(row) => row.sys_id}
-                    onRowClick={handleRowClick}
-                    checkboxSelection
-                    disableRowSelectionOnClick
-                    slots={{
-                        toolbar: CustomToolbar,
-                        noRowsOverlay: () => (
-                            <div className="w-full h-full flex items-center justify-center bg-white">
-                                <span className="text-gray-500 text-sm">No rows</span>
-                            </div>
-                        ),
-                    }}
-                    slotProps={{
-                        toolbar: {
-                            onAddRow: handleAddRow,
-                            searchText,
-                            setSearchText,
-                        },
-                        panel: {
-                            sx: {
-                                right: 16,
-                                left: "auto",
-                                top: 56,
+                <>
+                    <DataGrid
+                        // rows={filteredRows}
+                        rows={filteredRowsForGrid}
+                        columns={gridColumns}
+                        getRowId={(row) => row.sys_id}
+                        onRowClick={handleRowClick}
+                        checkboxSelection
+                        disableRowSelectionOnClick
+                        slots={{
+                            toolbar: CustomToolbar,
+                            noRowsOverlay: () => (
+                                <div className="w-full h-full flex items-center justify-center bg-white">
+                                    <span className="text-gray-500 text-sm">No rows</span>
+                                </div>
+                            ),
+                        }}
+                        slotProps={{
+                            toolbar: {
+                                onAddRow: handleAddRow,
+                                searchText,
+                                setSearchText,
+                                allowedFilters,
                             },
-                        }
-                    }}
+                            panel: {
+                                sx: {
+                                    right: 16,
+                                    left: "auto",
+                                    top: 56,
+                                },
+                            }
+                        }}
 
-                    pageSizeOptions={[5, 10]}
-                    processRowUpdate={(newRow) => {
-                        if (newRow.__isDraft) {
-                            setDraftRows(prev =>
-                                prev.map((r, i) =>
-                                    `draft-${i}` === newRow.sys_id ? newRow : r
+                        initialState={{
+                            pagination: {
+                                paginationModel: {
+                                    page: 0,
+                                    pageSize: 6, // ✅ fixed page size
+                                },
+                            },
+                        }}
+                        pageSizeOptions={[6]}
+
+                        // pageSizeOptions={[5, 10]}
+                        processRowUpdate={(newRow) => {
+                            if (newRow.__isDraft) {
+                                setDraftRows(prev =>
+                                    prev.map((r, i) =>
+                                        `draft-${i}` === newRow.sys_id ? newRow : r
+                                    )
+                                );
+                                return newRow;
+                            }
+
+                            setDirtyRowIds(prev => new Set(prev).add(newRow.sys_id));
+                            setEditedRows(prev =>
+                                prev.map(r =>
+                                    r.sys_id === newRow.sys_id ? newRow : r
                                 )
                             );
                             return newRow;
-                        }
-
-                        setDirtyRowIds(prev => new Set(prev).add(newRow.sys_id));
-                        setEditedRows(prev =>
-                            prev.map(r =>
-                                r.sys_id === newRow.sys_id ? newRow : r
-                            )
-                        );
-                        return newRow;
-                    }}
-                    sx={{
-                        "--DataGrid-containerBackground": "#050c6b",
-                        "& .MuiDataGrid-columnHeaders": {
-                            backgroundColor: "#08107D",
-                        },
-                        "& .MuiDataGrid-columnHeaderTitle": {
-                            color: "#ffffff",
-                            fontWeight: 600,
-                        },
-                        "& .MuiDataGrid-columnHeaderCheckbox .MuiDataGrid-checkboxInput": {
-                            display: "none",
-                        },
-                        "& .MuiDataGrid-footerContainer": {
-                            borderTop: "none",
-                            justifyContent: "flex-end",
-                        },
-                        "& .MuiTablePagination-toolbar": {
-                            minHeight: "40px",
-                        },
-                    }}
-                />
+                        }}
+                        sx={{
+                            "--DataGrid-containerBackground": "#050c6b",
+                            "& .MuiDataGrid-columnHeaders": {
+                                backgroundColor: "#08107D",
+                            },
+                            "& .MuiDataGrid-columnHeaderTitle": {
+                                color: "#ffffff",
+                                fontWeight: 600,
+                            },
+                            "& .MuiDataGrid-columnHeaderCheckbox .MuiDataGrid-checkboxInput": {
+                                display: "none",
+                            },
+                            "& .MuiDataGrid-footerContainer": {
+                                borderTop: "none",
+                                justifyContent: "flex-end",
+                            },
+                            "& .MuiTablePagination-toolbar": {
+                                minHeight: "40px",
+                            },
+                        }}
+                    />
                     <div className="flex justify-end mt-2 gap-3">
                         {initial_buttons.map((button) => (
                             <button
@@ -358,6 +327,7 @@ const TableCompnent2 = ({ tableObj, formValues, recordId, activeTab, designName 
                     fields={tableObj.fields}
                     initialValues={editingRow}
                     onSubmit={handleButtonClick}
+                    allowedFilters={allowedFilters}
                 />
             }
         </div>

@@ -5,11 +5,11 @@ import TabDesigner from "../Design/components/formDesigner/TabDesigner";
 import { useNavigate, useLocation } from "react-router-dom";
 import AddButtonEventModal from "../Design/components/formDesigner/AddButtonEventModal";
 import { TabsContainer, TabItem } from "../MyTickets/pages/StyledComponents";
-import { set } from "date-fns";
+
 import renderIcons from "../../../shared/functions/renderIcons";
 import PropTypes from "prop-types";
 import Fields from "../../../shared/CreationEditor/Fields";
-import { GetAllDesignes, GetDesignerFields, GetDesignById } from "../../../utils/CheckAndExecuteFlows/CRUDoperations";
+import {GetDesignById } from "../../../utils/CheckAndExecuteFlows/CRUDoperations";
 
 
 FormDesignerPage.propTypes = {
@@ -34,6 +34,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
   const [showCreate, setShowCreate] = useState(true)
   const [previousFieldsData, setPreviousFieldsData] = useState({} || JSON.parse(localStorage.getItem("formDesignerData")))
   const Navigate = useNavigate()
+  const [FilterButtons, setFilterButtons] = useState([])
   // const [recordId,setRecordId]=useState(recordId)
 
   const titleOptions = [
@@ -178,9 +179,6 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
       buttonData: button,
     });
   };
-
-  // console.log(formButtons)
-
   // Open modal on custom button add
   const addCustomButton = () => {
     if (module?.length > 0) {
@@ -189,7 +187,6 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
       alert("Select module");
     }
   };
-
   // Submit modal data: add button to formButtons
   const handleAddButtonModalSubmit = ({
     eventType,
@@ -252,7 +249,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
     console.log(response, "Hereee")
     if (response.success) {
       const { fields, formButtons, tabs, designName, views, module, departmentName, subCategory, category, designerName } = response;
-      console.log(category,"category Hereee")
+      // console.log(category,"category Hereee")
       setFormFields(fields)
       setFormButtons(formButtons)
       setTabs(tabs)
@@ -277,6 +274,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
   }, []);
   // console.log(previousFieldsData,"Previous Field Dataaa")
   // console.log(Fields,"Fields Herreee")
+  console.log(FilterButtons, "FilterButtons")
 
   return (
     <>
@@ -470,6 +468,8 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                   setTabs={setTabs}
                   tabs={tabs}
                   module={module?.replace(/\s+/g, "").toLowerCase()}
+                  filterButtons={FilterButtons}
+                  setFilterButtons={setFilterButtons}
                 />
               </section>
             )}

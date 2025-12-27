@@ -93,8 +93,14 @@ export default function AddFieldModal({ open, onClose, onSubmit, fieldToEdit }) 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white p-6 rounded-2xl shadow-lg w-[400px]">
+        <button
+          onClick={onClose}
+          className="rounded !text-red-500  top-2 right-2 w-8 h-8 flex items-center self-end"
+        >
+          X
+        </button>
 
-        <h2 className="text-lg font-semibold text-indigo-600 mb-4">
+        <h2 className="text-lg font-semibold text-indigo-600 mb-4 p-0">
           {isButtonItem
             ? "Button Details"
             : fieldToEdit
@@ -103,26 +109,28 @@ export default function AddFieldModal({ open, onClose, onSubmit, fieldToEdit }) 
         </h2>
 
         {/* Label */}
-        <label className="text-sm font-medium text-gray-700 mb-1 block">Label</label>
-        <input
-          type="text"
-          value={label}
-          onChange={(e) => !isButtonItem && setLabel(e.target.value)}
-          disabled={isButtonItem}
-          className={`w-full border border-gray-300 rounded-lg p-2 mb-4 ${isButtonItem ? "bg-gray-100" : ""
-            }`}
-        />
+        <div className="flex gap-2">
+          <label className="text-sm font-medium text-gray-700 mb-1 block">Label</label>
+          <input
+            type="text"
+            value={label}
+            onChange={(e) => !isButtonItem && setLabel(e.target.value)}
+            disabled={isButtonItem}
+            className={`w-[60%] border border-gray-300 rounded-lg p-2 mb-4 ${isButtonItem ? "bg-gray-100" : ""
+              }`}
+          />
+        </div>
 
         {/* Field Type */}
         {!isButtonItem && (
-          <>
+          <div className="flex">
             <label className="text-sm font-medium text-gray-700 mb-1 block">
               Type
             </label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-2 mb-4"
+              className="w-[50%] border border-gray-300 rounded-lg px-2 mb-4"
             >
               {FIELD_TYPES.map((f) => (
                 <option key={f.value} value={f.value}>
@@ -130,7 +138,7 @@ export default function AddFieldModal({ open, onClose, onSubmit, fieldToEdit }) 
                 </option>
               ))}
             </select>
-          </>
+          </div>
         )}
 
         {/* Options (only for fields, not buttons) */}

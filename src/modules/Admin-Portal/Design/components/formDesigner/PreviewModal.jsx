@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { AiOutlineSwap } from "react-icons/ai"; // or MdSwapHoriz / HiOutlineSwitchHorizontal
 import { useNavigate } from "react-router-dom";
-import FormDropdown from "../../../../../shared/UIElements/FormDropdown";
 import Select from "react-dropdown-select";
 import Cookies from "js-cookie";
 
@@ -403,6 +402,16 @@ export default function PreviewModal({
               )}
 
               {tab.type === "table" && (
+                <>
+                <div>
+                  <ul className="flex justify-end !gap-3">
+                    {
+                      tab?.filters?.map((filter) => (
+                        <li key={filter._uid} className="text-blue-600">{filter.label}</li>
+                      ))
+                    }
+                  </ul>
+                </div>
                 <table className="w-full table-fixed border border-gray-300 rounded-md text-center shadow-sm">
                   <thead className="bg-indigo-200 text-indigo-700 font-semibold">
                     <tr>
@@ -495,6 +504,7 @@ export default function PreviewModal({
                     </tr>
                   </tbody>
                 </table>
+                </>
               )}
 
             </section>

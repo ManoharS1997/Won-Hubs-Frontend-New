@@ -139,7 +139,7 @@ export default function FormBuilder({
                 <div
                   key={f.label}
                   onClick={() => {
-                    console.log("Field Click JESUS", f)
+                    console.log("Field Click ", f)
                     setFieldToEdit(f)
                     setShowAddFieldModal(true);
                   }}
@@ -150,7 +150,7 @@ export default function FormBuilder({
                     category="field"
                     onDragStart={onDragStart}
                     onClick={() => {
-                      console.log("Field Click JESUS", f)
+                      console.log("Field Click ", f)
                       setFieldToEdit(f)
                       setShowAddFieldModal(true);
                     }}
@@ -225,6 +225,10 @@ export default function FormBuilder({
                   }
                   setDraggedFieldIndex(null);
                 }}
+                onClick={() => {
+                    setFieldToEdit(field);
+                    setShowAddFieldModal(true);
+                  }}
                 className="flex justify-between items-center bg-white border border-indigo-100
                rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition
                cursor-move select-none"

@@ -627,7 +627,6 @@ export default function TableComponent({
         return <FormDesignerPage recordId={selectedTab} />;
 
       case 'formtest':
-      case 'group_names':
       case 'Groups':
       case 'Companies':
         return <FormUIDemo recordId={selectedTab || 1} tableName={tableName} />
@@ -919,8 +918,8 @@ export default function TableComponent({
               </FilterContainer>
             ))}
           {/* </FiltersContainer> */}
-          {console.log(allTableFields, "allTableFields Hereee")}
-          {console.log(selectedColumns, "selectedColumns Hereee")}
+          {/* {console.log(allTableFields, "allTableFields Hereee")}
+          {console.log(selectedColumns, "selectedColumns Hereee")} */}
           {showConfigurefieldsBtn === true && (
             <ConfigureFields
               isConfigureActive={isConfigureActive}

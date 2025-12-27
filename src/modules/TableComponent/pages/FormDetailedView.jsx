@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { GetDesignerFields, GetDynamicRecordData, GetTabValues, SaveTabRecord, UpdateTabRecord } from "../../../utils/CheckAndExecuteFlows/CRUDoperations";
 import EditableTable from "../components/DynamicTable";
 import TableCompnent2 from "../components/TabTable2";
+import Designtabs from "../../Admin-Portal/Design/components/DesignTabs";
 
 export default function FormUIDemo({ recordId, tableName }) {
     // console.log(tableName, "tableName");
@@ -220,12 +221,16 @@ export default function FormUIDemo({ recordId, tableName }) {
                 return null;
         }
     };
+    const returnFilters = () => {
+        const tabObj = design?.tabs.find((t) => t.name === activeTab);
+        return tabObj?.filters || [];
+    }
 
     // console.log(recordId, "recordId")
-    console.log(formValues, "formvalues @parent");
-    console.log(activeFields, "Active Fields @parent");
+    // console.log(formValues, "formvalues @parent");
+    // console.log(activeFields, "Active Fields @parent");
     return (
-        <div className="w-full min-h-[90%] bg-white p-4 font-sans">
+        <div className="w-full min-h-[90%] bg-white font-sans max-h-[90%] overflow-hidden p-0">
             {/* TABS */}
             <div className="flex !bg-[#01245c] text-white rounded-xl overflow-hidden mb-2 p-1 max-h-13">
                 {tabs.map((tab) => (
@@ -242,7 +247,7 @@ export default function FormUIDemo({ recordId, tableName }) {
                 ))}
             </div>
             {/* FORM CONTENT */}
-            <div className="bg-white p-8 rounded-xl shadow-md w-full">
+            <div className="bg-white p-8 rounded-xl shadow-md w-full max-h-[100%] overflow-auto" >
                 {
                     !isTableTab &&
                     <div className="grid grid-cols-2 gap-x-10 gap-y-6">
@@ -253,8 +258,7 @@ export default function FormUIDemo({ recordId, tableName }) {
                 }
                 {
                     // isTableTab && <EditableTable tableObj={tableObj} recordId={recordId} activeTab={activeTab} designName={designName} formValues={formValues} />1
-                    isTableTab && <TableCompnent2 tableObj={tableObj} recordId={recordId} activeTab={activeTab} designName={designName} formValues={formValues} />
-
+                    isTableTab && <TableCompnent2 tableObj={tableObj} recordId={recordId} activeTab={activeTab} designName={designName} formValues={formValues} allowedFilters={returnFilters()} />
                 }
                 {/* BUTTONS */}
                 <div className="flex gap-4 mt-6 items-end justify-end">

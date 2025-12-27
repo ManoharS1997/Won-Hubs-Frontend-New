@@ -5,10 +5,8 @@ import renderIcons from "../../../../../shared/functions/renderIcons";
 import AddButtonEventModal from "./AddButtonEventModal";
 import AddTableEventModal from "./AddTableEventModal";
 import AddTableActionEventModal from "./AddTableActionEventModal";
-import { Table } from "lucide-react";
 
 const PREDEFINED_TABS = ["History", "Settings"];
-
 const PREDEFINED_FIELDS = [
   { type: "text", label: "Id" },
   { type: "text", label: "Name" },
@@ -20,26 +18,23 @@ const PREDEFINED_FIELDS = [
   { type: "text", label: "Label" },
   { type: "text", label: "On Behalf Of" },
 ];
-
 const PREDEFINED_BUTTONS = [
   { type: "save", label: "Save" },
   { type: "update", label: "Update" },
   { type: "email", label: "Email" },
   { type: "export", label: "Export" },
 ];
-
 const TABLE_ACTIONS = [
   { id: 1, label: 'Search' },
   { id: 2, label: 'Filter' },
   { id: 3, label: 'Add' },
+  { id: 4, label:'Configure'}
 
 ];
-
 const fieldTypesWithOptions = ["dropdown", "radio", "checkbox"];
 function fieldSupportsOptions(type) {
   return fieldTypesWithOptions.includes(type);
 }
-
 function DraggableButton({ item, category, onDragStart, children, className }) {
   return (
     <button
@@ -147,9 +142,8 @@ function Tab({
   // addCustomButton,
   toggleRequired,
   setTabs,
+  removeFilter
 }) {
-
-
 
   const reorderTabFields = (tabIdx, fromIndex, toIndex) => {
     setTabs((prevTabs) => {
@@ -168,6 +162,15 @@ function Tab({
     });
   };
 
+
+  const onFilterActionDragStart = (e, action) => {
+    e.dataTransfer.setData(
+      "application/filter-action",
+      JSON.stringify(action)
+    );
+    e.dataTransfer.effectAllowed = "copy";
+  };
+
   return (
     <section className="bg-indigo-50 rounded-lg p-6 shadow-md w-full mb-2.5">
       <header className="flex justify-between items-center mb-4">
@@ -184,8 +187,7 @@ function Tab({
                   : "bg-slate-100 text-indigo-700 hover:bg-slate-200 border"
                 }
       rounded-l-md
-    `}
-            >
+    `} >
               Form
             </button>
             <button
@@ -304,14 +306,7 @@ function Tab({
                   {button.label}
                 </DraggableButton>
               ))}
-              {/* <button
-                onClick={() => {
-                  addCustomButton(tabIdx);
-                }}
-                className="px-3 py-1 !bg-green-600 text-white rounded cursor-pointer hover:bg-green-700"
-              >
-                + Custom Button
-              </button> */}
+
             </div>
 
             {/* Responsive grid layout for dropped buttons */}
@@ -379,7 +374,8 @@ function Tab({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 {tab.tableCols.map((col, idx) => (
                   <div
-                    key={col.name}
+                    key={col._uid}
+
                     className="flex justify-between items-center bg-white rounded px-4 py-2 shadow-sm hover:shadow-md transition"
                   >
                     <span>
@@ -402,43 +398,48 @@ function Tab({
               </p>
             )}
           </div>
+
           {/* Filter elements section */}
           <div
-            onDrop={(e) => onDrop(e, tabIdx, "column")}
-            onDragOver={allowDrop}
+            onDrop={(e) => onDrop(e, tabIdx, "filter")}
+            onDragOver={(e) => e.preventDefault()}
             className="border-2 border-dashed border-indigo-400 p-4 rounded-lg mb-6 min-h-[10rem]"
           >
-            {/* Predefined draggable fields & table actions */}
+            {/* Available filter actions */}
             <div className="flex flex-wrap gap-3 mb-4">
-              {TABLE_ACTIONS.map((field) => (
+              {TABLE_ACTIONS.map((action) => (
                 <DraggableButton
-                  key={field.label}
-                  item={field}
-                  category="field"
-                  onDragStart={onDragStart}
+                  key={action.label}
+                  item={action}
+                  category="filter-action"
+                  onDragStart={(e) => onFilterActionDragStart(e, action)}
                   className="px-3 py-1 bg-white border border-indigo-300 rounded cursor-grab text-sm text-indigo-700 shadow-sm"
                 >
-                  {field.label}
+                  {action.label}
                 </DraggableButton>
               ))}
             </div>
 
-            {/* Responsive grid layout for dropped columns */}
-            {TABLE_ACTIONS.length > 0 ? (
+            {/* Render dropped filters */}
+            {tab?.filters && tab?.filters.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                {tab.tableCols.map((col, idx) => (
+                {tab.filters.map((filter, idx) => (
                   <div
-                    key={col.name}
+                    key={filter._uid}
                     className="flex justify-between items-center bg-white rounded px-4 py-2 shadow-sm hover:shadow-md transition"
                   >
-                    <span>
-                      {col.label}{" "}
-                      <small className="text-indigo-500">({col.type})</small>
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-gray-800">
+                        {filter.label}
+                      </span>
+                      
+                    </div>
+
                     <button
-                      onClick={() => removeColumn(tabIdx, idx)}
-                      className="text-red-600 hover:text-red-800 rounded focus:outline-none"
-                      aria-label="Remove column"
+                      onClick={() => removeFilter(tabIdx, idx)}
+
+                      className="text-red-600 hover:text-red-800"
+                      title="Remove filter"
                     >
                       &times;
                     </button>
@@ -447,9 +448,18 @@ function Tab({
               </div>
             ) : (
               <p className="text-center text-gray-500 italic">
-                Drop columns here
+                Drop filter actions here
               </p>
             )}
+          </div>
+
+          {/* rendered tBale */}
+          <div>
+            <ul className="flex gap-2 justify-end items-end">
+              {tab?.filters?.map((filter) => (
+                <li key={filter._uid} className="text-blue-600">{filter.label}</li>
+              ))}
+            </ul>
           </div>
           <table className="w-full table-fixed border border-gray-300 rounded-md text-center shadow-sm">
             <thead className="bg-indigo-200 text-indigo-700 font-semibold">
@@ -490,7 +500,6 @@ function Tab({
                 )}
               </tr>
             </thead>
-
             <tbody>
               <tr>
                 {/* Non-action data cells */}
@@ -610,11 +619,12 @@ function TabsDesigner({
   addCustomButton,
   toggleRequired,
   setTabs,
-  
+  removeFilter
 }) {
   const [showAllButtonFields, setShowAllButtonFields] = useState(false);
   const [updatedTabsList, setUpdatedTabsList] = useState(tabsList);
   const [draggedTabIndex, setDraggedTabIndex] = useState(null);
+
 
   const reorderTabs = (fromIndex, toIndex) => {
     setTabs((prev) => {
@@ -763,6 +773,7 @@ function TabsDesigner({
                   removeTab={removeTab}
                   addCustomButton={addCustomButton}
                   toggleRequired={toggleRequired}
+                  removeFilter={removeFilter}
                 />
               </div>
             ))}
@@ -801,7 +812,7 @@ TabDesigner.propTypes = {
   module: PropTypes.any.isRequired,
 };
 
-export default function TabDesigner({ tabs, setTabs, module }) {
+export default function TabDesigner({ tabs, setTabs, module, filterButtons, setFilterButtons }) {
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
   const [fieldModalTabIdx, setFieldModalTabIdx] = useState(null);
   const [openActionModal, setOpenActionModal] = useState(false);
@@ -815,9 +826,7 @@ export default function TabDesigner({ tabs, setTabs, module }) {
     buttonData: null,
     tabIdx: null,
   });
-
-  const [buttonFilters,setButtonFilters] = useState(Table_ACTIONS);
-
+  // const [buttonFilters, setButtonFilters] = useState(Table_ACTIONS);
   const onDragStart = (e, item, category) => {
     e.dataTransfer.setData(
       "application/json",
@@ -872,13 +881,23 @@ export default function TabDesigner({ tabs, setTabs, module }) {
   const onDropTab = (e) => {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
+
     if (
       data.category === "tab" &&
-      !tabs.some((t) => t.name.toLowerCase() === data.item.toLowerCase())
+      !tabs.some(
+        (t) => t.name.toLowerCase() === data.item.toLowerCase()
+      )
     ) {
       setTabs((prev) => [
         ...prev,
-        { name: data.item, type: "", fields: [], buttons: [], tableCols: [] },
+        {
+          name: data.item,   // ✅ FIXED
+          type: "",
+          fields: [],
+          buttons: [],
+          tableCols: [],
+          filters: [],       // ✅ REQUIRED
+        },
       ]);
     }
   };
@@ -913,11 +932,24 @@ export default function TabDesigner({ tabs, setTabs, module }) {
           return { ...tab, type, fields: [], buttons: [], tableCols: [] };
         }
 
+        // if (type === "table") {
+        //   setSelectedTabIndex(idx);
+        //   setOpenTableEventModal(true);
+        //   return { ...tab, type, fields: [], buttons: [], tableCols: [] };
+        // }
         if (type === "table") {
           setSelectedTabIndex(idx);
           setOpenTableEventModal(true);
-          return { ...tab, type, fields: [], buttons: [], tableCols: [] };
+          return {
+            ...tab,
+            type,
+            fields: [],
+            buttons: [],
+            tableCols: [],
+            filters: []   // ✅ ADD THIS
+          };
         }
+
 
         return { ...tab, type };
       })
@@ -1053,6 +1085,21 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       )
     );
   };
+  const removeFilter = (tabIdx, filterIdx) => {
+    setTabs((prev) =>
+      prev.map((tab, i) =>
+        i === tabIdx
+          ? {
+            ...tab,
+            filters: (tab.filters || []).filter(
+              (_, idx) => idx !== filterIdx
+            ),
+          }
+          : tab
+      )
+    );
+  };
+
 
   const addTabButton = (idx, button) => {
     setTabs((prev) =>
@@ -1133,23 +1180,125 @@ export default function TabDesigner({ tabs, setTabs, module }) {
     });
   };
 
-  // Drop handlers
+  // Drop handlers(praveens onDrop function)
+  // const onDrop = (e, idx, type) => {
+  //   e.preventDefault();
+  //   const data = JSON.parse(e.dataTransfer.getData("application/json"));
+  //   // ----------------------------
+  //   // 1️⃣ FIELD DROP
+  //   // ----------------------------
+  //   if (type === "field" && data.category === "field") {
+  //     addTabField(idx, data.item);
+  //     return;
+  //   }
+  //   // ----------------------------
+  //   // 2️⃣ BUTTON DROP
+  //   // ----------------------------
+  //   if (type === "button" && data.category === "button") {
+  //     const currentTab = tabs[idx];
+  //     if (!currentTab) return;
+  //     const droppedButton = data.item;
+  //     const label = droppedButton.label || "";
+  //     const labelLower = label.toLowerCase().trim();
+  //     // 2.1 Prevent duplicates
+  //     if (
+  //       currentTab.buttons?.some(
+  //         (btn) => btn.label.toLowerCase().trim() === labelLower
+  //       )
+  //     ) {
+  //       alert(`Button "${label}" already exists in ${currentTab.name}.`);
+  //       return;
+  //     }
+  //     // ----------------------------
+  //     // 2.2 SAVE / UPDATE BUTTON → DIRECT INSERT (NO MODAL)
+  //     // ----------------------------
+  //     if (labelLower === "save" || labelLower === "update") {
+  //       const newButton = {
+  //         label,
+  //         type: "button",
+  //         actionType: "API Call",
+  //         apiEndpoint: "/api/form-designer/dynamic/save",
+  //         apiMethod: "POST",
+  //       };
+  //       setTabs((prev) =>
+  //         prev.map((tab, i) =>
+  //           i === idx ? { ...tab, buttons: [...tab.buttons, newButton] } : tab
+  //         )
+  //       );
+  //       return;
+  //     }
+  //     // ----------------------------
+  //     // 2.3 EMAIL BUTTON → DIRECT INSERT
+  //     // ----------------------------
+  //     if (labelLower === "email") {
+  //       const newButton = {
+  //         label,
+  //         type: "button",
+  //         actionType: "email",
+  //       };
+  //       setTabs((prev) =>
+  //         prev.map((tab, i) =>
+  //           i === idx ? { ...tab, buttons: [...tab.buttons, newButton] } : tab
+  //         )
+  //       );
+  //       return;
+  //     }
+  //     // ----------------------------
+  //     // 2.4 EXPORT BUTTON → DIRECT INSERT
+  //     // ----------------------------
+  //     if (labelLower === "export") {
+  //       const newButton = {
+  //         label,
+  //         type: "button",
+  //         actionType: "export",
+  //       };
+
+  //       setTabs((prev) =>
+  //         prev.map((tab, i) =>
+  //           i === idx ? { ...tab, buttons: [...tab.buttons, newButton] } : tab
+  //         )
+  //       );
+
+  //       return;
+  //     }
+  //     // ----------------------------
+  //     // 2.5 OTHER BUTTONS → OPEN MODAL
+  //     // ----------------------------
+  //     setAddingButton({
+  //       open: true,
+  //       tabIndex: null,
+  //       buttonData: droppedButton,
+  //       tabIdx: idx,
+  //     });
+
+  //     return;
+  //   }
+  //   // ----------------------------
+  //   // 3️⃣ COLUMN DROP (FIELD or ACTION)
+  //   // ----------------------------
+  //   if (
+  //     type === "column" &&
+  //     (data.category === "field" || data.category === "action")
+  //   ) {
+  //     addTabColumn(idx, data.item);
+  //     return;
+  //   }
+  // };
   const onDrop = (e, idx, type) => {
     e.preventDefault();
-    const data = JSON.parse(e.dataTransfer.getData("application/json"));
+    let data = null;
+    const jsonData = e.dataTransfer.getData("application/json");
 
-    // ----------------------------
-    // 1️⃣ FIELD DROP
-    // ----------------------------
-    if (type === "field" && data.category === "field") {
+    if (jsonData) {
+      data = JSON.parse(jsonData);
+    }
+
+    if (type === "field" && data?.category === "field") {
       addTabField(idx, data.item);
       return;
     }
 
-    // ----------------------------
-    // 2️⃣ BUTTON DROP
-    // ----------------------------
-    if (type === "button" && data.category === "button") {
+    if (type === "button" && data?.category === "button") {
       const currentTab = tabs[idx];
       if (!currentTab) return;
 
@@ -1157,7 +1306,7 @@ export default function TabDesigner({ tabs, setTabs, module }) {
       const label = droppedButton.label || "";
       const labelLower = label.toLowerCase().trim();
 
-      // 2.1 Prevent duplicates
+      // Prevent duplicates
       if (
         currentTab.buttons?.some(
           (btn) => btn.label.toLowerCase().trim() === labelLower
@@ -1167,89 +1316,116 @@ export default function TabDesigner({ tabs, setTabs, module }) {
         return;
       }
 
-      // ----------------------------
-      // 2.2 SAVE / UPDATE BUTTON → DIRECT INSERT (NO MODAL)
-      // ----------------------------
+      // SAVE / UPDATE
       if (labelLower === "save" || labelLower === "update") {
-        const newButton = {
-          label,
-          type: "button",
-          actionType: "API Call",
-          apiEndpoint: "/api/form-designer/dynamic/save",
-          apiMethod: "POST",
-        };
-
         setTabs((prev) =>
           prev.map((tab, i) =>
-            i === idx ? { ...tab, buttons: [...tab.buttons, newButton] } : tab
+            i === idx
+              ? {
+                ...tab,
+                buttons: [
+                  ...tab.buttons,
+                  {
+                    label,
+                    type: "button",
+                    actionType: "API Call",
+                    apiEndpoint: "/api/form-designer/dynamic/save",
+                    apiMethod: "POST",
+                  },
+                ],
+              }
+              : tab
           )
         );
-
         return;
       }
 
-      // ----------------------------
-      // 2.3 EMAIL BUTTON → DIRECT INSERT
-      // ----------------------------
+      // EMAIL
       if (labelLower === "email") {
-        const newButton = {
-          label,
-          type: "button",
-          actionType: "email",
-        };
-
         setTabs((prev) =>
           prev.map((tab, i) =>
-            i === idx ? { ...tab, buttons: [...tab.buttons, newButton] } : tab
+            i === idx
+              ? {
+                ...tab,
+                buttons: [...tab.buttons, { label, type: "button", actionType: "email" }],
+              }
+              : tab
           )
         );
-
         return;
       }
 
-      // ----------------------------
-      // 2.4 EXPORT BUTTON → DIRECT INSERT
-      // ----------------------------
+      // EXPORT
       if (labelLower === "export") {
-        const newButton = {
-          label,
-          type: "button",
-          actionType: "export",
-        };
-
         setTabs((prev) =>
           prev.map((tab, i) =>
-            i === idx ? { ...tab, buttons: [...tab.buttons, newButton] } : tab
+            i === idx
+              ? {
+                ...tab,
+                buttons: [...tab.buttons, { label, type: "button", actionType: "export" }],
+              }
+              : tab
           )
         );
-
         return;
       }
 
-      // ----------------------------
-      // 2.5 OTHER BUTTONS → OPEN MODAL
-      // ----------------------------
+      // OTHER BUTTONS → MODAL
       setAddingButton({
         open: true,
         tabIndex: null,
         buttonData: droppedButton,
         tabIdx: idx,
       });
-
       return;
     }
 
     // ----------------------------
-    // 3️⃣ COLUMN DROP (FIELD or ACTION)
+    // 3️⃣ COLUMN DROP
     // ----------------------------
     if (
       type === "column" &&
-      (data.category === "field" || data.category === "action")
+      (data?.category === "field" || data?.category === "action")
     ) {
       addTabColumn(idx, data.item);
       return;
     }
+
+    // ----------------------------
+    // 4️⃣ FILTER DROP
+    // ----------------------------
+    if (type === "filter") {
+      const raw = e.dataTransfer.getData("application/filter-action");
+      if (!raw) return;
+
+      const filterAction = JSON.parse(raw);
+
+      setTabs((prevTabs) =>
+        prevTabs.map((tab, i) =>
+          i === idx
+            ? {
+              ...tab,
+              filters: tab.filters?.some(
+                (f) => f.label.toLowerCase() === filterAction.label.toLowerCase()
+              )
+                ? tab.filters // ⛔ prevent duplicates
+                : [
+                  ...(tab.filters || []),
+                  {
+                    ...filterAction,
+                    type: "filter",
+                    _uid: crypto.randomUUID(),
+                  },
+                ],
+            }
+            : tab
+        )
+      );
+      return;
+    }
+
   };
+
 
   // Modal submit
   const onAddFieldSubmit = (fieldData) => {
@@ -1286,6 +1462,7 @@ export default function TabDesigner({ tabs, setTabs, module }) {
         addCustomButton={addCustomButton}
         toggleRequired={toggleRequired}
         setTabs={setTabs}
+        removeFilter={removeFilter}
       />
       <AddFieldModal
         open={showAddFieldModal}
