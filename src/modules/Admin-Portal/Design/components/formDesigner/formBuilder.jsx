@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import DraggableButton from "./DraggableButton";
 import AddFieldModal from "./AddFieldModal";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import renderIcons from "../../../../../shared/functions/renderIcons";
 
 const PREDEFINED_FIELDS = [
@@ -44,6 +44,8 @@ export default function FormBuilder({
   const [buttonDragFieldIndex, setButtonDragFieldIndex] = useState(null);
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
   const [fieldToEdit, setFieldToEdit] = useState(null);
+  const [fieldObject,setFieldObject]=useState()
+
   // When user submits Add Field Modal
   const onAddFieldModalSubmit = ({ label, type, options, required }) => {
     if (
@@ -67,8 +69,6 @@ export default function FormBuilder({
     setShowAddFieldModal(false);
   };
 
-  // console.log(formFields, "Form Fields Hereee")
-  // Toggle required flag for an existing field
   const toggleRequired = (index) => {
     setFormFields((prev) =>
       prev.map((field, i) =>
@@ -135,11 +135,10 @@ export default function FormBuilder({
           >
             {(showAllFields ? filteredFields : filteredFields.slice(0, 7)).map(
               (f) => (
-
                 <div
                   key={f.label}
                   onClick={() => {
-                    console.log("Field Click ", f)
+                    // console.log("Field Click ", f)
                     setFieldToEdit(f)
                     setShowAddFieldModal(true);
                   }}

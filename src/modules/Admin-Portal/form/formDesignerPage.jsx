@@ -9,8 +9,8 @@ import { TabsContainer, TabItem } from "../MyTickets/pages/StyledComponents";
 import renderIcons from "../../../shared/functions/renderIcons";
 import PropTypes from "prop-types";
 import Fields from "../../../shared/CreationEditor/Fields";
-import {GetDesignById } from "../../../utils/CheckAndExecuteFlows/CRUDoperations";
-
+import { GetDesignById } from "../../../utils/CheckAndExecuteFlows/CRUDoperations";
+import ModuleSelect from "./selecteModule";
 
 FormDesignerPage.propTypes = {
   recordId: PropTypes.any.isRequired,
@@ -35,47 +35,44 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
   const [previousFieldsData, setPreviousFieldsData] = useState({} || JSON.parse(localStorage.getItem("formDesignerData")))
   const Navigate = useNavigate()
   const [FilterButtons, setFilterButtons] = useState([])
+  const [showPublish, setShowPublish] = useState(false)
   // const [recordId,setRecordId]=useState(recordId)
-
   const titleOptions = [
     {
       name: "My Items",
       subModules: ["Tickets", "Tasks", "Approvals"],
     },
+
     {
-      name: "Users",
-      subModules: [],
+      name: "Admin",
+      subModules: [
+        "Users",
+        "Groups",
+        "Locations",
+        "Departments",
+        "Companies",
+        "Notifications",
+        "Feedbacks",
+        "Alerts",
+      ],
     },
+
     {
-      name: "Groups",
-      subModules: [],
-    },
-    {
-      name: "Locations",
+      name: "Apps",
       subModules: [],
     },
 
     {
-      name: "Departments",
+      name: "Calendar",
       subModules: [],
     },
+
     {
-      name: "Companies",
-      subModules: [],
-    },
-    {
-      name: "Notifications",
-      subModules: [],
-    },
-    {
-      name: "Feedbacks",
-      subModules: [],
-    },
-    {
-      name: "Alerts",
+      name: "Settings",
       subModules: [],
     },
   ];
+
   const [addingButton, setAddingButton] = useState({
     open: false,
     tabIndex: null,
@@ -246,7 +243,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
 
   const getDesignDetails = async () => {
     const response = await GetDesignById(recordId)
-    console.log(response, "Hereee")
+    // console.log(response, "Hereee")
     if (response.success) {
       const { fields, formButtons, tabs, designName, views, module, departmentName, subCategory, category, designerName } = response;
       // console.log(category,"category Hereee")
@@ -272,10 +269,14 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
       getDesignDetails()
     }
   }, []);
+
+  const handleModuleChange = (value) => {
+    // console.log(value,"")
+    setModule(value);
+  };
   // console.log(previousFieldsData,"Previous Field Dataaa")
   // console.log(Fields,"Fields Herreee")
-  console.log(FilterButtons, "FilterButtons")
-
+  // console.log(FilterButtons, "FilterButtons")
   return (
     <>
       <div className="h-[92vh] overflow-y-auto p-8 no-scrollbar">
@@ -304,6 +305,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                       setShowCreate(true);
                       setShowTabs(false);
                       setShowPreview(false);
+                      setShowPublish()
                     }}
                     className="bg-transparent"
                   >
@@ -312,11 +314,12 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
 
                   <TabItem
                     type="button"
-                    active={!showTabs && !showPreview && !showCreate}
+                    active={!showTabs && !showPreview && !showCreate && !showPublish}
                     onClick={() => {
                       setShowTabs(false);
                       setShowPreview(false);
                       setShowCreate(false)
+                      setShowPublish(false)
                     }}
                   >
                     Fields
@@ -328,6 +331,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                       if (module?.length > 0) {
                         setShowTabs(true);
                         setShowPreview(false);
+                        setShowPublish(false);
                       } else {
                         alert("Select module");
                       }
@@ -342,6 +346,7 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                       if (module?.length > 0) {
                         setShowPreview(true);
                         setShowTabs(false);
+                        setShowPublish(false);
                       } else {
                         alert("Select module");
                       }
@@ -349,11 +354,27 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                   >
                     Preview
                   </TabItem>
+                  <TabItem
+                    type="button"
+                    onClick={() => {
+                      // if (module?.length > 0) {
 
+                      setShowPublish(true);
+                      setShowTabs(false);
+                      setShowPreview(false);
+                      setShowCreate(false);
+                      // } else {
+                      //   alert("Select module");
+                      // }
+                    }}
+                    active={showPublish}
+                  >
+                    Live
+                  </TabItem>
                 </TabsContainer>
               </div>
 
-              <div className="relative inline-block w-48">
+              {/* <div className="relative inline-block w-48">
                 <button
                   onClick={() => {
                     setTitleObj((prev) => ({ ...prev, open: !prev.open }));
@@ -399,8 +420,8 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                           )}
                         </div>
 
-                        {/* Submodules - now shown to the LEFT */}
-                        {option.subModules.length > 0 &&
+                        // {/* Submodules - now shown to the LEFT */}
+              {/* {option.subModules.length > 0 &&
                           titleObj.hovered === option.name && (
                             <div
                               className="absolute right-full top-0 mr-1 w-40 bg-white border rounded shadow-md z-20"
@@ -437,15 +458,16 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                           )}
                       </div>
                     ))}
-                  </div>
-                )}
-              </div>
+                  </div> */}
+              {/* )}
+              </div> */}
+              <ModuleSelect modules={titleOptions} onChange={handleModuleChange} value={module} />
             </div>
           </div>
           {/* Conditional Screens */}
           <div className="grid grid-cols-1 gap-8">
             {/* Form Designer */}
-            {!showTabs && !showPreview && !showCreate && (
+            {!showTabs && !showPreview && !showCreate && !showPublish && (
               <FormBuilder
                 formFields={formFields}
                 formButtons={formButtons}
@@ -460,7 +482,6 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
                 setFormButtons={setFormButtons}
               />
             )}
-
             {/* Tab Designer */}
             {showTabs && (
               <section className="bg-white p-4 rounded-2xl shadow-lg border border-indigo-100 flex-grow min-w-[320px] transition">
@@ -492,7 +513,13 @@ export default function FormDesignerPage({ recordId: propRecordId }) {
               </section>
             )}
 
-            {(showCreate && !showPreview && !showTabs) && (<Fields path="formDesigner" data={previousFieldsData} />)}
+            {(showCreate && !showPreview && !showTabs && !showPublish) && (<Fields path="formDesigner" data={previousFieldsData} />)}
+
+            {showPublish &&
+              <section className="bg-white  rounded-2xl  flex-grow min-w-[320px] transition">
+                <Fields path="publish" />
+              </section>
+            }
           </div>
         </div>
       </div>

@@ -454,17 +454,18 @@ function Tab({
           </div>
 
           {/* rendered tBale */}
-          <div>
+          {/* <div>
             <ul className="flex gap-2 justify-end items-end">
               {tab?.filters?.map((filter) => (
                 <li key={filter._uid} className="text-blue-600">{filter.label}</li>
               ))}
             </ul>
           </div>
+
           <table className="w-full table-fixed border border-gray-300 rounded-md text-center shadow-sm">
             <thead className="bg-indigo-200 text-indigo-700 font-semibold">
               <tr>
-                {/* Non-action headers */}
+                
                 {tab.tableCols
                   .filter((col) => col.type !== "action")
                   .map((col) => (
@@ -483,7 +484,7 @@ function Tab({
                     </th>
                   ))}
 
-                {/* Single "Actions" header */}
+           
                 {tab.tableCols.some((col) => col.type === "action") && (
                   <th
                     className="border border-gray-300 px-4 py-2"
@@ -502,7 +503,6 @@ function Tab({
             </thead>
             <tbody>
               <tr>
-                {/* Non-action data cells */}
                 {tab.tableCols
                   .filter((col) => col.type !== "action")
                   .map((col) => (
@@ -524,7 +524,7 @@ function Tab({
                   ))}
 
                 {/* Single Actions cell */}
-                {tab.tableCols.some((col) => col.type === "action") && (
+                {/* {tab.tableCols.some((col) => col.type === "action") && (
                   <td
                     className="border border-gray-300 px-4 py-2"
                     style={{
@@ -565,9 +565,10 @@ function Tab({
                     </div>
                   </td>
                 )}
-              </tr>
-            </tbody>
-          </table>
+              </tr> */}
+            {/* </tbody>
+          </table> */} 
+          
         </>
       )}
     </section>
@@ -725,7 +726,7 @@ function TabsDesigner({
           {showAllButtonFields ? "Show Less" : "+ More"}
         </button>
       </div>
-
+{/* Dragging Area */}
       <div
         onDrop={onDropTab}
         onDragOver={allowDrop}
@@ -939,7 +940,7 @@ export default function TabDesigner({ tabs, setTabs, module, filterButtons, setF
         // }
         if (type === "table") {
           setSelectedTabIndex(idx);
-          setOpenTableEventModal(true);
+          // setOpenTableEventModal(true);
           return {
             ...tab,
             type,
@@ -1099,8 +1100,6 @@ export default function TabDesigner({ tabs, setTabs, module, filterButtons, setF
       )
     );
   };
-
-
   const addTabButton = (idx, button) => {
     setTabs((prev) =>
       prev.map((tab, i) =>
@@ -1139,7 +1138,7 @@ export default function TabDesigner({ tabs, setTabs, module, filterButtons, setF
     if (["Edit", "View", "Delete"].includes(column.label)) {
       setSelectedTabIndex(idx);
       setSelectedActionLabel(column.label);
-      setOpenActionModal(true);
+      // setOpenActionModal(true);
     } else {
       // Add regular column
       setTabs((prev) =>
@@ -1484,7 +1483,7 @@ export default function TabDesigner({ tabs, setTabs, module, filterButtons, setF
         moduleName={module}
       />
 
-      <AddTableEventModal
+      {/* <AddTableEventModal
         open={openTableEventModal}
         onClose={() => {
           setOpenTableEventModal(false);
@@ -1495,12 +1494,12 @@ export default function TabDesigner({ tabs, setTabs, module, filterButtons, setF
       />
 
       <AddTableActionEventModal
-        open={openActionModal}
-        onClose={() => setOpenActionModal(false)}
+        // open={openActionModal}
+        // onClose={() => setOpenActionModal(false)}
         onSubmit={handleActionApiSubmit}
         actionLabel={selectedActionLabel}
         moduleName={module}
-      />
+      /> */}
     </>
   );
 }

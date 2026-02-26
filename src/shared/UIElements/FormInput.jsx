@@ -65,6 +65,10 @@ export default function FormInput({
   iconName, inputType, options = []
 }) {
   const [inputFieldType, setInputType] = useState('password')
+  const isDateType =
+    type === "date" || type === "datetime";
+
+  const isTimeType = type === "time";
 
   useEffect(() => {
     if (type !== 'password' || inputType !== 'password') {
@@ -77,20 +81,16 @@ export default function FormInput({
       style={customstyles}
     >
       {/* ✅ Label */}
-
-       <label
-              htmlFor={name}
-              className="w-full !flex gap-2"
-            >
-              {label || 'label'}
-              {isMandatory === true && renderIcons('FaStarOfLife', 5, '#ff0000')}
-              {iconName && <span className="border !border-[#ccc] rounded-[2px] ml-auto flex items-center justify-center p-[2px]">
-                {renderIcons(iconName, 15, 'inherit')}
-              </span>}
-            </label>
-
-
-
+      <label
+        htmlFor={name}
+        className="w-full !flex gap-2"
+      >
+        {label || 'label'}
+        {isMandatory === true && renderIcons('FaStarOfLife', 5, '#ff0000')}
+        {iconName && <span className="border !border-[#ccc] rounded-[2px] ml-auto flex items-center justify-center p-[2px]">
+          {renderIcons(iconName, 15, 'inherit')}
+        </span>}
+      </label>
       {/* ✅ RADIO rendering */}
       {type === "radio" && options ? (
         <div className="flex flex-row gap-6">
@@ -134,6 +134,7 @@ export default function FormInput({
       ) : (
         /* ✅ Default Input rendering */
         <div className="flex items-center gap-2 border group-focus-within:shadow-[0_0_0.5rem_0.1rem_var(--primary-color)] focus-within:shadow-[0_0_0.5rem_0.1rem_var(--primary-color)]">
+
           <input
             id={name}
             value={value}
@@ -142,7 +143,22 @@ export default function FormInput({
             onChange={onChangeHandler}
             className="w-full p-2 border-none outline-none"
           />
-          {/* ✅ Password toggle */}
+
+          {/* ⏱ Time Icon */}
+          {isTimeType && (
+            <span className="pr-2 text-gray-400 pointer-events-none">
+              {renderIcons("LuClock", 16, "inherit")}
+            </span>
+          )}
+
+          {/* 📅 Calendar Icon */}
+          {isDateType && (
+            <span className="pr-2 text-gray-400 pointer-events-none">
+              {renderIcons("LuCalendar", 16, "inherit")}
+            </span>
+          )}
+
+          {/* 👁 Password toggle */}
           {(type === "password" || inputType === "password") &&
             (inputFieldType === "password" ? (
               <span
@@ -160,6 +176,7 @@ export default function FormInput({
               </span>
             ))}
         </div>
+
       )}
     </div>
   );

@@ -5,7 +5,6 @@ import { ReactSelect } from "../StyledComponents";
 import FormInput from "../../../../../shared/UIElements/FormInput";
 import { GetAllDesignes } from "../../../../../utils/CheckAndExecuteFlows/CRUDoperations";
 
-
 const dummyData = [
   {
     name: "Catalog Form",
@@ -195,10 +194,10 @@ export default function DesignTemplates() {
   const fetchNewData = async () => {
     const response = await GetAllDesignes()
     console.log(response, "response from new");
-   if(response.success){
-        setTemplatesData(response.designs);
+    if (response.success) {
+      setTemplatesData(response.designs);
 
-   }
+    }
   }
   const Navigate = useNavigate();
 
@@ -289,10 +288,8 @@ export default function DesignTemplates() {
     <div className="w-full h-full flex flex-col overflow-auto">
       <div className="w-full h-full flex flex-col p-4">
         <div className="w-full grid grid-cols-3 ">
-
           {/* LEFT EMPTY SPACE */}
           <div></div>
-
           {/* CENTER TABS */}
           <div className="w-full flex items-center justify-center gap-6">
             {["Desktop", "Tab", "Mobile"].map((item) => (
@@ -307,22 +304,6 @@ export default function DesignTemplates() {
               </button>
             ))}
           </div>
-
-          {/* RIGHT SELECT DROPDOWN */}
-          <div className="flex justify-end items-center pr-4 ml-40 w-70">
-            <select
-              className="min-w-[100px] border rounded py-1"
-              onChange={(e) => setCategory(e.target.value)}
-              defaultValue="IT"
-            >
-              <option value="IT">IT</option>
-              <option value="HR">HR</option>
-              <option value="Sales">Sales</option>
-              <option value="Agent">Agent</option>
-              <option value="User">User</option>
-            </select>
-          </div>
-
         </div>
 
         <div className="w-full h-fit">
@@ -389,9 +370,11 @@ export default function DesignTemplates() {
                   </div>
                 ))
             ) : (
-              <p className="text-center text-gray-500">
-                No templates available for this selection
-              </p>
+              <div className="border border-2">
+                <p className="text-center text-gray-500">
+                  No templates available for this selection
+                </p>
+              </div>
             )}
           </ul>
         </div>

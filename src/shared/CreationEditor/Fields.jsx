@@ -345,7 +345,8 @@
 //     </div>
 //   );
 // }
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+
 
 import { Loader2, Check, BarChart2, PieChart, Circle } from "lucide-react";
 
@@ -353,7 +354,7 @@ import FormInput from '../../shared/UIElements/FormInput';
 import FormDropdown from '../../shared/UIElements/FormDropdown';
 import FormTextarea from "../UIElements/FormTextarea";
 import SelectWithIcon from "../components/SelectWithIcon";
-
+import ToggleBtn from "../UIElements/ToggleBtn";
 
 const templateFields = {
   name: { value: "", isMandatory: true, type: "text", label: "ReportName" },
@@ -395,6 +396,7 @@ const templateFields = {
 };
 
 const FormDesignerFields = {
+  tablename: { value: "tickets_approvals", isMandatory: true, type: "text", label: "Table Name" },
   name: { value: "", isMandatory: true, type: "text", label: "DesignName" },
   department: {
     value: "",
@@ -455,6 +457,261 @@ const FormDesignerFields = {
       { label: "User", value: "user" },
     ],
   },
+  LifeCycle: {
+    value: "",
+    isMandatory: true,
+    type: "dropdown",
+    label: "Design Stage",
+    options: [
+      { label: "Draft", value: "draft" },
+      { label: "In Design", value: "in_design" },
+      { label: "Ready", value: "ready" },
+      { label: "Published", value: "published" },
+
+    ],
+  },
+  Description: {
+    value: "",
+    isMandatory: false,
+    type: "textarea",
+    label: 'Description'
+  }
+};
+
+const publishFields = {
+  DesignName: {
+    value: "",
+    isMandatory: true,
+    type: "text",
+    label: "Design Name",
+
+  },
+  version: {
+    value: "1.0.0",
+    isMandatory: true,
+    type: "text",
+    label: "Version",
+    readOnly: true
+  },
+  lifecycleStage: {
+    value: "draft",
+    isMandatory: true,
+    type: "dropdown",
+    label: "Design Stage",
+    options: [
+      { label: "Draft", value: "draft" },
+      { label: "Publish", value: "publish" },
+      { label: "Retire", value: "retire" }
+    ]
+  },
+  owner: {
+    value: "",
+    isMandatory: true,
+    type: "dropdown",
+    label: "Owner",
+    options: [] // populate from users API
+  },
+
+  maintainers: {
+    value: [],
+    isMandatory: false,
+    type: "multiselect",
+    label: "Maintainers",
+    options: [] // populate from users API
+  },
+
+  // publishToggle: {
+  //   value: false,
+  //   isMandatory: false,
+  //   type: "toggle",
+  //   label: "Publish Form"
+  // },
+
+  publishedBy: {
+    value: "Nowit",
+    isMandatory: false,
+    type: "text",
+    label: "Published By",
+    readOnly: true
+  },
+
+  publishedAt: {
+    value: "01/01/2026 11:45 ",
+    isMandatory: false,
+    type: "datetime",
+    label: "Published At",
+    readOnly: true
+  },
+  publishNotes: {
+    value: "",
+    isMandatory: false,
+    type: "textarea",
+    label: "Publish Notes / Change Summary"
+  },
+
+};
+const RetiredFields = {
+  DesignName: {
+    value: "",
+    isMandatory: true,
+    type: "text",
+    label: "Design Name",
+
+  },
+  version: {
+    value: "1.0.0",
+    isMandatory: true,
+    type: "text",
+    label: "Version",
+    readOnly: true
+  },
+  lifecycleStage: {
+    value: "draft",
+    isMandatory: true,
+    type: "dropdown",
+    label: "Design Stage",
+    options: [
+      { label: "Draft", value: "draft" },
+      { label: "Publish", value: "publish" },
+      { label: "Retire", value: "retire" }
+    ]
+  },
+
+  retirementType: {
+    value: "",
+    isMandatory: true,
+    type: "dropdown",
+    label: "Retirement Type",
+    options: [
+      { label: "Replaced", value: "replaced" },
+      { label: "Deprecated", value: "deprecated" },
+      { label: "Obsolete", value: "obsolete" },
+      { label: "Merged", value: "merged" }
+    ]
+  },
+
+
+
+  impactLevel: {
+    value: "low",
+    isMandatory: true,
+    type: "dropdown",
+    label: "Impact Level",
+    options: [
+      { label: "Low", value: "low" },
+      { label: "Medium", value: "medium" },
+      { label: "High", value: "high" }
+    ]
+  },
+
+  effectiveRetireDate: {
+    value: "",
+    isMandatory: true,
+    type: "datetime",
+    label: " Retirement Date"
+  },
+
+  retiredBy: {
+    value: "",
+    isMandatory: false,
+    type: "text",
+    label: "Retired By",
+    readOnly: true
+  },
+
+  retiredAt: {
+    value: "",
+    isMandatory: false,
+    type: "datetime",
+    label: "Retired At",
+    readOnly: true
+  },
+  retireReason: {
+    value: "",
+    isMandatory: true,               // REQUIRED when retiring
+    type: "textarea",
+    label: "Retirement Reason"
+  },
+};
+const DraftFields = {
+  DesignName: {
+    value: "",
+    isMandatory: true,
+    type: "text",
+    label: "Design Name",
+    readOnly: true
+  },
+  version: {
+    value: "1.0.0",
+    isMandatory: true,
+    type: "text",
+    label: "Version",
+    readOnly: true
+  },
+
+  lifecycleStage: {
+    value: "draft",
+    isMandatory: true,
+    type: "dropdown",
+    label: "Design Stage",
+    options: [
+      { label: "Draft", value: "draft" },
+      { label: "Publish", value: "publish" },
+      { label: "Retire", value: "retire" }
+    ]
+  },
+  Owner: {
+    value: "",
+    isMandatory: true,
+    type: "dropdown",
+    label: "Owner",
+    options: [] // users API
+  },
+
+  Reason: {
+    value: "",
+    isMandatory: true,
+    type: "dropdown",
+    label: "Draft Reason",
+    options: [
+      { label: "Under Development", value: "under_development" },
+      { label: "Pending Review", value: "pending_review" },
+      { label: "Awaiting Approval", value: "awaiting_approval" },
+      { label: "Blocked", value: "blocked" }
+    ]
+  },
+
+  expectedPublishDate: {
+    value: "",
+    isMandatory: false,
+    type: "date",
+    label: "Expected Publish Date"
+  },
+
+  lastUpdatedBy: {
+    value: "",
+    isMandatory: false,
+    type: "text",
+    label: "Last Updated By",
+    readOnly: true
+  },
+
+  lastUpdatedAt: {
+    value: "",
+    isMandatory: false,
+    type: "datetime",
+    label: "Last Updated At",
+    readOnly: true
+  },
+
+  draftNotes: {
+    value: "",
+    isMandatory: false,
+    type: "textarea",
+    label: "Draft Notes"
+  },
+
+
 };
 
 const WorkFlowFields = {
@@ -502,75 +759,53 @@ const WorkFlowFields = {
   description: { value: "", isMandatory: true, type: "text", label: "Description" },
 };
 
-export default function Fields({ title, data, path }) {
-  const defaultFields = {
-    name: { value: "", isMandatory: false, type: "text", label: "Name" },
-    from: { value: "", isMandatory: true, type: "text", label: "From", iconName: "TfiEmail" },
-    to: { value: "", isMandatory: true, type: "text", label: "To", iconName: "LuMailOpen" },
-    cc: { value: "", isMandatory: true, type: "text", label: "CC", iconName: "MdOutgoingMail" },
-    subject: { value: "", isMandatory: true, type: "text", label: "Subject" },
-    description: { value: "", isMandatory: true, type: "textarea", label: "Description" },
-  };
-  const [FieldsState, setFieldsState] = useState(defaultFields);
+
+const defaultFields = {
+  name: { value: "", isMandatory: false, type: "text", label: "Name" },
+  from: { value: "", isMandatory: true, type: "text", label: "From" },
+  to: { value: "", isMandatory: true, type: "text", label: "To" },
+  cc: { value: "", isMandatory: true, type: "text", label: "CC" },
+  subject: { value: "", isMandatory: true, type: "text", label: "Subject" },
+  description: { value: "", isMandatory: true, type: "textarea", label: "Description" },
+};
+
+export default function Fields({ data, path }) {
+  const [FieldsState, setFieldsState] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  console.log(data, "Data Hereeee in Child");
+  const [lifecycleStage, setLifecycleStage] = useState("draft");
+  const LIFECYCLE_SCHEMAS = {
+    draft: DraftFields,
+    publish: publishFields,
+    retire: RetiredFields,
+  };
+  /* ================= INITIAL LOAD ================= */
+  useEffect(() => {
+    let baseSchema = defaultFields;
+
+    if (path === "publish") baseSchema = publishFields;
+    if (path === "formDesigner") baseSchema = FormDesignerFields;
+    if (path === "flowreport") baseSchema = templateFields;
+    if (path === "workFlow") baseSchema = WorkFlowFields;
+
+    setFieldsState(baseSchema);
+    setIsLoading(false);
+  }, [path]);
+
+  /* ================= LIFECYCLE HANDLING ================= */
 
   useEffect(() => {
-    let baseFields = defaultFields;
-    if (path === "flowreport") baseFields = templateFields;
-    else if (path === "formDesigner") baseFields = FormDesignerFields;
-    else if (path === "workFlow") baseFields = WorkFlowFields;
+    if (path !== "publish") return;
 
-    const saved = JSON.parse(localStorage.getItem(`${path}Data`));
+    const schema = LIFECYCLE_SCHEMAS[lifecycleStage];
 
-    // CASE 1: If data is passed (EDIT mode)
-    if (data) {
-      const merged = {};
-
-      Object.keys(baseFields).forEach((key) => {
-        const incomingValue = data[key]?.value ?? data[key];
-
-        const hasValue =
-          incomingValue !== undefined &&
-          incomingValue !== null &&
-          incomingValue !== "";
-
-        merged[key] = {
-          ...baseFields[key],
-          value: hasValue
-            ? incomingValue
-            : baseFields[key].value,
-        };
-      });
-
-      setFieldsState(merged);
-      setIsLoading(false);
-      return;
+    if (schema) {
+      setFieldsState(schema);
     }
+  }, [lifecycleStage, path]);
 
-    // CASE 2: If localStorage exists
-    if (saved) {
-      const merged = {};
-      Object.keys(baseFields).forEach((key) => {
-        merged[key] = {
-          ...baseFields[key],
-          value: saved[key]?.value ?? "",
-        };
-      });
-      // console.log(FieldsState, "Fields Stateeee")
-      setFieldsState(merged);
-      setIsLoading(false);
-      return;
-    }
 
-    // CASE 3: Default schema
-    setFieldsState(baseFields);
-    setIsLoading(false);
-  }, [path, data]);
+  /* ================= HANDLERS ================= */
 
-  const saveToLocalStorage = () => {
-    localStorage.setItem(`${path}Data`, JSON.stringify(FieldsState));
-  };
   const onChangeInput = (e) => {
     const { id, value } = e.target;
     setFieldsState((prev) => ({
@@ -578,125 +813,119 @@ export default function Fields({ title, data, path }) {
       [id]: { ...prev[id], value },
     }));
   };
+
   const onChangeDropdown = (e, id) => {
     setFieldsState((prev) => ({
       ...prev,
       [id]: { ...prev[id], value: e.value },
     }));
+
+    if (id === "lifecycleStage") {
+      setLifecycleStage(e.value);
+    }
   };
-  const capitalize = (str = "") =>
-    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+  /* ================= RENDER FIELD ================= */
 
   const renderField = (key, field) => {
-    const value = field?.value || "";
-
+    if (!field) return null;
 
     if (field.type === "dropdown") {
-      // console.log(field.options,"Field Options Here....")
-      // console.log(value,"value")  
-      // console.log(field,"field Hereeee")
-      const normalizedValue = Array.isArray(value)
-        ? value[0]
-        : Array.isArray(field.value)
-          ? field.value[0]
-          : value ?? field.value;
+      if (field.label === "GraphType") return <SelectWithIcon />;
 
-
-      if (field.label === "GraphType") {
-        return <SelectWithIcon />;
-      }
-      // console.log(value,"value")
       return (
         <FormDropdown
           key={key}
-          label={capitalize(field.label || key)}
-          name={key}
+          label={field.label}
           options={field.options}
+          value={field.value}
           isMandatory={field.isMandatory}
-          value={normalizedValue || field.value}
-          // value={field.value}
           onChangeHandler={(e) => onChangeDropdown(e, key)}
-          defaultValue={normalizedValue}// if the value is  a list pass the list [0] here
         />
       );
     }
+
     if (field.type === "textarea") {
       return (
         <FormTextarea
           key={key}
-          label={capitalize(field.label || key)}
-          name={key}
+          label={field.label}
+          value={field.value}
           isMandatory={field.isMandatory}
-          value={value}
-          placeholder={`Enter ${capitalize(field.label || key)}`}
           onChangeHandler={onChangeInput}
         />
       );
     }
+
+    if (field.type === "toggle") {
+      return (
+        <div className="flex justify-between">
+          <label>{field.label}</label>
+          <ToggleBtn />
+        </div>
+      );
+    }
+
     return (
       <FormInput
         key={key}
         inputType={field.type}
         name={key}
-        label={capitalize(field.label || key)}
-        value={value}
+        label={field.label}
+        value={field.value}
         isMandatory={field.isMandatory}
-        placeholder={`Enter ${capitalize(field.label || key)}`}
         onChangeHandler={onChangeInput}
       />
     );
   };
-  const entries = Object.entries(FieldsState);
 
-  // console.log(data, "Data Here")
-  // console.log(FieldsState, "FieldsState Here....")
-  // console.log(entries, "Entries Hereee")
+  /* ================= UI ================= */
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        <Loader2 className="animate-spin w-6 h-6 mr-2" />
+        Loading fields...
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full h-[100vh] flex justify-center items-start px-4 py-6">
-      <div className="w-full bg-white rounded-xl shadow overflow-auto flex flex-col p-4">
+    <div className="w-full min-h-screen flex justify-center">
+      <div className="w-full bg-white rounded-xl shadow p-6 overflow-auto">
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-3 border-gray-200">
-          <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
-
+        <div className="flex justify-end mb-4">
           <button
-            onClick={saveToLocalStorage}
-            className="px-4 py-2 !bg-blue-600 text-white !rounded-lg shadow hover:bg-blue-700 transition"
+            onClick={() =>
+              localStorage.setItem(`${path}Data`, JSON.stringify(FieldsState))
+            }
+            className="px-4 py-2 !bg-blue-600 text-white rounded"
           >
             Save
           </button>
         </div>
 
-        {/* Fields */}
-        {isLoading ? (
-          <div className="flex justify-center items-center min-h-[50vh] text-gray-500 text-lg">
-            <Loader2 className="animate-spin w-6 h-6 mr-2" /> Loading fields...
-          </div>
-        ) : (
-          <div className="w-full flex flex-col gap-4 md:px-10 px-2 py-4">
-            {entries.reduce((rows, [key, field], i) => {
-              if (i % 2 === 0) {
-                const next = entries[i + 1];
-                rows.push([[key, field], next]);
-              }
-              return rows;
-            }, [])
-              .map((pair, index) => (
-                <div key={index} className="flex flex-col md:flex-row gap-4">
-                  <div className="w-full md:w-1/2">{renderField(pair[0][0], pair[0][1])}</div>
+        <div className="flex flex-col gap-4">
+          {Object.entries(FieldsState).map(([key, field], i) => {
+            if (i % 2 !== 0) return null;
+            const next = Object.entries(FieldsState)[i + 1];
 
-                  {pair[1] && (
-                    <div className="w-full md:w-1/2">
-                      {renderField(pair[1][0], pair[1][1])}
-                    </div>
-                  )}
+            return (
+              <div key={key} className="flex flex-col md:flex-row gap-4">
+                <div className="w-full md:w-1/2">
+                  {renderField(key, field)}
                 </div>
-              ))}
-          </div>
-        )}
+                {next && (
+                  <div className="w-full md:w-1/2">
+                    {renderField(next[0], next[1])}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
       </div>
     </div>
   );
 }
-

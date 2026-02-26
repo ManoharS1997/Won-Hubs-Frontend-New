@@ -21,7 +21,7 @@ import {
 } from "react-icons/io";
 import {
   IoKey, IoAddOutline, IoNotificationsOutline, IoChevronBack, IoExitOutline,
-  IoEye, IoEyeOff, IoSchool, IoGlobe, IoChevronBackOutline
+  IoEye, IoEyeOff, IoSchool, IoGlobe, IoChevronBackOutline,IoClose 
 } from "react-icons/io5";
 import {
   GrRadialSelected, GrMore, GrResources, GrShieldSecurity, GrIntegration,
@@ -74,7 +74,7 @@ import { MdFreeCancellation } from "react-icons/md";
 import { IoChevronForward } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
 import { FiTool } from "react-icons/fi";
-
+import { LuClock } from "react-icons/lu";
 
 
 const iconMap = {
@@ -103,7 +103,7 @@ const iconMap = {
   TfiEmail, HiOutlineMailOpen, LuMailOpen, MdOutgoingMail, MdOutlineKeyboardArrowDown, MdPieChart, BiBarChart, AiOutlineLineChart,
   MdAreaChart, FaBox, MdBarChart, GiFunnel, RiDonutChartFill, BiScatterChart, MdRadar, TbGauge, MdGridOn, TbCircles,
   TbChartHistogram, TbChartCandle, FaClockRotateLeft, MdFreeCancellation, IoChevronForward, GoPlus,
-  FiTool,
+  FiTool,IoClose,LuClock
 };
 
 export default function renderIcons(icon, size = 20, color = "#000") {

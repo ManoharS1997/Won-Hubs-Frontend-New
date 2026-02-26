@@ -3,6 +3,7 @@ import Select from "react-select";
 import renderIcons from "../functions/renderIcons";
 import Cookies from "js-cookie";
 
+
 export const customStyles = {
   container: (base, state) => ({
     ...base,

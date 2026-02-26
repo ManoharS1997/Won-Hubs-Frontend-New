@@ -167,9 +167,10 @@ import NewCalendar from "./modules/Admin-Portal/Calender/pages/NewCalendar.jsx";
 import UpdatedEventModal from "./modules/Admin-Portal/Calender/pages/EventModalUpdated.jsx";
 import TestingTableView from "./modules/Admin-Portal/FormDesignerTesting/FormTestingTableView.jsx";
 import TableCompnent2 from "./modules/TableComponent/components/TabTable2.jsx";
-
-
-
+import AddIconComponent from "./shared/CreationEditor/AddIcon.jsx";
+import ModuleSelect from "./modules/Admin-Portal/form/selecteModule.jsx";
+import ConfigureFieldsComponent from "./modules/TableComponent/pages/ConfigureFields.jsx";
+import PublishFieldsPage from "./modules/Admin-Portal/form/FieldsPage.jsx";
 const router = createBrowserRouter([
   // Public routes (no authentication required)
   {
@@ -784,13 +785,9 @@ const router = createBrowserRouter([
           {
             path: '/formtest',
             // element: <FormDesignerTesting />
-            element: <TestingTableView />
+            element: <PublishFieldsPage />
 
-          },{
-            path:"/test-table",
-            element:<TableCompnent2 />
-          }
-
+          }, 
         ],
       },
       // User portal layout routes

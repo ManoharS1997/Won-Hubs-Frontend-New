@@ -229,6 +229,7 @@ export default function FormUIDemo({ recordId, tableName }) {
     // console.log(recordId, "recordId")
     // console.log(formValues, "formvalues @parent");
     // console.log(activeFields, "Active Fields @parent");
+    
     return (
         <div className="w-full min-h-[90%] bg-white font-sans max-h-[90%] overflow-hidden p-0">
             {/* TABS */}

@@ -3376,7 +3376,7 @@ export const GetAllDesignes = async () => {
     };
 
     const response = await fetch(url, options);
-    console.log(response, "response from SaveDynamicRecord");
+    // console.log(response, "response from SaveDynamicRecord");
     if (!response.ok) {
       const err = await response.json();
       // console.error("SaveDynamicRecord Error:", err);
@@ -3428,3 +3428,74 @@ export const UpdateTabRecord = async (designName, fields, recordId = null, activ
   }
 };
 
+// configure Fields
+export const GetConfigureFields = async (tableName) => {
+  try {
+    const url = `${apiUrl}/api/configure/${tableName}`;
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+    };
+    const response = await fetch(url, options);
+    console.log(response, "reponse from the configure");
+    if (response.ok) {
+      const data = await response.json();
+      // console.log(data, "response Data");
+      return data;
+    }
+  } catch (err) {
+    console.error("error getting add user form fields", err);
+  }
+}
+
+export const SaveConfigureFields = async (tableName, columns) => {
+  // console.log(columns, "columns here, triggering");
+
+  try {
+    const url = `${apiUrl}/api/configure/${tableName}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
+      body: JSON.stringify({
+        columns, // ✅ array goes directly
+      }),
+    });
+
+    console.log(response, "response from configure");
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to save config");
+    }
+
+    return data;
+  } catch (err) {
+    console.error("error saving configure fields", err);
+    throw err;
+  }
+};
+
+
+export const GetSaveConfigFields = async (tableName) => {
+  try {
+    const url = `${apiUrl}/api/selectedColumns/configure/${tableName}`;
+    const response = await fetch(url);
+    // console.log(response, "response from configure");
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to save config");
+    }
+    return data;
+  } catch (err) {
+    console.error("error saving configure fields", err);
+    throw err;
+  }
+}

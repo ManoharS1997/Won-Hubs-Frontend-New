@@ -102,7 +102,7 @@ const CustomToolbar = ({ searchText, setSearchText, onAddRow, allowedFilters = [
     );
 };
 
-const TableCompnent2 = ({ tableObj, formValues, recordId, activeTab, designName, allowedFilters }) => {
+const TableCompnent2 = ({ tableObj, formValues, recordId, activeTab, designName, allowedFilters, isPreview }) => {
     const [persistedRows, setPersistedRows] = useState(initialRows); // READ-ONLY
     const [draftRows, setDraftRows] = useState([]);
     const [EditedRows, setEditedRows] = useState(
@@ -116,9 +116,30 @@ const TableCompnent2 = ({ tableObj, formValues, recordId, activeTab, designName,
     const [editingRow, setEditingRow] = useState(null); // null = add mode
 
     const gridColumns = useMemo(() => {
-        if (!tableObj?.fields) return [];
+        const Items = isPreview ? tableObj?.tableCols : tableObj?.fields
+        // if (!tableObj?.fields) return [];
 
-        return [...tableObj.fields]
+        // return [...tableObj.fields]
+        //     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+        //     .map(field => ({
+        //         field: field.key,
+        //         headerName: field.label,
+        //         flex: 1,
+        //         editable: field.type !== "custom", // 🔒 system fields non-editable
+        //         renderCell: (params) => {
+        //             // Optional: custom rendering
+        //             if (field.type === "custom") {
+        //                 return params.value
+        //                     ? new Date(params.value).toLocaleString()
+        //                     : "";
+        //             }
+        //             return params.value;
+        //         },
+        //     }));
+
+        if (!Items) return [];
+
+        return [...Items]
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
             .map(field => ({
                 field: field.key,
@@ -135,6 +156,9 @@ const TableCompnent2 = ({ tableObj, formValues, recordId, activeTab, designName,
                     return params.value;
                 },
             }));
+
+
+
     }, [tableObj]);
 
     useEffect(() => {
@@ -263,7 +287,7 @@ const TableCompnent2 = ({ tableObj, formValues, recordId, activeTab, designName,
                             },
                         }}
                         pageSizeOptions={[6]}
-
+                        hideFooter={{ isPreview }}
                         // pageSizeOptions={[5, 10]}
                         processRowUpdate={(newRow) => {
                             if (newRow.__isDraft) {

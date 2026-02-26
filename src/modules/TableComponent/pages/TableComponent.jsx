@@ -6,6 +6,7 @@ import {
   getTableData,
   UpdateSelectedColumns,
   DeleteRecord,
+  GetSaveConfigFields,
 } from "../../../utils/CheckAndExecuteFlows/CRUDoperations";
 // import { Tooltip } from 'react-tooltip';
 import PropTypes from "prop-types";
@@ -88,6 +89,7 @@ import FormDesignerPage from "../../Admin-Portal/form/formDesignerPage";
 import CreateFeedBack2 from "../../Admin-Portal/Feedback/pages/CreateFeedBack2";
 import FlowStepComponent from "../../Admin-Portal/Templates/pages/FlowStep";
 import FormUIDemo from "./FormDetailedView";
+import ConfigureFieldsComponent from "./ConfigureFields";
 const conditions = ["Like", "Not Like", "Equals To", "Not Equals To"];
 
 // <<<<<Model Styles
@@ -195,7 +197,7 @@ export default function TableComponent({
   const [oppenedRecordsList, setOppenedRecordsList] = useState([]);
   const navigate = useNavigate();
   const maxPages = Math.ceil(recievedTableData.length / 10);
-  const implemented_designs = ['Companies', 'Groups', 'form_test','designs']
+  const implemented_designs = ['Companies', 'Groups', 'form_test', 'designs']
   function formatDateForMySQL(isoDateString) {
     const date = new Date(isoDateString);
 
@@ -211,7 +213,7 @@ export default function TableComponent({
   useEffect(() => {
     setTableData(tableData);
     setAllTableFields(TableColumnNames || []);
-    getSelectedColumns();
+    getSelectedColumns(tableName);
   }, [tableData, TableColumnNames]);
 
   useEffect(() => {
@@ -227,6 +229,12 @@ export default function TableComponent({
       (item) => item[0].toUpperCase() + item.slice(1)
     );
     return convertedName.join(" ");
+  };
+
+  const convertBackendToFrontend = (field) => {
+    if (!field || typeof field !== "string") return field;
+
+    return field.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
   };
 
   // const OnSelectedRowActions = (action) => {
@@ -247,16 +255,19 @@ export default function TableComponent({
   };
 
   const getSelectedColumns = async () => {
-    const columns = await getTableData("table_selected_columns");
-    // console.log(columns, "in get selected")
-    const displayColumns =
-      columns?.table_selected_columns?.filter((record) => {
-        // console.log(record.table_name, tableName)
-        return record.table_name === tableName;
-      })[0]?.selected_columns || [];
-    // console.log(displayColumns,"in display")
+    const data = await GetSaveConfigFields(tableName);
+    console.log(data, "Heree@new saveFields");
+    // SAFELY extract columns array
+    const columnsArray =
+      data?.data?.[0]?.columns ||   // if wrapped in data[]
+      data?.columns ||              // if direct
+      [];
+    // Convert to array of strings expected by UI
+    const displayColumns = columnsArray
+      .filter(col => col.checked)   // only selected
+      .map(col => col.name);
+    console.log(displayColumns, "display columns")      // extract column name
     setSelectedColumns(displayColumns);
-
   };
 
   const SelectAllCheckBox = (e) => {
@@ -666,8 +677,9 @@ export default function TableComponent({
   // console.log(recievedTableData, "tableData here")
   // console.log(selectedRowIds, "selectedRowIds")
   // console.log(selectedTab,"Selected Tab")
-  // console.log(tableName,"tableName")
-  console.log(selectedColumns, "selectedColumns Hereee")
+  console.log(tableName, "tableName")
+  console.log(recievedTableData, "recievedTableData")
+
   return (
     <MainContainer>
       <div className="w-full h-fit bg-[var(--bakground-color)] pb-[4px] mb-2 overflow-auto scrollbar-hide ">
@@ -806,7 +818,11 @@ export default function TableComponent({
                 <ConfigureButton
                   title="Configure Fields"
                   type="button"
-                  onClick={() => setConfigure(true)}
+                  onClick={
+                    () =>
+                      setConfigure(prev => !prev)
+                    // ()=>isConfigureActive(prev=>!prev)
+                  }
                 >
                   <GrConfigure />
                 </ConfigureButton>
@@ -917,25 +933,11 @@ export default function TableComponent({
                 )}
               </FilterContainer>
             ))}
-          {/* </FiltersContainer> */}
-          {/* {console.log(allTableFields, "allTableFields Hereee")}
-          {console.log(selectedColumns, "selectedColumns Hereee")} */}
-          {showConfigurefieldsBtn === true && (
-            <ConfigureFields
-              isConfigureActive={isConfigureActive}
-              closeConfig={closeConfig}
-              customStyles={customStyles}
-              TableColumnNames={allTableFields?.map((field, index) => ({
-                ...field,
-                id: index,
-              }))}
-              allFields={allTableFields}
-              setSelectedColumns={setSelectedColumns}
-              selectedColumns={implemented_designs.includes(tableName)?TableColumnNames:selectedColumns}
-              recievedTableData={recievedTableData}
-              setTableColumnNames={setAllTableFields}
-            />
-          )}
+
+
+          {isConfigureActive &&
+            <ConfigureFieldsComponent tableData={tableData} schema={TableColumnNames} tableName={tableName} selectedColumns={selectedColumns} />
+          }
 
           <TableContainer>
             {isLoading ? (
@@ -990,10 +992,11 @@ export default function TableComponent({
                       );
                     })}
                   {
-                    implemented_designs.includes(tableName)  &&
-                    Array.isArray(TableColumnNames) &&
-                    TableColumnNames.length > 0 &&
-                    camelCaseToReadable(TableColumnNames).map((column) => (
+                    implemented_designs.includes(tableName) &&
+                    Array.isArray(selectedColumns) &&
+
+                    selectedColumns.length > 0 &&
+                    camelCaseToReadable(selectedColumns).map((column) => (
                       <CustomTh key={column}>
                         <ThContent>
                           <span>{column}</span>
@@ -1047,7 +1050,8 @@ export default function TableComponent({
                             />
                           </CustomTd>
 
-                          {(tableName !== 'formtest') && (tableName !== 'Groups') && selectedColumns.map((column) => {
+                          {(tableName !== 'formtest') && (tableName !== 'Groups') && (tableName !== 'designs') && selectedColumns.map((column) => {
+                            console.log("Triggering at 1")
                             return rdtColValue === column.name ? (
                               <CustomTd
                                 key={column.name}
@@ -1113,7 +1117,8 @@ export default function TableComponent({
                           })}
                           {
                             implemented_designs.includes(tableName) &&
-                            TableColumnNames.map((column) => {
+                            selectedColumns.map((column) => {
+                              // console.log("Triggering at 2", column)
                               return rdtColValue === column ? (
                                 <CustomTd
                                   key={column}
@@ -1171,7 +1176,7 @@ export default function TableComponent({
                                       ? formatDateForMySQL(row[column])
                                       : column.type === "json"
                                         ? "json data"
-                                        : row[column]}
+                                        : row[convertBackendToFrontend(column)]}
                                 </CustomTd>
                               );
                             })
